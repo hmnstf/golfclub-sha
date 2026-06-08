@@ -1,0 +1,152 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { resolveStatus, getSperrzeit, getUpcomingSperrzeiten } from '../lib/platzstatus';
+
+let rawStatus: any = {
+  hauptplatz: 'auto', kurzplatz: 'auto', drivingRange: 'auto', cafe: 'auto', carts: 'open',
+  hinweis: '', sperrzeiten: [],
+  zeitsteuerung: {
+    hauptplatzOeffnet: '07:00', hauptplatzSchliesst: '20:00',
+    kurzplatzOeffnet: '07:00', kurzplatzSchliesst: '21:00',
+    drivingRangeOeffnet: '07:00', drivingRangeSchliesst: '21:00',
+    cafeOeffnet: '09:00', cafeSchliesst: '21:00',
+  },
+};
+try {
+  const f = await import('../content/platzstatus/index.json').catch(() => null);
+  if (f?.default) rawStatus = { ...rawStatus, ...f.default };
+} catch {}
+
+const zt = rawStatus.zeitsteuerung ?? {};
+const sperrzeiten = rawStatus.sperrzeiten ?? [];
+
+const sz = {
+  hauptplatz: getSperrzeit(sperrzeiten, 'hauptplatz'),
+  kurzplatz:  getSperrzeit(sperrzeiten, 'kurzplatz'),
+  drivingRange: getSperrzeit(sperrzeiten, 'drivingRange'),
+  carts: getSperrzeit(sperrzeiten, 'carts'),
+};
+
+const resolved = {
+  hauptplatz:  resolveStatus(rawStatus.hauptplatz,  zt.hauptplatzOeffnet,  zt.hauptplatzSchliesst,  sz.hauptplatz),
+  kurzplatz:   resolveStatus(rawStatus.kurzplatz,   zt.kurzplatzOeffnet,   zt.kurzplatzSchliesst,   sz.kurzplatz),
+  drivingRange:resolveStatus(rawStatus.drivingRange,zt.drivingRangeOeffnet,zt.drivingRangeSchliesst,sz.drivingRange),
+  cafe:        resolveStatus(rawStatus.cafe,         zt.cafeOeffnet,        zt.cafeSchliesst),
+  carts:       resolveStatus(rawStatus.carts ?? 'open', undefined, undefined, sz.carts),
+};
+
+const upcoming = getUpcomingSperrzeiten(sperrzeiten);
+
+const statusMap: Record<string, { label: string; dot: string; bg: string; border: string }> = {
+  open:    { label: 'Geöffnet',      dot: 'bg-emerald-500', bg: 'bg-white',         border: 'border-gray-100' },
+  limited: { label: 'Eingeschränkt', dot: 'bg-amber-400',   bg: 'bg-amber-50',      border: 'border-amber-200' },
+  closed:  { label: 'Geschlossen',   dot: 'bg-red-500',     bg: 'bg-red-50',        border: 'border-red-200' },
+};
+
+const items = [
+  { label: 'Meisterschaftsplatz (18 Loch)', status: resolved.hauptplatz, oeffnet: zt.hauptplatzOeffnet,  schliesst: zt.hauptplatzSchliesst },
+  { label: 'Kurzplatz (6 Loch)',            status: resolved.kurzplatz,  oeffnet: zt.kurzplatzOeffnet,   schliesst: zt.kurzplatzSchliesst },
+  { label: 'Driving Range',                 status: resolved.drivingRange,oeffnet: zt.drivingRangeOeffnet,schliesst: zt.drivingRangeSchliesst },
+  { label: 'Restaurant / Café Brassie',     status: resolved.cafe,       oeffnet: zt.cafeOeffnet,        schliesst: zt.cafeSchliesst },
+  { label: 'Carts / Elektrobuggys',         status: resolved.carts,      cartsMode: true },
+];
+
+function formatDate(d: string) {
+  const [y,m,day] = d.split('-');
+  return `${day}.${m}.${y}`;
+}
+---
+
+<Layout title="Platzstatus" description="Aktueller Platzstatus – Golfclub Schwäbisch Hall">
+  <div class="bg-[#132e21] py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Aktuell</p>
+      <h1 class="font-serif text-5xl text-white mb-2">Platzstatus</h1>
+      <p class="text-white/50 text-sm">Wird täglich aktualisiert. Stand: heute</p>
+    </div>
+  </div>
+
+  <section class="py-16 bg-white">
+    <div class="max-w-3xl mx-auto px-4">
+
+      {rawStatus.hinweis && (
+        <div class="mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded">
+          <strong>📢 Hinweis:</strong> {rawStatus.hinweis}
+        </div>
+      )}
+
+      <!-- Aktive Sperrzeit Banner -->
+      {upcoming.filter((s: any) => s.isActive).map((s: any) => (
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 text-sm flex items-start gap-3">
+          <span class="text-lg">🚫</span>
+          <div>
+            <strong>Sperrzeit aktiv:</strong> {s.grund || 'Temporäre Sperrung'}<br/>
+            <span class="text-red-600 text-xs">{formatDate(s.vonDatum)} – {formatDate(s.bisDatum)}</span>
+          </div>
+        </div>
+      ))}
+
+      <!-- Status-Liste -->
+      <div class="divide-y divide-gray-100 border border-gray-100">
+        {items.map(({ label, status, oeffnet, schliesst, cartsMode }: any) => {
+          const s = statusMap[status] ?? statusMap.open;
+          const displayLabel = cartsMode
+            ? (status === 'open' ? 'Erlaubt' : status === 'limited' ? 'Eingeschränkt' : 'Nicht erlaubt')
+            : s.label;
+          return (
+            <div class={`flex items-center justify-between px-6 py-4 ${s.bg}`}>
+              <div class="flex items-center gap-3">
+                <span class={`w-2.5 h-2.5 rounded-full shrink-0 ${s.dot}`}></span>
+                <div>
+                  <span class="font-medium text-[#132e21] text-sm">{label}</span>
+                  {!cartsMode && oeffnet && schliesst && (
+                    <div class="text-xs text-gray-400 mt-0.5">Öffnungszeiten: {oeffnet} – {schliesst} Uhr</div>
+                  )}
+                </div>
+              </div>
+              <span class="text-sm font-semibold text-gray-700 shrink-0">{displayLabel}</span>
+            </div>
+          );
+        })}
+      </div>
+
+      <!-- Geplante Sperrzeiten -->
+      {upcoming.filter((s: any) => !s.isActive).length > 0 && (
+        <div class="mt-12">
+          <h2 class="font-serif text-2xl text-[#132e21] mb-6">Geplante Sperrzeiten</h2>
+          <div class="space-y-3">
+            {upcoming.filter((s: any) => !s.isActive).map((s: any) => (
+              <div class="flex items-start gap-4 p-4 bg-[#f5f5f0] border border-gray-200">
+                <div class="bg-[#132e21] text-white text-xs font-bold px-2 py-1 shrink-0 min-w-[80px] text-center">
+                  {s.daysUntil === 1 ? 'Morgen' : `in ${s.daysUntil} Tagen`}
+                </div>
+                <div>
+                  <div class="font-medium text-[#132e21] text-sm">{s.grund || 'Sperrzeit'}</div>
+                  <div class="text-xs text-gray-500 mt-0.5">{formatDate(s.vonDatum)} – {formatDate(s.bisDatum)}</div>
+                  <div class="flex flex-wrap gap-2 mt-2">
+                    {s.hauptplatz && s.hauptplatz !== 'auto' && (
+                      <span class="text-xs px-2 py-0.5 bg-white border border-gray-200 text-gray-600">Hauptplatz: {s.hauptplatz === 'closed' ? 'Geschlossen' : 'Eingeschränkt'}</span>
+                    )}
+                    {s.kurzplatz && s.kurzplatz !== 'auto' && (
+                      <span class="text-xs px-2 py-0.5 bg-white border border-gray-200 text-gray-600">Kurzplatz: {s.kurzplatz === 'closed' ? 'Geschlossen' : 'Eingeschränkt'}</span>
+                    )}
+                    {s.drivingRange && s.drivingRange !== 'auto' && (
+                      <span class="text-xs px-2 py-0.5 bg-white border border-gray-200 text-gray-600">Driving Range: {s.drivingRange === 'closed' ? 'Geschlossen' : 'Eingeschränkt'}</span>
+                    )}
+                    {s.carts && s.carts !== 'auto' && (
+                      <span class="text-xs px-2 py-0.5 bg-white border border-gray-200 text-gray-600">Carts: {s.carts === 'closed' ? 'Verboten' : 'Eingeschränkt'}</span>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <p class="text-xs text-gray-400 mt-8 text-center">
+        Bei Fragen zum Platzstatus: <a href="tel:+4979078190" class="hover:text-[#132e21]">+49 7907 8190</a>
+      </p>
+    </div>
+  </section>
+</Layout>

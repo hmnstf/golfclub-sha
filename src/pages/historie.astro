@@ -1,0 +1,136 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const meilensteine = [
+  {
+    jahr: '1982–1986',
+    titel: 'Die Idee entsteht',
+    text: 'Nach langen Vorbereitungen, die bereits 1982 begannen, reifte der Plan, in Schwäbisch Hall einen Golfclub zu gründen. Engagierte Bürger trieben das Projekt voran und schufen die nötigen Voraussetzungen.',
+    highlight: false,
+  },
+  {
+    jahr: '26. April 1987',
+    titel: 'Gründungsversammlung',
+    text: 'Mit der Gründungsversammlung am 26. April 1987 wurde der Startschuss zur Realisierung eines Golfplatzes gegeben. Mit Unterstützung der Stadt Schwäbisch Hall gelang es, die Voraussetzungen für die Umsetzung zu schaffen.',
+    highlight: true,
+  },
+  {
+    jahr: '1989',
+    titel: 'Baubeginn',
+    text: 'Der Bau des Golfplatzes begann 1989. Parallel dazu startete 1991 der Bau der Caddyhalle, die bis zur Einweihung schon fast fertiggestellt war.',
+    highlight: false,
+  },
+  {
+    jahr: '6. September 1991',
+    titel: 'Feierliche Einweihung',
+    text: 'Am 6. September 1991 wurde der Platz feierlich eingeweiht. Ein historischer Tag für den Golfsport in der Region Schwäbisch Hall.',
+    highlight: true,
+  },
+  {
+    jahr: '1993',
+    titel: 'Neuer Präsident',
+    text: 'In der Mitgliederversammlung 1993 wurden die Weichen für die Planung der zweiten 9-Loch-Anlage gestellt. Kurt Schmelzle folgte Dr. Eike Bücher als Präsident nach.',
+    highlight: false,
+  },
+  {
+    jahr: 'März 1995',
+    titel: 'Beschluss zur Erweiterung',
+    text: 'Im März 1995 wurde der Bau der zweiten 9 Bahnen beschlossen – ein großer Schritt zur heutigen 18-Loch-Meisterschaftsanlage.',
+    highlight: false,
+  },
+  {
+    jahr: 'Herbst 1995',
+    titel: 'Auszeichnung für Beispielhaftes Bauen',
+    text: 'Eine besondere Auszeichnung konnte die Anlage im Jahr 1995 verzeichnen: Im Rahmen des Architekturwettbewerbes „Beispielhaftes Bauen" im Kreis 85–95 erhielt unser Platz als erster in Baden-Württemberg dafür einen Preis der Architektenkammer Baden-Württemberg.',
+    highlight: true,
+  },
+  {
+    jahr: 'Heute',
+    titel: 'Ein lebendiger Club',
+    text: 'Heute ist der Golfclub Schwäbisch Hall e.V. ein lebendiger Verein mit einer wachsenden Mitgliedergemeinschaft, einer modernen 18-Loch-Anlage, einem 6-Loch-Kurzplatz, einer Übungsanlage und dem Restaurant Brassie.',
+    highlight: false,
+  },
+];
+---
+
+<Layout title="Historie" description="Die Geschichte des Golfclub Schwäbisch Hall seit 1987">
+
+  <div class="bg-[#132e21] py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Club</p>
+      <h1 class="font-serif text-5xl text-white mb-4">Unsere Geschichte</h1>
+      <p class="text-white/60 max-w-2xl">Vom ersten Spatenstich 1989 zur modernen 18-Loch-Anlage – die Geschichte des Golfclub Schwäbisch Hall.</p>
+    </div>
+  </div>
+
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4">
+
+      <!-- Kennzahlen -->
+      <div class="grid grid-cols-3 gap-6 mb-16">
+        {[
+          { zahl: '1987', label: 'Gründungsjahr' },
+          { zahl: '38+', label: 'Jahre Geschichte' },
+          { zahl: '18', label: 'Loch Meisterschaftsplatz' },
+        ].map(({ zahl, label }) => (
+          <div class="text-center py-8 bg-[#f5f5f0]">
+            <div class="font-serif text-4xl text-[#c4a94a] font-bold mb-1">{zahl}</div>
+            <div class="text-xs text-gray-400 uppercase tracking-wider">{label}</div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Timeline -->
+      <div class="relative">
+        <!-- Vertikale Linie -->
+        <div class="absolute left-[7.5rem] top-0 bottom-0 w-px bg-gray-200 hidden md:block"></div>
+
+        <div class="space-y-8">
+          {meilensteine.map((m) => (
+            <div class="md:grid md:grid-cols-[8rem_1fr] gap-8 items-start">
+              <!-- Jahr -->
+              <div class="hidden md:block text-right pr-8 pt-1">
+                <span class={`text-xs font-bold uppercase tracking-wider ${m.highlight ? 'text-[#c4a94a]' : 'text-gray-400'}`}>
+                  {m.jahr}
+                </span>
+              </div>
+
+              <!-- Inhalt -->
+              <div class={`relative pl-0 md:pl-8 ${m.highlight ? 'border-l-4 border-[#c4a94a] pl-4' : ''}`}>
+                <!-- Punkt auf der Timeline -->
+                <div class={`absolute -left-[1.15rem] top-2 w-3.5 h-3.5 rounded-full border-2 hidden md:block ${m.highlight ? 'bg-[#c4a94a] border-[#c4a94a]' : 'bg-white border-gray-300'}`}></div>
+
+                <div class={`p-5 ${m.highlight ? 'bg-[#132e21] text-white' : 'bg-[#f5f5f0]'}`}>
+                  <!-- Mobil: Jahr -->
+                  <div class={`text-xs font-bold uppercase tracking-wider mb-1 md:hidden ${m.highlight ? 'text-[#c4a94a]' : 'text-gray-400'}`}>
+                    {m.jahr}
+                  </div>
+                  <h3 class={`font-serif text-xl mb-2 ${m.highlight ? 'text-white' : 'text-[#132e21]'}`}>{m.titel}</h3>
+                  <p class={`text-sm leading-relaxed ${m.highlight ? 'text-white/75' : 'text-gray-600'}`}>{m.text}</p>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Mitglied werden CTA -->
+      <div class="mt-16 p-8 bg-[#132e21] text-white text-center">
+        <p class="text-[#c4a94a] text-sm uppercase tracking-widest mb-3">Teil der Geschichte werden</p>
+        <h3 class="font-serif text-3xl mb-4">Werden Sie Mitglied</h3>
+        <p class="text-white/60 mb-6 max-w-md mx-auto text-sm">Schreiben Sie die Geschichte des Golfclub Schwäbisch Hall weiter – als aktives Mitglied unserer Gemeinschaft.</p>
+        <a href="/kontakt#mitglied" class="inline-block bg-[#c4a94a] text-[#132e21] font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors">
+          Mitgliedschaft anfragen
+        </a>
+      </div>
+
+      <!-- Links -->
+      <div class="mt-12 pt-8 border-t border-gray-100 flex flex-wrap gap-6">
+        <a href="/club" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">← Unser Club</a>
+        <a href="/spielgruppen" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Spielgruppen</a>
+        <a href="/hole-in-one" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Hole-in-One</a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

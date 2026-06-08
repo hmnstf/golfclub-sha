@@ -1,0 +1,98 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Hundeordnung" description="Hundeordnung des Golfclub Schwäbisch Hall e.V.">
+
+  <div class="bg-[#132e21] py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Golfanlage</p>
+      <h1 class="font-serif text-5xl text-white mb-4">Hundeordnung</h1>
+      <p class="text-white/60 max-w-xl">Hunde sind auf unserer Anlage herzlich willkommen – bitte beachten Sie die folgenden Regeln.</p>
+    </div>
+  </div>
+
+  <section class="py-16 bg-white">
+    <div class="max-w-3xl mx-auto px-4">
+
+      <div class="mb-10 p-5 bg-[#f5f5f0] border-l-4 border-[#c4a94a]">
+        <p class="text-sm text-gray-600">Hunde sind auf der Anlage willkommen und können täglich mitgenommen werden. Wir bitten Sie jedoch, die nachfolgenden Regeln zum Schutz aller Spieler und Tiere zu beachten.</p>
+      </div>
+
+      <div class="space-y-6">
+
+        {[
+          {
+            nr: '1',
+            titel: 'Anmeldung & Registrierung',
+            text: 'Hunde müssen bei der Geschäftsstelle angemeldet und registriert sein. Ein Nachweis der Hundehaftpflichtversicherung ist erforderlich und bei der Anmeldung vorzulegen.',
+            icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2',
+          },
+          {
+            nr: '2',
+            titel: 'Leinenpflicht',
+            text: 'Hunde müssen während des gesamten Aufenthalts auf der Anlage angeleint sein. Die Leine wird sicher am Golf-Bag befestigt. Der Hund muss ruhig bleiben und darf den Spielbetrieb nicht stören.',
+            icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
+          },
+          {
+            nr: '3',
+            titel: 'Wochenendregelung',
+            text: 'Bei starker Auslastung an Wochenenden (Mai bis September) werden Hundeführer gebeten, ihre Tiere nur zu Randzeiten mitzunehmen: vor 10:00 Uhr oder nach 16:00 Uhr.',
+            icon: 'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z',
+          },
+          {
+            nr: '4',
+            titel: 'Sauberkeit',
+            text: 'Verunreinigungen durch den Hund sind vom Besitzer sofort zu beseitigen. Bitte führen Sie immer ausreichend Tüten mit. Die Anlage muss für alle Besucher sauber gehalten werden.',
+            icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16',
+          },
+          {
+            nr: '5',
+            titel: 'Turniersperre',
+            text: 'Das Mitführen von Hunden während eines Wettspiels ist grundsätzlich nicht erlaubt. Bitte informieren Sie sich vorab über den Turnierkalender.',
+            icon: 'M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636',
+          },
+          {
+            nr: '6',
+            titel: 'Haftung',
+            text: 'Der Hundebesitzer haftet vollständig für alle Schäden, die durch seinen Hund verursacht werden. Bei wiederholtem Fehlverhalten kann die Clubleitung das Mitführen von Hunden zeitlich begrenzen oder dauerhaft untersagen.',
+            icon: 'M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z',
+          },
+          {
+            nr: '7',
+            titel: 'Wohlbefinden des Tieres',
+            text: 'Besitzer sollten Witterung, Ausdauer und Sicherheit ihres Tieres berücksichtigen. Eine Golfrunde kann bis zu 5 Stunden dauern – bitte stellen Sie sicher, dass Ihr Hund ausreichend Wasser und Pausen bekommt.',
+            icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z',
+          },
+        ].map((regel) => (
+          <div class="flex gap-5 p-5 bg-[#f5f5f0]">
+            <div class="w-10 h-10 bg-[#132e21] flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={regel.icon}/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="font-semibold text-[#132e21] mb-1">{regel.nr}. {regel.titel}</h3>
+              <p class="text-sm text-gray-600 leading-relaxed">{regel.text}</p>
+            </div>
+          </div>
+        ))}
+
+      </div>
+
+      <div class="mt-10 p-6 bg-[#132e21] text-white">
+        <h3 class="font-serif text-xl mb-2">Fragen zur Hundeordnung?</h3>
+        <p class="text-white/70 text-sm mb-4">Wenden Sie sich gerne an unsere Geschäftsstelle für weitere Informationen oder zur Anmeldung Ihres Hundes.</p>
+        <a href="/kontakt" class="inline-block bg-[#c4a94a] text-[#132e21] font-semibold px-6 py-2.5 text-sm uppercase tracking-wider hover:bg-[#d4bc6a] transition-colors">
+          Kontakt aufnehmen
+        </a>
+      </div>
+
+      <div class="mt-10 pt-8 border-t border-gray-100 flex flex-wrap gap-6">
+        <a href="/golf-erleben" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">← Golfanlage</a>
+        <a href="/platzregeln" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Platzregeln</a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

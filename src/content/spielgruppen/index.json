@@ -1,0 +1,28 @@
+{
+  "gruppen": [
+    {
+      "name": "Ladies Golf",
+      "beschreibung": "Die Ladies-Gruppe trifft sich wöchentlich zum gemeinsamen Golfen. Alle interessierten Damen sind herzlich willkommen – egal ob Anfängerin oder erfahrene Spielerin.",
+      "termine": [
+        { "saison": "September – Mai", "uhrzeit": "Dienstag ab 11:00 Uhr" },
+        { "saison": "Juni, Juli & August", "uhrzeit": "Dienstag ab 10:00 Uhr" }
+      ],
+      "ansprechpartner_titel": "Ansprechpartnerin",
+      "ansprechpartner_name": "Kyung-Pea Blazek",
+      "telefon": "",
+      "email": ""
+    },
+    {
+      "name": "Senioren Golf",
+      "beschreibung": "Die Senioren-Gruppe bietet regelmäßige Golfrunden in geselliger Atmosphäre. Alle interessierten Herren ab 60 Jahren sind herzlich eingeladen mitzumachen.",
+      "termine": [
+        { "saison": "September – Mai", "uhrzeit": "Donnerstag ab 11:00 Uhr" },
+        { "saison": "Juni, Juli & August", "uhrzeit": "Donnerstag ab 10:00 Uhr" }
+      ],
+      "ansprechpartner_titel": "Ansprechpartner",
+      "ansprechpartner_name": "Herbert Gallasch",
+      "telefon": "",
+      "email": ""
+    }
+  ]
+}

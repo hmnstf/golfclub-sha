@@ -1,0 +1,25 @@
+{
+  "saison": "2025",
+  "hinweis": "Alle Preise inkl. MwSt. Schnupperkurse und Jugendliche bis 18 Jahre erhalten Sonderkonditionen – bitte in der Geschäftsstelle erfragen.",
+  "greenfee18": [
+    { "kategorie": "Mit Clubausweis (DGV-Mitglied)", "wochentag": "65 €", "wochenende": "80 €" },
+    { "kategorie": "Ohne Clubausweis (Greenfee-Gast)", "wochentag": "75 €", "wochenende": "90 €" },
+    { "kategorie": "Twilight (ab 16:00 Uhr)", "wochentag": "40 €", "wochenende": "50 €" },
+    { "kategorie": "Jugendliche (bis 18 J., mit Ausweis)", "wochentag": "30 €", "wochenende": "35 €" }
+  ],
+  "greenfee9": [
+    { "kategorie": "Mit Clubausweis (DGV-Mitglied)", "wochentag": "40 €", "wochenende": "50 €" },
+    { "kategorie": "Ohne Clubausweis (Greenfee-Gast)", "wochentag": "50 €", "wochenende": "60 €" },
+    { "kategorie": "Jugendliche (bis 18 J., mit Ausweis)", "wochentag": "20 €", "wochenende": "25 €" }
+  ],
+  "kurzplatz": [
+    { "kategorie": "Erwachsene", "wochentag": "15 €", "wochenende": "15 €" },
+    { "kategorie": "Jugendliche (bis 18 J.)", "wochentag": "8 €", "wochenende": "8 €" }
+  ],
+  "leihgebuehren": [
+    { "item": "E-Cart (18 Loch)", "preis": "40 €" },
+    { "item": "E-Cart (9 Loch)", "preis": "25 €" },
+    { "item": "Trolley (manuell)", "preis": "5 €" },
+    { "item": "Leihschläger (Set)", "preis": "25 €" }
+  ]
+}

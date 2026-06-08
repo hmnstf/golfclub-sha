@@ -1,0 +1,244 @@
+---
+const navItems = [
+  {
+    label: 'Golf Erleben',
+    href: '/golf-erleben',
+    sub: [
+      { label: 'Unsere Anlage',        href: '/golf-erleben',    desc: 'Platz, Kurzplatz & Driving Range', icon: 'M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+      { label: 'Spielgebühren',        href: '/spielgebuehren',  desc: 'Greenfee & Leihgebühren',          icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z' },
+      { label: 'Platzregeln',          href: '/platzregeln',     desc: 'Lokale Regeln des Platzes',        icon: 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2' },
+      { label: 'Platz- & Spielordnung',href: '/platzordnung',    desc: 'Verhaltensregeln auf der Anlage', icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z' },
+      { label: 'Wettspielordnung',     href: '/wettspielordnung',desc: 'Regeln für Turniere & Wettkämpfe',icon: 'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z' },
+      { label: 'Hundeordnung',         href: '/hundeordnung',    desc: 'Hunde auf dem Golfplatz',         icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z' },
+      { label: 'Platzstatus',          href: '/platzstatus',     desc: 'Aktuell geöffnet / gesperrt',     icon: 'M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z' },
+    ],
+  },
+  { label: 'Golf Lernen', href: '/golf-lernen' },
+  { label: 'Turniere & Events', href: '/turniere' },
+  {
+    label: 'Club',
+    href: '/club',
+    sub: [
+      { label: 'Unser Club',   href: '/club',        desc: 'Vorstand & Team',              icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z' },
+      { label: 'Historie',     href: '/historie',    desc: 'Seit 1987 in Schwäbisch Hall', icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z' },
+      { label: 'Mannschaften', href: '/mannschaften',desc: 'Liga & Wettkampfteams',         icon: 'M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9' },
+      { label: 'Spielgruppen', href: '/spielgruppen',desc: 'Ladies & Senioren',             icon: 'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z' },
+      { label: 'Clubmeister',  href: '/clubmeister', desc: 'Sieger der Clubmeisterschaft', icon: 'M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z' },
+      { label: 'Hole-in-One',  href: '/hole-in-one', desc: 'Die besondere Ehrenliste',     icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z' },
+    ],
+  },
+  { label: 'Restaurant', href: '/restaurant' },
+  { label: 'Kontakt', href: '/kontakt' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="bg-[#132e21] text-white sticky top-0 z-50 shadow-lg">
+  <!-- Topbar -->
+  <div class="border-b border-white/10 text-xs">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between py-1.5">
+      <div class="flex items-center gap-4 text-white/60">
+        <a href="/platzstatus" class="hover:text-white transition-colors flex items-center gap-1">
+          <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          </svg>
+          Platzstatus
+        </a>
+        <span class="text-white/20">|</span>
+        <a href="https://www.instagram.com/gc.schwaebischhall/" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="hidden sm:flex items-center gap-1 hover:text-[#c4a94a] transition-colors">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          <span class="text-xs hidden lg:inline">@gc.schwaebischhall</span>
+        </a>
+        <span class="text-white/20 hidden sm:inline">|</span>
+        <!-- Wetter-Widget (Schwäbisch Hall, DE) -->
+        <a
+          href="https://www.wetter.com/deutschland/schwaebisch-hall/DE0009632.html"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="hidden sm:flex items-center gap-1.5 hover:text-white transition-colors"
+          id="weather-display"
+        >
+          <!-- Wolken-Icon als Fallback, wird per JS durch echtes Wetter-Icon ersetzt -->
+          <svg id="weather-icon" class="w-3.5 h-3.5 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"/>
+          </svg>
+          <span id="weather-temp" class="text-white/60 text-xs">–°C</span>
+          <span class="text-white/30 text-xs hidden md:inline">·</span>
+          <span class="text-white/40 text-xs hidden md:inline">Schwäbisch Hall</span>
+        </a>
+      </div>
+      <a
+        href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="bg-[#c4a94a] text-[#132e21] font-semibold px-4 py-1 text-xs uppercase tracking-wider hover:bg-[#d4bc6a] transition-colors"
+      >
+        Startzeit buchen
+      </a>
+    </div>
+  </div>
+
+  <!-- Main Nav -->
+  <div class="max-w-7xl mx-auto px-4">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo -->
+      <a href="/" class="flex items-center shrink-0">
+        <img
+          src="/Logo-GC-SHA-1024x282.jpg"
+          alt="Golfclub Schwäbisch Hall"
+          class="h-12 w-auto rounded"
+          style="background: white; padding: 4px 8px;"
+        />
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav class="hidden lg:flex items-center gap-1" aria-label="Hauptnavigation">
+        {navItems.map((item: any) => (
+          <div class="relative group">
+            <a
+              href={item.href}
+              class:list={[
+                'px-3 py-2 text-sm font-medium transition-colors hover:text-[#c4a94a] flex items-center gap-1',
+                currentPath.startsWith(item.href) ? 'text-[#c4a94a]' : 'text-white/90'
+              ]}
+            >
+              {item.label}
+              {item.sub && (
+                <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                </svg>
+              )}
+            </a>
+            {item.sub && (
+              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <!-- Pfeil -->
+                <div class="absolute top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0d2118] border-l border-t border-white/10 rotate-45 z-10"></div>
+                <div class="relative bg-[#0d2118] border border-white/10 shadow-2xl min-w-[260px] overflow-hidden">
+                  <!-- Goldene Kopfzeile -->
+                  <div class="h-0.5 bg-gradient-to-r from-transparent via-[#c4a94a] to-transparent"></div>
+                  <div class="py-2">
+                    {item.sub.map((sub: any) => (
+                      <a
+                        href={sub.href}
+                        class="flex items-start gap-3 px-4 py-3 group/item hover:bg-white/5 transition-colors border-l-2 border-transparent hover:border-[#c4a94a] mx-2 rounded-sm"
+                      >
+                        {sub.icon && (
+                          <svg class="w-4 h-4 text-[#c4a94a]/60 group-hover/item:text-[#c4a94a] mt-0.5 shrink-0 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={sub.icon}/>
+                          </svg>
+                        )}
+                        <div>
+                          <div class="text-sm text-white/80 group-hover/item:text-white font-medium transition-colors whitespace-nowrap">{sub.label}</div>
+                          {sub.desc && <div class="text-xs text-white/35 group-hover/item:text-white/50 mt-0.5 transition-colors">{sub.desc}</div>}
+                        </div>
+                      </a>
+                    ))}
+                  </div>
+                  <!-- Goldene Fußzeile -->
+                  <div class="h-0.5 bg-gradient-to-r from-transparent via-[#c4a94a]/30 to-transparent"></div>
+                </div>
+              </div>
+            )}
+          </div>
+        ))}
+      </nav>
+
+      <!-- Mobile menu button -->
+      <button
+        id="mobile-menu-btn"
+        class="lg:hidden p-2 text-white/80 hover:text-white"
+        aria-label="Menü öffnen"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Nav -->
+  <div id="mobile-menu" class="hidden lg:hidden border-t border-white/10 bg-[#0d2118]">
+    <nav class="max-w-7xl mx-auto px-4 py-3 flex flex-col" aria-label="Mobile Navigation">
+      {navItems.map((item: any) => (
+        <>
+          <a
+            href={item.href}
+            class="py-3 text-sm font-medium text-white/90 hover:text-[#c4a94a] border-b border-white/5 transition-colors"
+          >
+            {item.label}
+          </a>
+          {item.sub && item.sub.map((sub: any) => (
+            <a
+              href={sub.href}
+              class="py-2 pl-4 text-xs text-white/50 hover:text-[#c4a94a] border-b border-white/5 transition-colors"
+            >
+              → {sub.label}
+            </a>
+          ))}
+        </>
+      ))}
+      <a
+        href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="mt-4 bg-[#c4a94a] text-[#132e21] font-semibold px-4 py-2 text-sm uppercase tracking-wider text-center hover:bg-[#d4bc6a] transition-colors"
+      >
+        Startzeit buchen
+      </a>
+    </nav>
+  </div>
+</header>
+
+<script>
+  const btn = document.getElementById('mobile-menu-btn');
+  const menu = document.getElementById('mobile-menu');
+  btn?.addEventListener('click', () => {
+    const isHidden = menu?.classList.toggle('hidden');
+    btn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
+    btn.setAttribute('aria-label', isHidden ? 'Menü öffnen' : 'Menü schließen');
+  });
+
+  // Wetter via Open-Meteo (kostenlos, kein API-Key)
+  // Koordinaten Schwäbisch Hall: 49.1128° N, 9.7404° E
+  async function loadWeather() {
+    try {
+      const res = await fetch(
+        'https://api.open-meteo.com/v1/forecast?latitude=49.1128&longitude=9.7404&current=temperature_2m,weather_code&wind_speed_unit=kmh&timezone=Europe%2FBerlin'
+      );
+      const data = await res.json();
+      const temp = Math.round(data.current.temperature_2m);
+      const code = data.current.weather_code;
+
+      const tempEl = document.getElementById('weather-temp');
+      const iconEl = document.getElementById('weather-icon');
+      const descEl = document.getElementById('weather-desc');
+
+      if (tempEl) tempEl.textContent = `${temp}°C`;
+
+      // WMO-Code → Icon-Pfad
+      const iconPath = code <= 1
+        ? 'M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M12 7a5 5 0 100 10A5 5 0 0012 7z' // Sonne
+        : code <= 3
+        ? 'M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z' // Bewölkt
+        : code < 70
+        ? 'M20 17.58A5 5 0 0018 8h-1.26A8 8 0 104 15.25M8 19v1m0-9v1m4-1v1m4-1v1' // Regen
+        : 'M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8'; // Schnee/sonstiges
+
+      if (iconEl) {
+        iconEl.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${iconPath}"/>`;
+      }
+
+      const desc = code <= 1 ? 'Sonnig' : code <= 3 ? 'Bewölkt' : code < 70 ? 'Regen' : 'Niederschlag';
+      if (descEl) descEl.textContent = desc;
+    } catch {
+      // Stille Fehlerbehandlung – Widget bleibt als Link sichtbar
+    }
+  }
+  loadWeather();
+</script>

@@ -1,0 +1,258 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Golf Erleben – Golfanlage" description="18-Loch-Meisterschaftsplatz und 6-Loch-Kurzplatz des Golfclub Schwäbisch Hall in der Hohenloher Landschaft">
+
+  <div class="bg-[#132e21] py-24 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <img src="/images/hero/course.jpg" alt="" class="w-full h-full object-cover"/>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Unsere Anlage</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Golf Erleben</h1>
+      <p class="text-white/60 max-w-xl">18-Loch-Meisterschaftsplatz und 6-Loch-Kurzplatz in der Hohenloher Landschaft.</p>
+    </div>
+  </div>
+
+  <!-- 18-Loch -->
+  <section id="meisterschaft" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Meisterschaftskurs</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-6">18-Loch-Meisterschaftsplatz</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Unser 18-Loch-Meisterschaftsplatz begeistert mit abwechslungsreichen Spielbahnen in
+          der hügeligen Hohenloher Landschaft. Jede Bahn hat ihren eigenen Charakter –
+          von weiten Fairways mit strategischen Hindernissen bis hin zu engen Loch-Varianten,
+          die Präzision fordern.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-8">
+          Wasserhindernisse, Bunker und natürliches Rough sorgen für sportliche Herausforderung
+          auf allen Spielniveaus. Das Clubhaus mit Locker Rooms, Duschen und Restaurant bietet
+          nach der Runde den perfekten Ausklang – mit Blick auf das 18. Grün.
+        </p>
+        <div class="grid grid-cols-3 gap-4 mb-4">
+          {[
+            { val: '18', label: 'Bahnen' },
+            { val: 'Par 72', label: 'Gesamtpar' },
+            { val: '85 ha', label: 'Gesamtfläche' },
+          ].map(({ val, label }) => (
+            <div class="bg-[#f5f5f0] p-4 text-center">
+              <div class="font-serif text-xl text-[#c4a94a] font-bold">{val}</div>
+              <div class="text-gray-400 text-xs mt-0.5 uppercase tracking-wider">{label}</div>
+            </div>
+          ))}
+        </div>
+        <!-- Abschlag-Tabelle mit CR/Slope -->
+        <div class="overflow-x-auto mb-6">
+          <table class="w-full text-xs border-collapse">
+            <thead>
+              <tr class="bg-[#132e21] text-white">
+                <th class="text-left px-3 py-2 font-medium">Abschlag</th>
+                <th class="text-center px-3 py-2 font-medium">Par</th>
+                <th class="text-center px-3 py-2 font-medium">CR</th>
+                <th class="text-center px-3 py-2 font-medium">Slope</th>
+                <th class="text-center px-3 py-2 font-medium">Länge</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100 text-sm">
+              {[
+                { abschlag: 'Herren Weiß', par: 72, cr: '73,5', slope: 138, laenge: '6.242 m' },
+                { abschlag: 'Herren Gelb', par: 72, cr: '72,9', slope: 136, laenge: '6.103 m' },
+                { abschlag: 'Herren Blau', par: 69, cr: '69,7', slope: 126, laenge: '5.510 m' },
+                { abschlag: 'Damen Blau',  par: 73, cr: '75,5', slope: 136, laenge: '5.510 m' },
+                { abschlag: 'Damen Rot',   par: 72, cr: '74,7', slope: 135, laenge: '5.373 m' },
+              ].map(({ abschlag, par, cr, slope, laenge }, i) => (
+                <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
+                  <td class="px-3 py-2 text-[#132e21] font-medium">{abschlag}</td>
+                  <td class="px-3 py-2 text-center text-[#132e21]">{par}</td>
+                  <td class="px-3 py-2 text-center text-gray-500">{cr}</td>
+                  <td class="px-3 py-2 text-center text-gray-500">{slope}</td>
+                  <td class="px-3 py-2 text-center text-gray-500">{laenge}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <!-- Downloads -->
+        <div class="flex flex-wrap gap-3 mb-6">
+          {[
+            { label: 'Scorekarte', href: '/downloads/scorekarte-18loch.pdf' },
+            { label: 'Birdiebook 2025', href: '/downloads/birdiebook-2025.pdf' },
+            { label: 'Spielvorgabentabelle', href: '/downloads/spielvorgabentabelle.pdf' },
+          ].map(({ label, href }) => (
+            <a href={href} target="_blank" rel="noopener noreferrer"
+              class="flex items-center gap-2 text-xs font-semibold text-[#132e21] border border-[#132e21]/20 px-3 py-2 hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              {label}
+            </a>
+          ))}
+        </div>
+        <a
+          href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+          target="_blank" rel="noopener noreferrer"
+          class="inline-block bg-[#c4a94a] text-[#132e21] font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+        >
+          Startzeit buchen
+        </a>
+      </div>
+      <div class="grid grid-cols-2 gap-3 h-[420px]">
+        <div class="row-span-2 relative overflow-hidden">
+          <img src="/images/platz/golfanlage1.jpg" alt="Meisterschaftsplatz" class="w-full h-full object-cover"/>
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-4">
+            <div class="text-[#c4a94a] text-xs uppercase tracking-wider">18 Loch</div>
+            <div class="font-serif text-white text-sm">Meisterschaftsplatz</div>
+          </div>
+        </div>
+        <div class="relative overflow-hidden">
+          <img src="/images/platz/bruecke-herbst.jpg" alt="Brücke im Herbst" class="w-full h-full object-cover"/>
+        </div>
+        <div class="relative overflow-hidden">
+          <img src="/images/platz/golfanlage2.jpg" alt="Golfanlage" class="w-full h-full object-cover"/>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Platzgrafik -->
+  <section class="py-14 bg-[#f5f5f0]">
+    <div class="max-w-5xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Übersicht</p>
+      <h2 class="font-serif text-3xl text-[#132e21] mb-6">Platzgrafik</h2>
+      <div class="overflow-x-auto">
+        <img src="/images/platz/platzgrafik.png" alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full border border-gray-200"/>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6-Loch -->
+  <section id="kurzplatz" class="py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <div class="grid grid-cols-2 gap-3 h-72 lg:h-auto lg:min-h-[340px] order-2 lg:order-1">
+        <div class="relative overflow-hidden col-span-2">
+          <img src="/images/platz/kurzplatz-luft.jpg" alt="Kurzplatz Luftbild" class="w-full h-full object-cover"/>
+          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-5">
+            <div class="text-[#c4a94a] text-xs uppercase tracking-wider">6 Loch</div>
+            <div class="font-serif text-white">Kurzplatz – offen für Gäste</div>
+          </div>
+        </div>
+      </div>
+      <div class="order-1 lg:order-2">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Für Einsteiger & Gäste</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-6">6-Loch-Kurzplatz</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Unser 6-Loch-Kurzplatz ist für jeden zugänglich – auch ohne Platzreife.
+          Ideal für Einsteiger, Jugendliche und Gäste, die Golf unverbindlich ausprobieren möchten.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-6">
+          Der Kurzplatz eignet sich hervorragend zur Technikverfeinerung und als
+          entspannter Einstieg in den Golfsport – ohne Leistungsdruck.
+        </p>
+        <div class="grid grid-cols-3 gap-3 mb-6">
+          {[
+            { val: 'Par 19', label: '1 Runde' },
+            { val: '803 m', label: 'Gesamtlänge' },
+            { val: '230 m', label: 'Längstes Loch' },
+          ].map(({ val, label }) => (
+            <div class="bg-white p-3 text-center">
+              <div class="font-serif text-base text-[#c4a94a] font-bold">{val}</div>
+              <div class="text-gray-400 text-xs mt-0.5">{label}</div>
+            </div>
+          ))}
+        </div>
+        <div class="space-y-2 text-sm text-gray-600 mb-6">
+          {[
+            'Kein DGV-Ausweis erforderlich',
+            'Ideal für Einsteiger und Jugendliche',
+            'Keine Voranmeldung nötig',
+            'Schlägersatz-Verleih möglich',
+          ].map(item => (
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-full bg-[#c4a94a] shrink-0"></span>
+              {item}
+            </div>
+          ))}
+        </div>
+        <div class="flex flex-wrap gap-3 mb-4">
+          <a href="/downloads/scorekarte-kurzplatz.pdf" target="_blank" rel="noopener noreferrer"
+            class="flex items-center gap-2 text-xs font-semibold text-[#132e21] border border-[#132e21]/20 px-3 py-2 hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Scorekarte Kurzplatz
+          </a>
+        </div>
+        <a href="/spielgebuehren" class="text-xs font-bold uppercase tracking-widest text-[#c4a94a] hover:text-[#132e21] transition-colors">
+          Spielgebühren ansehen →
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Übungsanlage -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mb-12">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Training & Übung</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Übungsanlage</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        {[
+          {
+            title: 'Driving Range',
+            desc: '20 Abschlagboxen, davon 3 überdacht. Verschiedene Trainingshilfen für alle Schläger und Distanzen.',
+            icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+          },
+          {
+            title: 'Putting Green',
+            desc: 'Gepflegte Greens zum Trainieren des kurzen Spiels auf verschiedenen Linien und Entfernungen.',
+            icon: 'M12 22C6.477 22 2 17.523 2 12S6.477 2 12 2s10 4.477 10 10-4.477 10-10 10zm0-2a8 8 0 100-16 8 8 0 000 16z',
+          },
+          {
+            title: 'Short Game Area',
+            desc: 'Bunker und Chipping-Zone für gezieltes Kurzspiel-Training – der Schlüssel zu niedrigeren Scores.',
+            icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+          },
+        ].map(({ title, desc, icon }) => (
+          <div class="bg-[#f5f5f0] p-6">
+            <svg class="w-8 h-8 text-[#c4a94a] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon}/>
+            </svg>
+            <h3 class="font-serif text-xl text-[#132e21] mb-2">{title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-[#132e21] py-16">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="font-serif text-2xl text-white mb-1">Jetzt eine Startzeit buchen</div>
+        <div class="text-white/60 text-sm">Online über golf.de oder telefonisch: +49 7907 8190</div>
+      </div>
+      <div class="flex flex-wrap gap-4">
+        <a
+          href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="shrink-0 bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+        >
+          Online buchen
+        </a>
+        <a
+          href="/kontakt"
+          class="shrink-0 border border-white/40 text-white px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors"
+        >
+          Kontakt
+        </a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

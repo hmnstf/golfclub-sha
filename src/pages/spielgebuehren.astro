@@ -1,0 +1,144 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Spielgebühren aus Keystatic laden
+import gebuehrenData from '../content/spielgebuehren/index.json';
+
+const greenfee18 = gebuehrenData.greenfee18 ?? [];
+const greenfee9 = gebuehrenData.greenfee9 ?? [];
+const kurzplatz = gebuehrenData.kurzplatz ?? [];
+const leihgebuehren = gebuehrenData.leihgebuehren ?? [];
+const hinweis = gebuehrenData.hinweis ?? '';
+const saison = gebuehrenData.saison ?? '';
+---
+
+<Layout title="Spielgebühren & Greenfee" description="Aktuelle Spielgebühren und Greenfee-Preise des Golfclub Schwäbisch Hall">
+
+  <div class="bg-[#132e21] py-24">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Golfanlage</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Spielgebühren</h1>
+      <p class="text-white/60 max-w-xl">Aktuelle Greenfee-Preise für Mitglieder und Gäste.</p>
+    </div>
+  </div>
+
+  <!-- 18-Loch -->
+  <section class="py-16 bg-white">
+    <div class="max-w-5xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Meisterschaftsplatz</p>
+      <h2 class="font-serif text-3xl text-[#132e21] mb-8">18-Loch Greenfee</h2>
+
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-[#132e21] text-white">
+              <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider">Kategorie</th>
+              <th class="text-center px-5 py-3 font-medium text-xs uppercase tracking-wider">Mo – Fr</th>
+              <th class="text-center px-5 py-3 font-medium text-xs uppercase tracking-wider">Sa / So / Feiertag</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {greenfee18.map((row: any, i: number) => (
+              <tr class={i === 0 ? 'bg-[#faf9f7]' : 'bg-white'}>
+                <td class="px-5 py-3.5 text-[#132e21]">{row.kategorie}</td>
+                <td class="px-5 py-3.5 text-center font-semibold text-[#132e21]">{row.wochentag}</td>
+                <td class="px-5 py-3.5 text-center font-semibold text-[#132e21]">{row.wochenende}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">9 Loch</p>
+      <h2 class="font-serif text-3xl text-[#132e21] mb-8">9-Loch Greenfee</h2>
+
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-[#132e21] text-white">
+              <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider">Kategorie</th>
+              <th class="text-center px-5 py-3 font-medium text-xs uppercase tracking-wider">Mo – Fr</th>
+              <th class="text-center px-5 py-3 font-medium text-xs uppercase tracking-wider">Sa / So / Feiertag</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {greenfee9.map((row: any, i: number) => (
+              <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f7]'}>
+                <td class="px-5 py-3.5 text-[#132e21]">{row.kategorie}</td>
+                <td class="px-5 py-3.5 text-center font-semibold text-[#132e21]">{row.wochentag}</td>
+                <td class="px-5 py-3.5 text-center font-semibold text-[#132e21]">{row.wochenende}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 6-Loch Kurzplatz -->
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Kurzplatz</p>
+      <h2 class="font-serif text-3xl text-[#132e21] mb-6">6-Loch-Kurzplatz</h2>
+      <p class="text-gray-500 text-sm mb-6">Öffentlich zugänglich – keine Platzreife erforderlich.</p>
+
+      <div class="overflow-x-auto mb-12">
+        <table class="w-full text-sm border-collapse">
+          <thead>
+            <tr class="bg-[#132e21] text-white">
+              <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider">Kategorie</th>
+              <th class="text-center px-5 py-3 font-medium text-xs uppercase tracking-wider">Mo – Fr</th>
+              <th class="text-center px-5 py-3 font-medium text-xs uppercase tracking-wider">Sa / So / Feiertag</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {kurzplatz.map((row: any, i: number) => (
+              <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f7]'}>
+                <td class="px-5 py-3.5 text-[#132e21]">{row.kategorie}</td>
+                <td class="px-5 py-3.5 text-center font-semibold text-[#132e21]">{row.wochentag}</td>
+                <td class="px-5 py-3.5 text-center font-semibold text-[#132e21]">{row.wochenende}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Leihgebühren -->
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Verleih</p>
+      <h2 class="font-serif text-3xl text-[#132e21] mb-6">Leihgebühren</h2>
+
+      <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-12">
+        {leihgebuehren.map((l: any) => (
+          <div class="flex items-center justify-between bg-[#f5f5f0] px-5 py-4">
+            <span class="text-[#132e21] font-medium text-sm">{l.item}</span>
+            <span class="font-serif text-xl text-[#c4a94a] font-bold">{l.preis}</span>
+          </div>
+        ))}
+      </div>
+
+      <!-- Hinweise -->
+      <div class="bg-[#f5f5f0] p-6 text-sm text-gray-600 space-y-2">
+        <div class="font-semibold text-[#132e21] mb-3">Hinweise</div>
+        <div>• Gäste mit Clubausweis und eingetragener Vorgabe ab -54 sind herzlich willkommen.</div>
+        <div>• Handicap-Begrenzung am Wochenende: -45.</div>
+        <div>• Alle Preise inklusive Nutzung der Übungsanlage am Spieltag.</div>
+        <div>• Startzeiten online buchbar über <a href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course" target="_blank" rel="noopener noreferrer" class="text-[#c4a94a] hover:underline">PCCaddie</a> oder telefonisch: +49 7907 8190.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-[#132e21] py-14">
+    <div class="max-w-5xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="font-serif text-2xl text-white mb-1">Startzeit online buchen</div>
+        <div class="text-white/60 text-sm">Bequem über golf.de – oder rufen Sie uns an.</div>
+      </div>
+      <a
+        href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+        target="_blank"
+        rel="noopener noreferrer"
+        class="shrink-0 bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+      >
+        Jetzt buchen
+      </a>
+    </div>
+  </section>
+
+</Layout>

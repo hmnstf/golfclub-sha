@@ -1,0 +1,108 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Hole-in-One Einträge aus Keystatic laden
+const files = import.meta.glob('../content/holeinone/*.json', { eager: true });
+const eintraege = Object.values(files)
+  .map((f: any) => {
+    const d = f.default ?? f;
+    // Slug als Anzeigename umwandeln (z.B. "fritz-scheufele" → "Fritz Scheufele")
+    const anzeigeName = d.name
+      .replace(/-\d{4}$/, '') // Jahressuffix entfernen (werner-strecker-2001 → werner-strecker)
+      .split('-')
+      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(' ')
+      .replace(/^Dr /, 'Dr. '); // "Dr " → "Dr. "
+    // Datum formatieren: "1991-09-07" → "07.09.1991"
+    const [year, month, day] = (d.datum ?? '').split('-');
+    const datumFormatiert = year ? `${day}.${month}.${year}` : d.datum;
+    return { datum: datumFormatiert, bahn: d.bahn, name: anzeigeName, _raw: d.datum };
+  })
+  .sort((a: any, b: any) => a._raw.localeCompare(b._raw));
+---
+
+<Layout title="Hole-in-One" description="Die Hole-in-One Liste des Golfclub Schwäbisch Hall">
+
+  <div class="bg-[#132e21] py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Club</p>
+      <h1 class="font-serif text-5xl text-white mb-4">Hole-in-One</h1>
+      <p class="text-white/60 max-w-2xl">Das seltene Kunststück – ein Schlag, ein Loch. Herzlichen Glückwunsch an alle, denen dieses besondere Erlebnis vergönnt war.</p>
+    </div>
+  </div>
+
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4">
+
+      <!-- Intro -->
+      <div class="grid md:grid-cols-3 gap-10 mb-16 items-start">
+        <div class="md:col-span-2 space-y-4 text-gray-600 leading-relaxed">
+          <p>
+            Oft ist es einem Golfspieler oder einer Golfspielerin in ihrer ganzen sportlichen Laufbahn nicht vergönnt, einmal mit einem Schlag den Ball ins Loch zu befördern.
+          </p>
+          <p>
+            Ein Hole-in-One ist ein besonderes Ereignis – und erfreut sich größter Beliebtheit. Denn wenn es in einem Turnier gelingt, ist es ein ungeschriebenes Gesetz, dass der oder die Glückliche eine Runde für alle Teilnehmer ausgeben muss.
+          </p>
+          <p>
+            Doch wie im richtigen Leben ist es auch hier möglich, sich mit einer Versicherung abzusichern und mit Geduld auf das glückliche Ereignis zu warten – was die Nachfolgenden bereits erreicht haben.
+          </p>
+        </div>
+        <div class="flex flex-col items-center gap-3">
+          <div class="w-24 h-24 bg-[#c4a94a]/10 rounded-full flex items-center justify-center">
+            <svg class="w-12 h-12 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/>
+            </svg>
+          </div>
+          <div class="text-center">
+            <div class="font-serif text-4xl text-[#132e21] font-bold">{eintraege.length}</div>
+            <div class="text-sm text-gray-400 uppercase tracking-wider">Hole-in-Ones</div>
+          </div>
+          <div class="text-center">
+            <div class="font-serif text-2xl text-[#132e21] font-bold">seit 1991</div>
+            <div class="text-sm text-gray-400 uppercase tracking-wider">Erste Eintragung</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabelle -->
+      <div class="overflow-x-auto border border-gray-200">
+        <table class="w-full text-sm min-w-[400px]">
+          <thead>
+            <tr class="bg-[#132e21] text-white">
+              <th class="text-left px-6 py-4 font-semibold text-xs uppercase tracking-wider">#</th>
+              <th class="text-left px-6 py-4 font-semibold text-xs uppercase tracking-wider">Datum</th>
+              <th class="text-left px-6 py-4 font-semibold text-xs uppercase tracking-wider">Bahn</th>
+              <th class="text-left px-6 py-4 font-semibold text-xs uppercase tracking-wider">Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {eintraege.map((e, i) => (
+              <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#f5f5f0]'}>
+                <td class="px-6 py-3.5 text-gray-400 text-xs">{eintraege.length - i}</td>
+                <td class="px-6 py-3.5 text-gray-700 font-mono">{e.datum}</td>
+                <td class="px-6 py-3.5">
+                  <span class="inline-flex items-center justify-center w-7 h-7 bg-[#c4a94a]/10 text-[#c4a94a] font-bold text-xs rounded-full">
+                    {e.bahn}
+                  </span>
+                </td>
+                <td class="px-6 py-3.5 text-[#132e21] font-medium">{e.name}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="mt-4 text-xs text-gray-400 text-right">
+        Aktualisiert: Juli 2025
+      </div>
+
+      <!-- Links -->
+      <div class="mt-12 pt-8 border-t border-gray-100 flex flex-wrap gap-6">
+        <a href="/club" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">← Unser Club</a>
+        <a href="/clubmeister" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Clubmeister</a>
+        <a href="/spielgruppen" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Spielgruppen</a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

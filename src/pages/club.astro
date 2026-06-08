@@ -1,0 +1,269 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Team laden
+let teamMembers: any[] = [];
+try {
+  const files = import.meta.glob('../content/team/*.json', { eager: true });
+  teamMembers = Object.values(files)
+    .map((f: any) => f.default ?? f)
+    .sort((a: any, b: any) => (a.reihenfolge ?? 99) - (b.reihenfolge ?? 99));
+} catch {}
+
+const gruppenLabels: Record<string, string> = {
+  vorstand_gf: 'Geschäftsführender Vorstand',
+  vorstand: 'Vorstandsmitglieder',
+  geschaeftsstelle: 'Geschäftsstelle',
+  trainer: 'Trainer & Pro',
+  ehren: 'Ehrenmitglieder',
+};
+
+const gruppen = ['vorstand_gf', 'vorstand', 'geschaeftsstelle', 'trainer', 'ehren'];
+
+// Clubmeister laden
+let clubmeister: any[] = [];
+try {
+  const files = import.meta.glob('../content/clubmeister/*.json', { eager: true });
+  clubmeister = Object.values(files)
+    .map((f: any) => f.default ?? f)
+    .sort((a: any, b: any) => {
+      const jA = parseInt(String(a.titel ?? 0));
+      const jB = parseInt(String(b.titel ?? 0));
+      return jB - jA;
+    });
+} catch {}
+---
+
+<Layout title="Unser Club" description="Golfclub Schwäbisch Hall – Geschichte, Vorstand, Teams und Mitgliedschaft seit 1987">
+
+  <!-- Hero -->
+  <div class="bg-[#132e21] py-24 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+      <img src="/images/gallery/golf1.jpg" alt="" class="w-full h-full object-cover"/>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Über uns</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Unser Club</h1>
+      <p class="text-white/60 max-w-xl">Seit 1987 – Golf, Gemeinschaft und Natur in der Hohenloher Landschaft.</p>
+    </div>
+  </div>
+
+  <!-- Philosophie -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Unser Verständnis</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-6 leading-tight">Golf ist mehr als<br/>ein Spiel</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Golf ist ein Lebensgefühl, das sowohl sportliche Herausforderung als auch Spaß, Kontakt
+          mit Gleichgesinnten und Naturgenuss bietet. In einem attraktiven Umfeld verbinden wir
+          Freizeiterlebnis, Lebensfreude und Wohlbefinden.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Wir verstehen uns als Club und als verlässlichen und zeitgemäßen Dienstleister, der für
+          alle Anliegen offen ist und sie im Sinne des Einzelnen und der Gemeinschaft umsetzt.
+        </p>
+        <p class="text-gray-600 leading-relaxed">
+          Die Zufriedenheit der Mitglieder und Gäste steht für uns jeden Tag aufs Neue im Mittelpunkt
+          unserer Arbeit – mit Kompetenz, Freundlichkeit und Herzlichkeit.
+        </p>
+      </div>
+      <div class="grid grid-cols-3 gap-4">
+        {[
+          { number: '1987', label: 'Gründungsjahr' },
+          { number: '900+', label: 'Mitglieder' },
+          { number: '18+6', label: 'Loch gesamt' },
+        ].map(({ number, label }) => (
+          <div class="bg-[#f5f5f0] p-8 text-center">
+            <div class="font-serif text-3xl text-[#c4a94a] font-bold mb-1">{number}</div>
+            <div class="text-gray-500 text-xs uppercase tracking-wider">{label}</div>
+          </div>
+        ))}
+        <div class="col-span-3 bg-[#132e21] p-6 text-center">
+          <div class="font-serif text-2xl text-[#c4a94a] font-bold mb-1">Seit 2013</div>
+          <div class="text-white/70 text-xs uppercase tracking-wider">Stützpunkt für Nachwuchsförderung</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teams & Mannschaften -->
+  <section class="py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mb-12">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Sport & Wettkampf</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Unsere Mannschaften</h2>
+      </div>
+      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {[
+          { titel: 'Damen', liga: 'BWMM 4. Liga', desc: 'Unser Damenteam kämpft in der 4. Liga des Badenwürttembergischen Golfverbands.' },
+          { titel: 'Damen 50+', liga: 'BWGV 2. Liga, Gruppe B', desc: 'Die erfahrenen Damen spielen in der 2. Landesverbandsliga.' },
+          { titel: 'Herren', liga: 'BWMM 4. Liga', desc: 'Die Herrenmannschaft vertrittden GC SHA in der 4. Liga und der Gruppenliga.' },
+          { titel: 'Herren 30+', liga: 'BWGV 2. Liga, Gruppe B', desc: 'Engagierter Wettkampfsport in der 2. Landesverbandsliga.' },
+          { titel: 'Herren 50+', liga: 'BWGV 3. Liga, Gruppe B', desc: 'Seniorengolf auf hohem Niveau in der 3. Liga.' },
+          { titel: 'Herren 65+', liga: 'BWGV 3. Liga, Gruppe F', desc: 'Unsere ältesten Aktiven – leidenschaftlich und wettkampfstark.' },
+        ].map(({ titel, liga, desc }) => (
+          <div class="bg-white p-6 border border-gray-100">
+            <div class="w-6 h-0.5 bg-[#c4a94a] mb-4"></div>
+            <h3 class="font-serif text-lg text-[#132e21] mb-1">{titel}</h3>
+            <div class="text-xs font-semibold text-[#c4a94a] uppercase tracking-wider mb-3">{liga}</div>
+            <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+      <div class="mt-8 bg-white border border-gray-100 p-6">
+        <div class="w-6 h-0.5 bg-[#c4a94a] mb-4"></div>
+        <h3 class="font-serif text-lg text-[#132e21] mb-2">Jugendförderung</h3>
+        <p class="text-gray-500 text-sm leading-relaxed max-w-2xl">
+          Seit 2013 ist der GC Schwäbisch Hall anerkannter Stützpunkt für Nachwuchsförderung.
+          Junge Golfer erhalten besonders günstige Jahresbeiträge und professionelles Coaching.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Personen / Vorstand -->
+  {gruppen.map(gruppe => {
+    const mitglieder = teamMembers.filter(m => (m.gruppe ?? 'vorstand_gf') === gruppe);
+    if (mitglieder.length === 0) return null;
+    const isBig = gruppe === 'vorstand_gf';
+    return (
+      <section class={`py-16 border-t border-gray-100 ${isBig ? 'bg-white' : 'bg-[#f5f5f0]'}`}>
+        <div class="max-w-7xl mx-auto px-4">
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Personen</p>
+          <h2 class="font-serif text-3xl text-[#132e21] mb-10">{gruppenLabels[gruppe]}</h2>
+          <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {mitglieder.map((person: any) => (
+              <div class="group bg-white">
+                <!-- Foto -->
+                <div class="overflow-hidden bg-[#f5f5f0] aspect-[4/3]">
+                  {person.bild ? (
+                    <img
+                      src={person.bild}
+                      alt={person.name}
+                      class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
+                    />
+                  ) : (
+                    <div class="w-full h-full flex items-center justify-center">
+                      <svg class="w-12 h-12 text-[#c4a94a]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                      </svg>
+                    </div>
+                  )}
+                </div>
+                <!-- Info -->
+                <div class="p-4 border border-t-0 border-gray-100">
+                  <div class="text-xs font-bold text-[#c4a94a] uppercase tracking-widest mb-1">{person.rolle}</div>
+                  <div class="font-serif text-lg text-[#132e21]">{person.name}</div>
+                  {(person.email || person.telefon) && (
+                    <div class="mt-2 space-y-0.5">
+                      {person.email && <a href={`mailto:${person.email}`} class="text-xs text-gray-400 hover:text-[#c4a94a] block">{person.email}</a>}
+                      {person.telefon && <a href={`tel:${person.telefon.replace(/\s/g,'')}`} class="text-xs text-gray-400 hover:text-[#c4a94a] block">{person.telefon}</a>}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+    );
+  })}
+
+  <!-- Clubmeister -->
+  {clubmeister.length > 0 && (
+    <section class="py-20 bg-[#f5f5f0]">
+      <div class="max-w-7xl mx-auto px-4">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Ehrenliste</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-10">Clubmeister</h2>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-[#132e21] text-white">
+                <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider">Jahr</th>
+                <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider">Herren</th>
+                <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider">Damen</th>
+                <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider hidden md:table-cell">Senioren</th>
+                <th class="text-left px-5 py-3 font-medium text-xs uppercase tracking-wider hidden lg:table-cell">Brutto</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              {clubmeister.map((cm: any, i: number) => (
+                <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f7]'}>
+                  <td class="px-5 py-3 font-semibold text-[#c4a94a]">{cm.titel}</td>
+                  <td class="px-5 py-3 text-[#132e21]">{cm.herren ?? '–'}</td>
+                  <td class="px-5 py-3 text-[#132e21]">{cm.damen ?? '–'}</td>
+                  <td class="px-5 py-3 text-gray-500 hidden md:table-cell">{cm.senioren ?? '–'}</td>
+                  <td class="px-5 py-3 text-gray-500 hidden lg:table-cell">{cm.brutto ?? '–'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Mitgliedschaft -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <div>
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Mitmachen</p>
+          <h2 class="font-serif text-4xl text-[#132e21] mb-6">Mitgliedschaft</h2>
+          <p class="text-gray-600 leading-relaxed mb-8">
+            Als Mitglied des Golfclub Schwäbisch Hall genießen Sie alle Vorteile einer lebendigen
+            Golfgemeinschaft: ermäßigte Greenfees an Partnerclubs, Zugang zu Trainingsanlagen,
+            Teilnahme an Turnieren und einer herzlichen Gemeinschaft.
+          </p>
+          <a
+            href="/kontakt#mitglied"
+            class="inline-block bg-[#132e21] text-white px-8 py-3.5 font-semibold uppercase tracking-wider text-sm hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors"
+          >
+            Jetzt Mitglied werden
+          </a>
+        </div>
+        <div class="space-y-3">
+          {[
+            { kat: 'Vollmitgliedschaft', desc: 'Voller Zugang zu allen Anlagen und Angeboten des Clubs' },
+            { kat: 'Schnuppermitgliedschaft', desc: 'Für den 6-Loch-Kurzplatz – ideal zum Einstieg' },
+            { kat: 'Karrierestarter', desc: 'Sonderkonditionen in den ersten 6 Berufsjahren' },
+            { kat: 'Jugend bis 12 Jahre', desc: 'Besonders günstige Jahresbeiträge für die Jüngsten' },
+            { kat: 'Jugend 13–18 Jahre', desc: 'Günstige Konditionen für Schüler und Jugendliche' },
+            { kat: 'Junioren 19–21 Jahre', desc: 'Attraktive Einstiegspreise für junge Erwachsene' },
+            { kat: 'Studenten / Azubis bis 27', desc: 'Vergünstigte Mitgliedschaft während Ausbildung oder Studium' },
+            { kat: 'Zweitmitgliedschaft', desc: 'Auf Anfrage – sprechen Sie uns an' },
+          ].map(({ kat, desc }) => (
+            <div class="flex gap-4 p-4 bg-[#f5f5f0]">
+              <div class="w-1.5 bg-[#c4a94a] shrink-0 rounded-full"></div>
+              <div>
+                <div class="font-semibold text-[#132e21] text-sm">{kat}</div>
+                <div class="text-gray-500 text-xs mt-0.5">{desc}</div>
+              </div>
+            </div>
+          ))}
+          <p class="text-xs text-gray-400 pt-2">
+            Genaue Beiträge und Aufnahmegebühren auf Anfrage bei der Geschäftsstelle.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kontakt CTA -->
+  <section class="bg-[#132e21] py-16">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="font-serif text-2xl text-white mb-1">Fragen zur Mitgliedschaft?</div>
+        <div class="text-white/60 text-sm">Geschäftsstelle: +49 7907 8190 · info@gc-sha.de</div>
+      </div>
+      <a
+        href="/kontakt#mitglied"
+        class="shrink-0 bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+      >
+        Kontakt aufnehmen
+      </a>
+    </div>
+  </section>
+
+</Layout>

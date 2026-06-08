@@ -1,0 +1,111 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+let clubmeister: any[] = [];
+try {
+  const files = import.meta.glob('../content/clubmeister/*.json', { eager: true });
+  clubmeister = Object.values(files)
+    .map((f: any) => f.default ?? f)
+    .sort((a: any, b: any) => parseInt(String(b.titel ?? 0)) - parseInt(String(a.titel ?? 0)));
+} catch {}
+
+const current = clubmeister[0];
+
+const kategorien = [
+  { key: 'herren',      bildKey: 'herren_bild',      label: 'Herren' },
+  { key: 'damen',       bildKey: 'damen_bild',        label: 'Damen' },
+  { key: 'senioren',    bildKey: 'senioren_bild',     label: 'Senioren' },
+  { key: 'seniorinnen', bildKey: 'seniorinnen_bild',  label: 'Seniorinnen' },
+  { key: 'jugend',      bildKey: null,                label: 'Jugend' },
+  { key: 'brutto',      bildKey: null,                label: 'Brutto' },
+];
+---
+
+<Layout title="Clubmeister" description="Clubmeister des Golfclub Schwäbisch Hall – die Ehrenliste seit 1992">
+
+  <div class="bg-[#132e21] py-24 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-5">
+      <img src="/images/gallery/golf1.jpg" alt="" class="w-full h-full object-cover"/>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Ehrenliste</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Clubmeister</h1>
+      <p class="text-white/60 max-w-xl">Die Clubmeister des GC Schwäbisch Hall seit 1992.</p>
+    </div>
+  </div>
+
+  <!-- Aktuelle Clubmeister -->
+  {current && (
+    <section class="py-20 bg-white">
+      <div class="max-w-7xl mx-auto px-4">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Aktuelle Titelträger</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-10">{current.titel}</h2>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {kategorien.filter(k => current[k.key]).map(k => (
+            <div class="group">
+              <!-- Foto -->
+              <div class="aspect-square bg-[#f5f5f0] mb-4 overflow-hidden">
+                {current[k.bildKey] ? (
+                  <img
+                    src={current[k.bildKey]}
+                    alt={current[k.key]}
+                    class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
+                  />
+                ) : (
+                  <div class="w-full h-full flex items-center justify-center">
+                    <svg class="w-16 h-16 text-[#c4a94a]/30" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+              <!-- Info -->
+              <div class="border-l-2 border-[#c4a94a] pl-4">
+                <div class="text-xs font-bold text-[#c4a94a] uppercase tracking-widest mb-1">{k.label}</div>
+                <div class="font-serif text-xl text-[#132e21]">{current[k.key]}</div>
+                <div class="text-gray-400 text-xs mt-0.5">Clubmeister {current.titel}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- Vollständige Tabelle -->
+  <section class="py-16 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Alle Jahre</p>
+      <h2 class="font-serif text-3xl text-[#132e21] mb-8">Vollständige Ehrenliste</h2>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="bg-[#132e21] text-white">
+              <th class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider">Jahr</th>
+              <th class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider">Herren</th>
+              <th class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider">Damen</th>
+              <th class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider hidden md:table-cell">Senioren</th>
+              <th class="text-left px-4 py-3 font-medium text-xs uppercase tracking-wider hidden lg:table-cell">Seniorinnen</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {clubmeister.map((cm: any, i: number) => (
+              <tr class={`${i === 0 ? 'bg-[#faf8f2]' : i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'} hover:bg-[#f5f5f0] transition-colors`}>
+                <td class="px-4 py-3 font-bold text-[#c4a94a]">
+                  {cm.titel}
+                  {i === 0 && <span class="ml-2 text-[10px] bg-[#c4a94a] text-[#132e21] px-1.5 py-0.5 font-bold uppercase tracking-wider">aktuell</span>}
+                </td>
+                <td class="px-4 py-3 text-[#132e21] font-medium">{cm.herren || '–'}</td>
+                <td class="px-4 py-3 text-[#132e21] font-medium">{cm.damen || '–'}</td>
+                <td class="px-4 py-3 text-gray-500 hidden md:table-cell">{cm.senioren || '–'}</td>
+                <td class="px-4 py-3 text-gray-500 hidden lg:table-cell">{cm.seniorinnen || '–'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</Layout>

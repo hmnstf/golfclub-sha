@@ -1,17 +1,474 @@
 ---
+import Layout from '../layouts/Layout.astro';
+import { resolveStatus, getSperrzeit } from '../lib/platzstatus';
 
+// ── Platzstatus laden ──────────────────────────────────────────────
+let rawStatus: any = {
+  hauptplatz: 'auto', kurzplatz: 'auto', drivingRange: 'auto', cafe: 'auto',
+  hinweis: '',
+  zeitsteuerung: {
+    hauptplatzOeffnet: '07:00', hauptplatzSchliesst: '20:00',
+    kurzplatzOeffnet: '07:00', kurzplatzSchliesst: '21:00',
+    drivingRangeOeffnet: '07:00', drivingRangeSchliesst: '21:00',
+    cafeOeffnet: '09:00', cafeSchliesst: '21:00',
+  },
+};
+try {
+  const f = await import('../content/platzstatus/index.json').catch(() => null);
+  if (f?.default) rawStatus = { ...rawStatus, ...f.default };
+} catch {}
+
+const zt = rawStatus.zeitsteuerung ?? {};
+const sperrzeiten = rawStatus.sperrzeiten ?? [];
+const sz = {
+  hauptplatz:   getSperrzeit(sperrzeiten, 'hauptplatz'),
+  kurzplatz:    getSperrzeit(sperrzeiten, 'kurzplatz'),
+  drivingRange: getSperrzeit(sperrzeiten, 'drivingRange'),
+  carts:        getSperrzeit(sperrzeiten, 'carts'),
+};
+const status = {
+  hauptplatz:   resolveStatus(rawStatus.hauptplatz,   zt.hauptplatzOeffnet,   zt.hauptplatzSchliesst,   sz.hauptplatz),
+  kurzplatz:    resolveStatus(rawStatus.kurzplatz,    zt.kurzplatzOeffnet,    zt.kurzplatzSchliesst,    sz.kurzplatz),
+  drivingRange: resolveStatus(rawStatus.drivingRange, zt.drivingRangeOeffnet, zt.drivingRangeSchliesst, sz.drivingRange),
+  cafe:         resolveStatus(rawStatus.cafe,         zt.cafeOeffnet,         zt.cafeSchliesst),
+};
+
+const statusUI: Record<string, { dot: string; label: string; labelCarts?: string }> = {
+  open:    { dot: 'bg-emerald-500', label: 'Offen',          labelCarts: 'Erlaubt' },
+  limited: { dot: 'bg-amber-400',   label: 'Eingeschränkt',  labelCarts: 'Eingeschränkt' },
+  closed:  { dot: 'bg-red-500',     label: 'Geschlossen',    labelCarts: 'Nicht erlaubt' },
+};
+
+const cartsStatus = resolveStatus(rawStatus.carts ?? 'open', undefined, undefined, sz.carts);
+
+const platzItems = [
+  {
+    label: 'Meisterschaftsplatz',
+    status: status.hauptplatz,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21V3m0 0l9 4 9-4v18l-9-4-9 4"/>`,
+  },
+  {
+    label: 'Kurzplatz',
+    status: status.kurzplatz,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17V7m0 0l6 3 6-3 6 3v10l-6-3-6 3-6-3z"/>`,
+  },
+  {
+    label: 'Driving Range',
+    status: status.drivingRange,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>`,
+  },
+  {
+    label: 'Restaurant',
+    status: status.cafe,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>`,
+  },
+  {
+    label: 'Carts',
+    status: cartsStatus,
+    isCarts: true,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4"/>`,
+  },
+];
+
+// ── News laden ─────────────────────────────────────────────────────
+let news: any[] = [];
+try {
+  const files = import.meta.glob('../content/news/*.json', { eager: true });
+  news = Object.values(files)
+    .map((f: any) => f.default ?? f)
+    .filter((n: any) => n.featured)
+    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    .slice(0, 3);
+} catch {}
+
+// ── Events laden ───────────────────────────────────────────────────
+let events: any[] = [];
+try {
+  const files = import.meta.glob('../content/events/*.json', { eager: true });
+  const today = new Date().toISOString().split('T')[0];
+  events = Object.values(files)
+    .map((f: any) => f.default ?? f)
+    .filter((e: any) => e.date >= today)
+    .sort((a: any, b: any) => a.date.localeCompare(b.date))
+    .slice(0, 4);
+} catch {}
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<Layout title="Startseite">
+
+  <!-- ══ HERO ══════════════════════════════════════════════════════════ -->
+  <!-- overflow-visible damit Karten in den Hero ragen können -->
+  <section class="relative h-[72vh] min-h-[520px] flex flex-col justify-center" aria-label="Startseite Hero">
+    <!-- Bild-Wrapper hat overflow-hidden, Section selbst nicht -->
+    <div class="absolute inset-0 overflow-hidden">
+      <img
+        src="/images/hero/course.jpg"
+        alt="Golfclub Schwäbisch Hall"
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#0d2118]/85 via-[#0d2118]/55 to-[#0d2118]/10"></div>
+      <!-- Gradient nur im oberen Drittel, unten bleibt das Bild sichtbar -->
+      <div class="absolute inset-x-0 top-0 h-1/3 bg-gradient-to-b from-[#0d2118]/40 to-transparent"></div>
+    </div>
+
+    <!-- Inhalt – pb-14 = halbe Kartenhöhe, schafft den 50/50-Overlap -->
+    <div class="relative max-w-7xl mx-auto px-4 w-full pb-14">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">
+        Sport · Natur · Gemeinschaft
+      </p>
+      <h1 class="font-serif text-4xl md:text-5xl lg:text-6xl text-white leading-tight mb-5 max-w-xl">
+        Golfclub<br />Schwäbisch Hall
+      </h1>
+      <p class="text-white/70 text-base md:text-lg leading-relaxed mb-8 max-w-md">
+        Seit 1987 – Sport, Natur und Gemeinschaft in der Hohenloher Landschaft.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a
+          href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+          target="_blank" rel="noopener noreferrer"
+          class="bg-[#c4a94a] text-[#132e21] font-semibold px-7 py-3 uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+        >
+          Startzeit buchen
+        </a>
+        <a
+          href="/kontakt#mitglied"
+          class="border border-white/50 text-white font-medium px-7 py-3 text-sm hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors"
+        >
+          Mitglied werden
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ QUICK ACTIONS – ragen in den Hero rein ══════════════════════ -->
+  <div class="relative z-10 -mt-14 max-w-7xl mx-auto px-4">
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3">
+      {[
+        {
+          href: 'https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course',
+          external: true,
+          line1: 'Greenfee',
+          line2: 'Buchen',
+          icon: `<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/><polyline points="9 16 11 18 15 14" stroke-width="1.5"/>`,
+        },
+        {
+          href: '/turniere',
+          external: false,
+          line1: 'Turnier',
+          line2: 'Kalender',
+          icon: `<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/>`,
+        },
+        {
+          href: '/kontakt#mitglied',
+          external: false,
+          line1: 'Mitglied',
+          line2: 'Werden',
+          icon: `<circle cx="9" cy="7" r="4" stroke-width="1.5"/><path stroke-width="1.5" d="M3 21v-2a4 4 0 014-4h4a4 4 0 014 4v2"/><line x1="19" y1="8" x2="19" y2="14" stroke-width="1.5"/><line x1="16" y1="11" x2="22" y2="11" stroke-width="1.5"/>`,
+        },
+        {
+          href: '/restaurant',
+          external: false,
+          line1: 'Restaurant',
+          line2: 'Entdecken',
+          icon: `<line x1="9" y1="2" x2="9" y2="12" stroke-width="1.5"/><path stroke-linecap="round" stroke-width="1.5" d="M6 2v4a3 3 0 006 0V2"/><line x1="12" y1="12" x2="12" y2="22" stroke-width="1.5"/><path stroke-linecap="round" stroke-width="1.5" d="M20 5c0 0-1 7-5 7v10"/>`,
+        },
+      ].map(({ href, external, line1, line2, icon }) => (
+        <a
+          href={href}
+          target={external ? '_blank' : undefined}
+          rel={external ? 'noopener noreferrer' : undefined}
+          class="group bg-white hover:bg-[#faf8f2] transition-colors duration-200 px-7 py-7 flex items-center justify-between gap-5 shadow-md border border-gray-200"
+        >
+          <!-- Icon links -->
+          <svg
+            class="w-10 h-10 text-[#c4a94a] shrink-0"
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            viewBox="0 0 24 24"
+            set:html={icon}
+          ></svg>
+
+          <!-- Text in der Mitte -->
+          <div class="flex-1">
+            <div class="font-bold text-[#1a1a1a] text-xs uppercase tracking-widest leading-snug">{line1}</div>
+            <div class="font-bold text-[#1a1a1a] text-xs uppercase tracking-widest leading-snug">{line2}</div>
+          </div>
+
+          <!-- Pfeil rechts -->
+          <svg
+            class="w-4 h-4 text-[#c4a94a] shrink-0 group-hover:translate-x-0.5 transition-transform"
+            fill="none" stroke="currentColor" viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      ))}
+    </div>
+  </div>
+
+  <!-- ══ ABOUT + PLATZSTATUS ══════════════════════════════════════════ -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-start">
+
+      <!-- Links: Clubinfo -->
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Der Golfclub</p>
+        <h2 class="font-serif text-4xl md:text-5xl text-[#132e21] mb-6 leading-tight">
+          Golfen mitten in<br />Schwäbisch Hall
+        </h2>
+        <p class="text-gray-500 leading-relaxed mb-8">
+          Seit 1987 verbindet der Golfclub Schwäbisch Hall sportliche Herausforderung mit
+          Naturerlebnissen und herzlicher Gastfreundschaft.
+        </p>
+        <!-- Facility Icons -->
+        <div class="grid grid-cols-4 gap-4 pt-4 border-t border-gray-100">
+          {[
+            { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21V3m0 0l9 4 9-4v18l-9-4-9 4"/>`, label1: '18-Loch', label2: 'Meisterschaftsplatz' },
+            { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17V7m0 0l6 3 6-3 6 3v10l-6-3-6 3-6-3z"/>`, label1: '6-Loch', label2: 'Kurzplatz' },
+            { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>`, label1: 'Driving', label2: 'Range' },
+            { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>`, label1: 'Golf', label2: 'Academy' },
+          ].map(({ icon, label1, label2 }) => (
+            <div class="text-center">
+              <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center">
+                <svg class="w-7 h-7 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icon}></svg>
+              </div>
+              <div class="text-[10px] font-bold uppercase tracking-wider text-[#132e21] leading-tight">{label1}</div>
+              <div class="text-[10px] uppercase tracking-wider text-gray-400 leading-tight">{label2}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- Rechts: Platzstatus Live -->
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-5">Platzstatus Live</p>
+        {rawStatus.hinweis && (
+          <div class="mb-4 p-3 bg-amber-50 border border-amber-200 text-amber-800 text-xs">
+            ⚠ {rawStatus.hinweis}
+          </div>
+        )}
+        <div class="divide-y divide-gray-100">
+          {platzItems.map(({ label, status: s, isCarts, icon }) => {
+            const ui = statusUI[s] ?? statusUI.open;
+            const statusLabel = isCarts ? (ui.labelCarts ?? ui.label) : ui.label;
+            return (
+              <div class="flex items-center gap-4 py-4">
+                <div class="w-8 h-8 flex items-center justify-center shrink-0">
+                  <svg class="w-5 h-5 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icon}></svg>
+                </div>
+                <span class="flex-1 text-sm font-medium text-[#132e21]">{label}</span>
+                <div class="flex items-center gap-2">
+                  <span class:list={['w-2 h-2 rounded-full', ui.dot]}></span>
+                  <span class="text-sm text-gray-600">{statusLabel}</span>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+        <a
+          href="/platzstatus"
+          class="inline-flex items-center gap-2 mt-6 text-xs font-bold uppercase tracking-widest text-[#c4a94a] hover:text-[#132e21] transition-colors"
+        >
+          Details zum Platzstatus
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ══ FEATURE CARDS ════════════════════════════════════════════════ -->
+  <section class="py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Was wir bieten</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Ihr Golfclub in der Region</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        {[
+          {
+            title: 'Golf spielen',
+            subtitle: 'Herausfordernder Platz für jedes Spielniveau',
+            href: '/golf-erleben',
+            icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+            desc: 'Unser 18-Loch-Meisterschaftsplatz in wunderschöner Hohenloher Landschaft bietet Golf auf höchstem Niveau – für Gäste und Mitglieder.',
+            img: '/images/gallery/golf4.jpg',
+          },
+          {
+            title: 'Golf lernen',
+            subtitle: 'Einsteigen, verbessern und Freude erleben',
+            href: '/golf-lernen',
+            icon: 'M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253',
+            desc: 'Ob Anfänger oder Fortgeschrittener – unsere PGA-Profis in der Golf Academy begleiten Sie auf Ihrem Weg zu besserem Golf.',
+            img: '/images/gallery/golf2.jpg',
+          },
+          {
+            title: 'Cluberleben',
+            subtitle: 'Turniere, Events und Gemeinschaft genießen',
+            href: '/club',
+            icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z',
+            desc: 'Als Mitglied genießen Sie ein vielfältiges Turnierangebot, gesellige Clubveranstaltungen und eine lebendige Gemeinschaft.',
+            img: '/images/gallery/golf5.jpg',
+          },
+        ].map(({ title, subtitle, href, icon, desc, img }) => (
+          <a href={href} class="group bg-white hover:shadow-xl transition-all duration-300 border border-transparent hover:border-[#c4a94a]/30 overflow-hidden flex flex-col">
+            <div class="aspect-video overflow-hidden">
+              <img src={img} alt={title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+            </div>
+            <div class="p-7 flex-1 flex flex-col">
+              <div class="w-9 h-9 bg-[#132e21] flex items-center justify-center mb-4 group-hover:bg-[#c4a94a] transition-colors">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon}/>
+                </svg>
+              </div>
+              <h3 class="font-serif text-xl text-[#132e21] mb-1">{title}</h3>
+              <p class="text-[#c4a94a] text-xs uppercase tracking-wider font-semibold mb-3">{subtitle}</p>
+              <p class="text-gray-500 text-sm leading-relaxed mb-5 flex-1">{desc}</p>
+              <span class="text-xs font-bold uppercase tracking-wider text-[#132e21] group-hover:text-[#c4a94a] transition-colors flex items-center gap-1">
+                Mehr erfahren
+                <svg class="w-3 h-3 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ NEWS ══════════════════════════════════════════════════════════ -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="flex items-end justify-between mb-10">
+        <div>
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Aktuell</p>
+          <h2 class="font-serif text-4xl text-[#132e21]">News & Highlights</h2>
+        </div>
+        <a href="/turniere" class="hidden sm:flex items-center gap-1 text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">
+          Alle Events
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+
+      {news.length > 0 ? (
+        <div class="grid md:grid-cols-3 gap-6">
+          {news.map((item: any) => (
+            <article class="group border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden">
+              <div class="aspect-video overflow-hidden bg-[#132e21]">
+                {item.image && <img src={item.image} alt={item.title?.value ?? item.title} class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"/>}
+              </div>
+              <div class="p-6">
+                <div class="text-xs text-[#c4a94a] font-semibold uppercase tracking-wider mb-2">
+                  {new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })}
+                </div>
+                <h3 class="font-serif text-xl text-[#132e21] mb-2">{item.title?.value ?? item.title}</h3>
+                <p class="text-gray-500 text-sm leading-relaxed">{item.excerpt}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      ) : (
+        <!-- Placeholder-News, solange noch keine eingetragen -->
+        <div class="grid md:grid-cols-3 gap-6">
+          {[
+            { tag: 'Turnier', date: 'Demnächst', title: 'Clubmeisterschaft 2024', desc: 'Unser jährliches Highlight – die Clubmeisterschaft. Jetzt anmelden.', img: '/images/gallery/golf4.jpg' },
+            { tag: 'Golfschule', date: 'Laufend', title: 'Anfängerkurse Sommer', desc: 'Mit dem Golfen anfangen! Unsere Platzreife-Kurse starten regelmäßig.', img: '/images/gallery/golf2.jpg' },
+            { tag: 'Restaurant', date: 'Aktuell', title: 'Neue Saisonkarte', desc: 'Unser Team verwöhnt Sie mit neuen Gerichten aus der Region Hohenlohe.', img: '/images/gallery/golf5.jpg' },
+          ].map(({ tag, date, title, desc, img }) => (
+            <article class="group border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden">
+              <div class="aspect-video overflow-hidden">
+                <img src={img} alt={title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                <div class="absolute top-4 left-4">
+                  <span class="bg-[#c4a94a] text-[#132e21] text-xs font-bold px-2 py-0.5 uppercase">{tag}</span>
+                </div>
+              </div>
+              <div class="p-6">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="bg-[#132e21] text-[#c4a94a] text-xs font-bold px-2 py-0.5">{tag}</span>
+                  <span class="text-xs text-gray-400">{date}</span>
+                </div>
+                <h3 class="font-serif text-xl text-[#132e21] mb-2">{title}</h3>
+                <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+    </div>
+  </section>
+
+  <!-- ══ EVENTS STRIP ══════════════════════════════════════════════════ -->
+  <section class="bg-[#132e21] py-12">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col lg:flex-row lg:items-center gap-8">
+      <div class="shrink-0">
+        <p class="text-[#c4a94a] text-xs uppercase tracking-widest mb-1">Nächste Termine</p>
+        <h2 class="font-serif text-2xl text-white">Turnierkalender</h2>
+      </div>
+      <div class="flex-1 border-l border-white/20 lg:pl-8">
+        {events.length > 0 ? (
+          <div class="divide-y divide-white/10">
+            {events.map((e: any) => {
+              const d = new Date(e.date);
+              return (
+                <div class="flex items-center gap-5 py-3">
+                  <div class="text-center w-10 shrink-0">
+                    <div class="text-[#c4a94a] text-xl font-bold font-serif leading-none">{d.getDate()}</div>
+                    <div class="text-white/40 text-xs uppercase">{d.toLocaleDateString('de-DE', { month: 'short' })}</div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="text-white font-medium text-sm truncate">{e.title?.value ?? e.title}</div>
+                    {e.description && <div class="text-white/40 text-xs mt-0.5 truncate">{e.description}</div>}
+                  </div>
+                  <span class="shrink-0 text-xs bg-white/10 text-white/60 px-2 py-0.5 capitalize">{e.category}</span>
+                </div>
+              );
+            })}
+          </div>
+        ) : (
+          <p class="text-white/40 text-sm italic">Keine anstehenden Veranstaltungen.</p>
+        )}
+      </div>
+      <a href="/turniere" class="shrink-0 border border-[#c4a94a] text-[#c4a94a] px-6 py-2.5 text-sm font-medium uppercase tracking-wider hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors">
+        Alle Termine
+      </a>
+    </div>
+  </section>
+
+  <!-- ══ GALERIE / IMPRESSIONEN ════════════════════════════════════════ -->
+  <section class="py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-10">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Impressionen</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Erleben Sie unsere Anlage</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-2">
+        {[
+          '/images/gallery/golf1.jpg',
+          '/images/gallery/golf2.jpg',
+          '/images/gallery/golf3.jpg',
+          '/images/gallery/golf4.jpg',
+          '/images/gallery/golf5.jpg',
+        ].map((src) => (
+          <div class="aspect-square overflow-hidden">
+            <img src={src} alt="Impression" class="w-full h-full object-cover hover:scale-110 transition-transform duration-500"/>
+          </div>
+        ))}
+      </div>
+      <div class="text-center mt-6">
+        <a href="https://instagram.com" target="_blank" rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          </svg>
+          Folgen Sie uns auf Instagram
+        </a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

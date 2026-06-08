@@ -1,0 +1,19 @@
+{
+  "hauptplatz": "auto",
+  "kurzplatz": "auto",
+  "drivingRange": "auto",
+  "cafe": "auto",
+  "carts": "open",
+  "hinweis": "",
+  "zeitsteuerung": {
+    "hauptplatzOeffnet": "07:00",
+    "hauptplatzSchliesst": "20:00",
+    "kurzplatzOeffnet": "07:00",
+    "kurzplatzSchliesst": "21:00",
+    "drivingRangeOeffnet": "07:00",
+    "drivingRangeSchliesst": "21:00",
+    "cafeOeffnet": "09:00",
+    "cafeSchliesst": "21:00"
+  },
+  "sperrzeiten": []
+}

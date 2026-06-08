@@ -1,0 +1,128 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Platz- und Spielordnung 2026" description="Allgemeine Platz- und Spielordnung des Golfclub Schwäbisch Hall e.V.">
+
+  <div class="bg-[#132e21] py-24">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Golfanlage</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Platz- und Spielordnung</h1>
+      <p class="text-white/60 max-w-xl">Allgemeine Platz- und Spielordnung 2026 des GC Schwäbisch Hall e.V. – gültig für alle Spieler auf der Anlage.</p>
+    </div>
+  </div>
+
+  <section class="py-16 bg-white">
+    <div class="max-w-4xl mx-auto px-4">
+
+      <div class="mb-10 p-5 bg-[#f5f5f0] border-l-4 border-[#c4a94a]">
+        <p class="text-sm text-gray-600">Die Platz- und Spielordnung gilt ergänzend zu den Offiziellen Golfregeln und den Ständigen Platzregeln für alle Spieler auf der Anlage des GC Schwäbisch Hall e.V.</p>
+      </div>
+
+      <div class="space-y-8 text-sm text-gray-700 leading-relaxed">
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">1. Spielberechtigung</h2>
+          <div class="space-y-3">
+            <p>Spielberechtigt sind Mitglieder eines anerkannten Golfclubs mit einem gültigen World Handicap Index (WHI) von mindestens 54.</p>
+            <p>An Wochenenden und Feiertagen benötigen Gäste einen WHI von mindestens 45.</p>
+            <p>Gruppen ab 9 Personen sind nur nach vorheriger Voranmeldung und mit Genehmigung der Geschäftsstelle spielberechtigt.</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">2. Platzsperre bei Wettspielen</h2>
+          <p>Bei Wettspielen kann der Platz für den allgemeinen Spielbetrieb gesperrt werden. Die Sperrzeiten werden am Schwarzen Brett und online bekanntgegeben. Abschläge müssen mindestens 30–45 Minuten vor dem ersten Flight frei sein.</p>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">3. Privatwettspiele &amp; Gruppenanmeldungen</h2>
+          <p>Für Gruppen mit angemeldeten Wettspielen werden durch die Spielleitung Startzeiten zugeteilt. Wettkämpfe mit mehr als 9 Spielern bedürfen einer ausdrücklichen Genehmigung durch die Clubleitung und sind rechtzeitig anzumelden.</p>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">4. Platzrecht &amp; Flugreihenfolge</h2>
+          <div class="space-y-2">
+            <p>Zweiballspiele haben grundsätzlich Vorrang gegenüber größeren Flights.</p>
+            <p>An Wochenenden und Feiertagen sind Drei- oder Vierbälle zu bevorzugen, um den Platz optimal auszulasten.</p>
+            <p>Wer seinen Platz verliert, muss die nachfolgende Gruppe durchspielen lassen.</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">5. Spielgeschwindigkeit</h2>
+          <div class="space-y-3">
+            <p>Langsamere vordere Gruppen müssen schnelleren nachfolgenden Spielern auf Verlangen Vorrang gewähren und sie durchspielen lassen.</p>
+            <div class="grid sm:grid-cols-2 gap-3 my-3">
+              {[
+                { label: '18 Loch', zeit: 'max. 4 Stunden' },
+                { label: '9 Loch', zeit: 'max. 2 Stunden' },
+              ].map(({ label, zeit }) => (
+                <div class="bg-[#f5f5f0] p-4 flex items-center justify-between">
+                  <span class="font-semibold text-[#132e21]">{label}</span>
+                  <span class="text-[#c4a94a] font-bold">{zeit}</span>
+                </div>
+              ))}
+            </div>
+            <p>Spieler, die erkennbar langsam spielen und keine Einsicht zeigen, können von der Spielleitung vom Platz verwiesen werden.</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">6. Elektrobuggys &amp; Trolleys</h2>
+          <div class="space-y-2">
+            <p>Die Nutzung von Elektrobuggys (E-Carts) ist erlaubt und kann über die Geschäftsstelle gebucht werden. Bei Platzpflege-Maßnahmen oder schlechter Witterung kann die Nutzung eingeschränkt oder untersagt werden.</p>
+            <p>Trolleys und E-Carts sind von Grüns, Abschlägen, Bunkern und markierten Schutzzonen fernzuhalten. Es gelten die ausgeschilderten Fahrwege.</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">7. Platzpflege &amp; Etikette</h2>
+          <ul class="space-y-2 pl-4">
+            {[
+              'Divots auf dem Fairway sind zu ersetzen oder mit Sand zu füllen.',
+              'Pitchmarken auf dem Grün sind sofort auszubessern.',
+              'Bunker sind nach dem Spiel sorgfältig zu harken.',
+              'Flaggenstöcke sind schonend zu behandeln und wieder einzusetzen.',
+              'Abfall ist in die vorgesehenen Behälter zu entsorgen.',
+            ].map(item => (
+              <li class="flex gap-3 items-start">
+                <span class="text-[#c4a94a] font-bold shrink-0 mt-0.5">→</span>
+                <span>{item}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">8. Sicherheit</h2>
+          <p>Spieler sind verpflichtet, vor jedem Schlag sicherzustellen, dass keine Personen gefährdet werden. Bei herannahenden Gewittern ist der Platz sofort zu verlassen. Das Clubhaus und die Schutzhütten sind als Schutzräume zu nutzen.</p>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">9. Mobiltelefone</h2>
+          <p>Mobiltelefone sind auf der Anlage auf lautlos zu stellen. Telefonate sollten kurz gehalten und abseits der Spielpartner geführt werden, um den Spielfluss nicht zu stören.</p>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">10. Kleiderordnung</h2>
+          <p>Auf der Anlage gilt eine angemessene Golfkleidung. Sportliche Freizeitkleidung ist gestattet. Badekleidung, kurze Shorts oder Kleidung ohne Hemd/Oberteil sind nicht erlaubt. Im Restaurant gelten die dort aushängenden Kleiderordnungsregeln.</p>
+        </div>
+
+        <div>
+          <h2 class="font-serif text-2xl text-[#132e21] mb-4 pb-2 border-b border-gray-100">11. Haftung</h2>
+          <p>Für Unfälle, die durch Missachtung der Platz- und Spielordnung oder durch Unachtsamkeit entstehen, übernimmt der Golfclub Schwäbisch Hall e.V. keine Haftung. Jeder Spieler ist für seine eigene Sicherheit verantwortlich und haftet für Schäden, die er Dritten zufügt. Der Abschluss einer Golfsport-Haftpflichtversicherung wird dringend empfohlen.</p>
+        </div>
+
+      </div>
+
+      <div class="mt-12 pt-8 border-t border-gray-100 flex flex-wrap gap-6">
+        <a href="/platzregeln" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Ständige Platzregeln</a>
+        <a href="/wettspielordnung" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Wettspielordnung</a>
+        <a href="/golf-erleben" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Golfanlage</a>
+        <a href="/spielgebuehren" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Spielgebühren</a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

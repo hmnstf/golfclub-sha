@@ -1,0 +1,11 @@
+{
+  "oeffnungszeiten": [
+    { "tag": "Montag", "zeit": "Ruhetag", "ruhetag": true },
+    { "tag": "Dienstag – Freitag", "zeit": "ab 11:00 Uhr", "ruhetag": false },
+    { "tag": "Samstag, Sonntag & Feiertage", "zeit": "ab 10:00 Uhr", "ruhetag": false }
+  ],
+  "hinweis": "Abweichende Öffnungszeiten in den Wintermonaten möglich. Bitte informieren Sie sich vorab telefonisch.",
+  "reservierungTelefon": "+49 7907 94 02 42",
+  "reservierungEmail": "restaurant@gc-sha.de",
+  "reservierungUrl": ""
+}

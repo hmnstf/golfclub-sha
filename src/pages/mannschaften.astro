@@ -1,0 +1,102 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Mannschaften aus Keystatic laden
+const files = import.meta.glob('../content/mannschaften/*.json', { eager: true });
+const mannschaftenRaw = Object.values(files)
+  .map((f: any) => f.default ?? f)
+  .sort((a: any, b: any) => (a.reihenfolge ?? 99) - (b.reihenfolge ?? 99));
+
+// Anzeigenamen aus Slug ableiten (z.B. "herren-ak30" → "Herren AK 30")
+function slugToName(slug: string): string {
+  return slug
+    .split('-')
+    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+    .join(' ')
+    .replace(/Ak (\d+)/, 'AK $1');
+}
+
+const groupIcon = 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z';
+
+const mannschaften = mannschaftenRaw.map((m: any, i: number) => ({
+  name: slugToName(m.name),
+  icon: groupIcon,
+  ligen: m.ligen ?? [],
+  beschreibung: m.beschreibung ?? '',
+  farbe: i % 2 === 0 ? '#132e21' : '#c4a94a',
+}));
+---
+
+<Layout title="Mannschaften" description="Die Mannschaften des Golfclub Schwäbisch Hall im Ligabetrieb">
+
+  <div class="bg-[#132e21] py-20">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Club</p>
+      <h1 class="font-serif text-5xl text-white mb-4">Mannschaften</h1>
+      <p class="text-white/60 max-w-2xl">Der GC Schwäbisch Hall ist mit mehreren Mannschaften im Ligagolf aktiv. Gemeinsame Erfolge, Freundschaften und konsequentes Training verbinden unsere Teams.</p>
+    </div>
+  </div>
+
+  <section class="py-16 bg-white">
+    <div class="max-w-5xl mx-auto px-4">
+
+      <!-- Intro -->
+      <div class="max-w-3xl mb-14">
+        <p class="text-gray-600 leading-relaxed text-lg">
+          Mannschaftsgolf verbindet – gemeinsame Siege, aber auch Niederlagen schweißen zusammen. Wer Interesse hat, in einer unserer Mannschaften mitzuspielen, wendet sich gerne an die Geschäftsstelle oder den jeweiligen Mannschaftsführer.
+        </p>
+      </div>
+
+      <!-- Mannschaften Grid -->
+      <div class="grid md:grid-cols-2 gap-6 mb-16">
+        {mannschaften.map((m) => (
+          <div class="border border-gray-200 overflow-hidden group">
+            <!-- Kopfzeile -->
+            <div class="flex items-center gap-4 p-5 border-b border-gray-100">
+              <div class="w-10 h-10 flex items-center justify-center shrink-0" style={`background-color: ${m.farbe}15`}>
+                <svg class="w-5 h-5" style={`color: ${m.farbe}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={m.icon}/>
+                </svg>
+              </div>
+              <h2 class="font-serif text-xl text-[#132e21]">{m.name}</h2>
+            </div>
+
+            <div class="p-5 space-y-4">
+              <!-- Ligen -->
+              <div class="space-y-1.5">
+                {m.ligen.map((l) => (
+                  <div class="flex items-center gap-2 text-sm">
+                    <span class={`w-2 h-2 rounded-full shrink-0 ${l.aktiv ? 'bg-[#c4a94a]' : 'bg-gray-300'}`}></span>
+                    <span class={l.aktiv ? 'text-[#132e21] font-medium' : 'text-gray-400 italic'}>{l.liga}</span>
+                  </div>
+                ))}
+              </div>
+
+              <!-- Beschreibung -->
+              <p class="text-sm text-gray-500 leading-relaxed">{m.beschreibung}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <!-- Mitmachen -->
+      <div class="bg-[#132e21] p-8 flex flex-col sm:flex-row items-start sm:items-center gap-6">
+        <div class="flex-1">
+          <h3 class="font-serif text-2xl text-white mb-2">Interesse am Mannschaftsgolf?</h3>
+          <p class="text-white/60 text-sm">Wir freuen uns über neue Spielerinnen und Spieler in unseren Teams. Einfach bei der Geschäftsstelle melden!</p>
+        </div>
+        <a href="/kontakt" class="shrink-0 bg-[#c4a94a] text-[#132e21] font-semibold px-6 py-3 text-sm uppercase tracking-wider hover:bg-[#d4bc6a] transition-colors">
+          Kontakt aufnehmen
+        </a>
+      </div>
+
+      <!-- Links -->
+      <div class="mt-12 pt-8 border-t border-gray-100 flex flex-wrap gap-6">
+        <a href="/club" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">← Unser Club</a>
+        <a href="/turniere" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Turnierkalender</a>
+        <a href="/golf-lernen" class="text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">→ Golf Academy</a>
+      </div>
+    </div>
+  </section>
+
+</Layout>

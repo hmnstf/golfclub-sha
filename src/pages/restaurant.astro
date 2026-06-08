@@ -1,0 +1,138 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+// Restaurant-Daten aus Keystatic laden
+import restaurantData from '../content/restaurant/index.json';
+
+const oeffnungszeiten = restaurantData.oeffnungszeiten ?? [];
+const hinweis = restaurantData.hinweis ?? '';
+const telefon = restaurantData.reservierungTelefon ?? '+49 7907 94 02 42';
+const email = restaurantData.reservierungEmail ?? '';
+---
+
+<Layout title="Restaurant Brassie" description="Restaurant Brassie im Golfclub Schwäbisch Hall – Hausgemachte deutsche Spezialitäten mit Blick auf das 18. Grün">
+
+  <div class="bg-[#132e21] py-24 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-15">
+      <img src="/images/gallery/golf5.jpg" alt="" class="w-full h-full object-cover"/>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Gastronomie</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Restaurant Brassie</h1>
+      <p class="text-white/60 max-w-xl">Hausgemachte Spezialitäten mit Blick auf das 18. Grün und die Driving Range.</p>
+    </div>
+  </div>
+
+  <!-- Über das Restaurant -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Willkommen</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-6">Genuss nach der Runde</h2>
+        <p class="text-gray-600 leading-relaxed mb-4">
+          Das Restaurant <strong>Brassie</strong> begrüßt Sie mit hausgemachten deutschen Spezialitäten
+          in gemütlicher Atmosphäre. Ob nach der Runde, zur Mittagspause oder als geselliger
+          Abend mit Freunden – unser Team sorgt für Ihr Wohlbefinden.
+        </p>
+        <p class="text-gray-600 leading-relaxed mb-8">
+          Unsere große Terrasse mit Blick auf das 18. Grün und die Driving Range lädt zum
+          Entspannen ein. Die Küche richtet sich auf private Events und Gruppenveranstaltungen
+          mit individuell angepassten Menüs ein.
+        </p>
+
+        <!-- Öffnungszeiten -->
+        <div class="bg-[#f5f5f0] p-6">
+          <div class="text-xs font-bold uppercase tracking-widest text-[#c4a94a] mb-4">Öffnungszeiten</div>
+          <div class="space-y-2 text-sm">
+            {oeffnungszeiten.map((o: any) => (
+              <div class="flex justify-between items-baseline">
+                <span class="text-gray-500">{o.tag}</span>
+                <span class={`font-semibold ${o.ruhetag ? 'text-red-600' : 'text-[#132e21]'}`}>{o.zeit}</span>
+              </div>
+            ))}
+          </div>
+          <div class="mt-5 pt-4 border-t border-gray-200">
+            <a href={`tel:${telefon.replace(/\s/g, '')}`} class="flex items-center gap-2 text-sm text-[#132e21] hover:text-[#c4a94a] transition-colors font-medium">
+              <svg class="w-4 h-4 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+              {telefon}
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bild + Highlights -->
+      <div class="space-y-4">
+        <div class="relative overflow-hidden h-64">
+          <img src="/images/gallery/golf4.jpg" alt="Restaurant Brassie" class="w-full h-full object-cover"/>
+          <div class="absolute inset-0 bg-gradient-to-t from-[#132e21]/60 to-transparent flex items-end p-6">
+            <div class="font-serif text-white text-xl">Terrasse mit Blick auf Bahn 18</div>
+          </div>
+        </div>
+        <div class="grid grid-cols-3 gap-4">
+          {[
+            { icon: 'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6', label: 'Terrasse' },
+            { icon: 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z', label: 'Gruppenevents' },
+            { icon: 'M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7', label: 'Dt. Küche' },
+          ].map(({ icon, label }) => (
+            <div class="bg-[#f5f5f0] p-4 text-center">
+              <svg class="w-6 h-6 text-[#c4a94a] mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon}/>
+              </svg>
+              <div class="text-xs text-gray-500 uppercase tracking-wider">{label}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Angebote -->
+  <section class="py-16 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="mb-10">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Was wir bieten</p>
+        <h2 class="font-serif text-3xl text-[#132e21]">Angebote & Events</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        {[
+          {
+            title: 'Mittagstisch',
+            desc: 'Frische Tagesgerichte und hausgemachte Spezialitäten zur Mittagszeit – für Golfer und externe Gäste.',
+          },
+          {
+            title: 'Turnieressen',
+            desc: 'Nach dem Turnier gemeinsam speisen: Wir organisieren Buffets und Menüs für Ihre Turnierteilnehmer.',
+          },
+          {
+            title: 'Private Feiern',
+            desc: 'Geburtstage, Firmenfeiern, Jubiläen – unser Team plant Ihr Event mit individuellen Menüs und besonderem Ambiente.',
+          },
+        ].map(({ title, desc }) => (
+          <div class="bg-white p-6 border-t-2 border-[#c4a94a]">
+            <h3 class="font-serif text-xl text-[#132e21] mb-3">{title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Reservierung CTA -->
+  <section class="bg-[#132e21] py-14">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
+      <div>
+        <div class="font-serif text-2xl text-white mb-1">Tisch reservieren</div>
+        <div class="text-white/60 text-sm">Restaurant Brassie · {telefon}</div>
+      </div>
+      <a
+        href={`tel:${telefon.replace(/\s/g, '')}`}
+        class="shrink-0 bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+      >
+        Jetzt anrufen
+      </a>
+    </div>
+  </section>
+
+</Layout>
