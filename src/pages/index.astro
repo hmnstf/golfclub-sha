@@ -16,6 +16,58 @@ const defaults: any = {
 };
 const rawStatus = { ...defaults, ...((await getPlatzstatus()) ?? {}) };
 
+const zt = rawStatus.zeitsteuerung ?? {};
+const sperrzeiten = rawStatus.sperrzeiten ?? [];
+const sz = {
+  hauptplatz:   getSperrzeit(sperrzeiten, 'hauptplatz'),
+  kurzplatz:    getSperrzeit(sperrzeiten, 'kurzplatz'),
+  drivingRange: getSperrzeit(sperrzeiten, 'drivingRange'),
+  carts:        getSperrzeit(sperrzeiten, 'carts'),
+};
+const status = {
+  hauptplatz:   resolveStatus(rawStatus.hauptplatz,   zt.hauptplatzOeffnet,   zt.hauptplatzSchliesst,   sz.hauptplatz),
+  kurzplatz:    resolveStatus(rawStatus.kurzplatz,    zt.kurzplatzOeffnet,    zt.kurzplatzSchliesst,    sz.kurzplatz),
+  drivingRange: resolveStatus(rawStatus.drivingRange, zt.drivingRangeOeffnet, zt.drivingRangeSchliesst, sz.drivingRange),
+  cafe:         resolveStatus(rawStatus.cafe,         zt.cafeOeffnet,         zt.cafeSchliesst),
+};
+
+const statusUI: Record<string, { dot: string; label: string; labelCarts?: string }> = {
+  open:    { dot: 'bg-emerald-500', label: 'Offen',          labelCarts: 'Erlaubt' },
+  limited: { dot: 'bg-amber-400',   label: 'Eingeschränkt',  labelCarts: 'Eingeschränkt' },
+  closed:  { dot: 'bg-red-500',     label: 'Geschlossen',    labelCarts: 'Nicht erlaubt' },
+};
+
+const cartsStatus = resolveStatus(rawStatus.carts ?? 'open', undefined, undefined, sz.carts);
+
+const platzItems = [
+  {
+    label: 'Meisterschaftsplatz',
+    status: status.hauptplatz,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21V3m0 0l9 4 9-4v18l-9-4-9 4"/>`,
+  },
+  {
+    label: 'Kurzplatz',
+    status: status.kurzplatz,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17V7m0 0l6 3 6-3 6 3v10l-6-3-6 3-6-3z"/>`,
+  },
+  {
+    label: 'Driving Range',
+    status: status.drivingRange,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>`,
+  },
+  {
+    label: 'Restaurant',
+    status: status.cafe,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>`,
+  },
+  {
+    label: 'Carts',
+    status: cartsStatus,
+    isCarts: true,
+    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4"/>`,
+  },
+];
+
 // ── News laden ─────────────────────────────────────────────────────
 const news = await getNews({ nurVeroeffentlicht: true, nurHighlights: true, limit: 3 });
 
