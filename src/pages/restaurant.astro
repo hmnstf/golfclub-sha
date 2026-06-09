@@ -1,13 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getRestaurant } from '../lib/directus';
 
-// Restaurant-Daten aus Keystatic laden
-import restaurantData from '../content/restaurant/index.json';
-
-const oeffnungszeiten = restaurantData.oeffnungszeiten ?? [];
-const hinweis = restaurantData.hinweis ?? '';
-const telefon = restaurantData.reservierungTelefon ?? '+49 7907 94 02 42';
-const email = restaurantData.reservierungEmail ?? '';
+const restaurantData = await getRestaurant();
+const oeffnungszeiten = restaurantData?.oeffnungszeiten ?? [];
+const hinweis         = restaurantData?.hinweis         ?? '';
+const telefon         = restaurantData?.reservierungTelefon ?? '+49 7907 94 02 42';
+const email           = restaurantData?.reservierungEmail   ?? '';
 ---
 
 <Layout title="Restaurant Brassie" description="Restaurant Brassie im Golfclub Schwäbisch Hall – Hausgemachte deutsche Spezialitäten mit Blick auf das 18. Grün">

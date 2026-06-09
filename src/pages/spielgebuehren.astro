@@ -1,15 +1,14 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getSpielgebuehren } from '../lib/directus';
 
-// Spielgebühren aus Keystatic laden
-import gebuehrenData from '../content/spielgebuehren/index.json';
-
-const greenfee18 = gebuehrenData.greenfee18 ?? [];
-const greenfee9 = gebuehrenData.greenfee9 ?? [];
-const kurzplatz = gebuehrenData.kurzplatz ?? [];
-const leihgebuehren = gebuehrenData.leihgebuehren ?? [];
-const hinweis = gebuehrenData.hinweis ?? '';
-const saison = gebuehrenData.saison ?? '';
+const gebuehrenData = await getSpielgebuehren();
+const greenfee18    = gebuehrenData?.greenfee18    ?? [];
+const greenfee9     = gebuehrenData?.greenfee9     ?? [];
+const kurzplatz     = gebuehrenData?.kurzplatz     ?? [];
+const leihgebuehren = gebuehrenData?.leihgebuehren ?? [];
+const hinweis       = gebuehrenData?.hinweis       ?? '';
+const saison        = gebuehrenData?.saison        ?? '';
 ---
 
 <Layout title="Spielgebühren & Greenfee" description="Aktuelle Spielgebühren und Greenfee-Preise des Golfclub Schwäbisch Hall">

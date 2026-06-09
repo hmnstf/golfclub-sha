@@ -1,25 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getMannschaften } from '../lib/directus';
 
-// Mannschaften aus Keystatic laden
-const files = import.meta.glob('../content/mannschaften/*.json', { eager: true });
-const mannschaftenRaw = Object.values(files)
-  .map((f: any) => f.default ?? f)
-  .sort((a: any, b: any) => (a.reihenfolge ?? 99) - (b.reihenfolge ?? 99));
-
-// Anzeigenamen aus Slug ableiten (z.B. "herren-ak30" → "Herren AK 30")
-function slugToName(slug: string): string {
-  return slug
-    .split('-')
-    .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
-    .replace(/Ak (\d+)/, 'AK $1');
-}
+const mannschaftenRaw = await getMannschaften();
 
 const groupIcon = 'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z';
 
 const mannschaften = mannschaftenRaw.map((m: any, i: number) => ({
-  name: slugToName(m.name),
+  name: m.name,
   icon: groupIcon,
   ligen: m.ligen ?? [],
   beschreibung: m.beschreibung ?? '',

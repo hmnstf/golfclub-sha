@@ -1,11 +1,12 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { resolveStatus, getSperrzeit } from '../lib/platzstatus';
+import { getPlatzstatus, getNews, getEvents, bildUrl } from '../lib/directus';
 
 // ── Platzstatus laden ──────────────────────────────────────────────
-let rawStatus: any = {
-  hauptplatz: 'auto', kurzplatz: 'auto', drivingRange: 'auto', cafe: 'auto',
-  hinweis: '',
+const defaults: any = {
+  hauptplatz: 'auto', kurzplatz: 'auto', drivingRange: 'auto', cafe: 'auto', carts: 'open',
+  hinweis: '', sperrzeiten: [],
   zeitsteuerung: {
     hauptplatzOeffnet: '07:00', hauptplatzSchliesst: '20:00',
     kurzplatzOeffnet: '07:00', kurzplatzSchliesst: '21:00',
@@ -13,85 +14,14 @@ let rawStatus: any = {
     cafeOeffnet: '09:00', cafeSchliesst: '21:00',
   },
 };
-try {
-  const f = await import('../content/platzstatus/index.json').catch(() => null);
-  if (f?.default) rawStatus = { ...rawStatus, ...f.default };
-} catch {}
-
-const zt = rawStatus.zeitsteuerung ?? {};
-const sperrzeiten = rawStatus.sperrzeiten ?? [];
-const sz = {
-  hauptplatz:   getSperrzeit(sperrzeiten, 'hauptplatz'),
-  kurzplatz:    getSperrzeit(sperrzeiten, 'kurzplatz'),
-  drivingRange: getSperrzeit(sperrzeiten, 'drivingRange'),
-  carts:        getSperrzeit(sperrzeiten, 'carts'),
-};
-const status = {
-  hauptplatz:   resolveStatus(rawStatus.hauptplatz,   zt.hauptplatzOeffnet,   zt.hauptplatzSchliesst,   sz.hauptplatz),
-  kurzplatz:    resolveStatus(rawStatus.kurzplatz,    zt.kurzplatzOeffnet,    zt.kurzplatzSchliesst,    sz.kurzplatz),
-  drivingRange: resolveStatus(rawStatus.drivingRange, zt.drivingRangeOeffnet, zt.drivingRangeSchliesst, sz.drivingRange),
-  cafe:         resolveStatus(rawStatus.cafe,         zt.cafeOeffnet,         zt.cafeSchliesst),
-};
-
-const statusUI: Record<string, { dot: string; label: string; labelCarts?: string }> = {
-  open:    { dot: 'bg-emerald-500', label: 'Offen',          labelCarts: 'Erlaubt' },
-  limited: { dot: 'bg-amber-400',   label: 'Eingeschränkt',  labelCarts: 'Eingeschränkt' },
-  closed:  { dot: 'bg-red-500',     label: 'Geschlossen',    labelCarts: 'Nicht erlaubt' },
-};
-
-const cartsStatus = resolveStatus(rawStatus.carts ?? 'open', undefined, undefined, sz.carts);
-
-const platzItems = [
-  {
-    label: 'Meisterschaftsplatz',
-    status: status.hauptplatz,
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21V3m0 0l9 4 9-4v18l-9-4-9 4"/>`,
-  },
-  {
-    label: 'Kurzplatz',
-    status: status.kurzplatz,
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 17V7m0 0l6 3 6-3 6 3v10l-6-3-6 3-6-3z"/>`,
-  },
-  {
-    label: 'Driving Range',
-    status: status.drivingRange,
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>`,
-  },
-  {
-    label: 'Restaurant',
-    status: status.cafe,
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>`,
-  },
-  {
-    label: 'Carts',
-    status: cartsStatus,
-    isCarts: true,
-    icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4"/>`,
-  },
-];
+const rawStatus = { ...defaults, ...((await getPlatzstatus()) ?? {}) };
 
 // ── News laden ─────────────────────────────────────────────────────
-let news: any[] = [];
-try {
-  const files = import.meta.glob('../content/news/*.json', { eager: true });
-  news = Object.values(files)
-    .map((f: any) => f.default ?? f)
-    .filter((n: any) => n.featured)
-    .sort((a: any, b: any) => new Date(b.date).getTime() - new Date(a.date).getTime())
-    .slice(0, 3);
-} catch {}
+const news = await getNews({ nurVeroeffentlicht: true, nurHighlights: true, limit: 3 });
 
 // ── Events laden ───────────────────────────────────────────────────
-let events: any[] = [];
-try {
-  const files = import.meta.glob('../content/events/*.json', { eager: true });
-  const today = new Date().toISOString().split('T')[0];
-  events = Object.values(files)
-    .map((f: any) => f.default ?? f)
-    .filter((e: any) => e.date >= today)
-    .sort((a: any, b: any) => a.date.localeCompare(b.date))
-    .slice(0, 4);
-} catch {}
+const allEvents = await getEvents(true);
+const events = allEvents.slice(0, 4);
 ---
 
 <Layout title="Startseite">
@@ -360,13 +290,13 @@ try {
           {news.map((item: any) => (
             <article class="group border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden">
               <div class="aspect-video overflow-hidden bg-[#132e21]">
-                {item.image && <img src={item.image} alt={item.title?.value ?? item.title} class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"/>}
+                {bildUrl(item.bild) && <img src={bildUrl(item.bild)} alt={item.titel} class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"/>}
               </div>
               <div class="p-6">
                 <div class="text-xs text-[#c4a94a] font-semibold uppercase tracking-wider mb-2">
                   {new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })}
                 </div>
-                <h3 class="font-serif text-xl text-[#132e21] mb-2">{item.title?.value ?? item.title}</h3>
+                <h3 class="font-serif text-xl text-[#132e21] mb-2">{item.titel}</h3>
                 <p class="text-gray-500 text-sm leading-relaxed">{item.excerpt}</p>
               </div>
             </article>
@@ -421,7 +351,7 @@ try {
                     <div class="text-white/40 text-xs uppercase">{d.toLocaleDateString('de-DE', { month: 'short' })}</div>
                   </div>
                   <div class="flex-1 min-w-0">
-                    <div class="text-white font-medium text-sm truncate">{e.title?.value ?? e.title}</div>
+                    <div class="text-white font-medium text-sm truncate">{e.titel}</div>
                     {e.description && <div class="text-white/40 text-xs mt-0.5 truncate">{e.description}</div>}
                   </div>
                   <span class="shrink-0 text-xs bg-white/10 text-white/60 px-2 py-0.5 capitalize">{e.category}</span>

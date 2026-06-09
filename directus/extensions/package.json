@@ -1,0 +1,12 @@
+{
+  "name": "directus-extensions",
+  "version": "1.0.0",
+  "description": "GC SHA Directus Extensions",
+  "type": "module",
+  "dependencies": {
+    "@directus-labs/seo-plugin": "^1.1.1",
+    "@directus-labs/timeline-chart-panel": "^1.0.1",
+    "@samfurlong/directus-panel-calendar": "^1.0.3",
+    "directus-extension-flexible-editor": "^1.8.4"
+  }
+}

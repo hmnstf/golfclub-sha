@@ -1,0 +1,9 @@
+FROM directus/directus:11
+
+# Als node User bleiben (Standard im Image) und Extensions installieren
+RUN cd /directus && \
+    pnpm add \
+      directus-extension-flexible-editor \
+      "@directus-labs/seo-plugin" \
+      "@samfurlong/directus-panel-calendar" \
+      "@directus-labs/timeline-chart-panel"

@@ -1,0 +1,16 @@
+{
+  "name": "gcsha-directus",
+  "version": "1.0.0",
+  "description": "Directus CMS für Golfclub Schwäbisch Hall",
+  "scripts": {
+    "start": "directus start",
+    "bootstrap": "directus bootstrap"
+  },
+  "dependencies": {
+    "directus": "^11.0.0",
+    "directus-extension-flexible-editor": "^1.8.4",
+    "@directus-labs/seo-plugin": "^1.1.1",
+    "@samfurlong/directus-panel-calendar": "^1.0.3",
+    "@directus-labs/timeline-chart-panel": "^1.0.1"
+  }
+}

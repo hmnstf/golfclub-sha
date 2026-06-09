@@ -1,0 +1,21 @@
+services:
+  directus:
+    build:
+      context: .
+      dockerfile: Dockerfile.directus
+    ports:
+      - "8055:8055"
+    volumes:
+      - ./directus/database:/directus/database
+      - ./directus/uploads:/directus/uploads
+    environment:
+      SECRET: "gcsha-secret-key-2026"
+      ADMIN_EMAIL: "admin@gc-sha.de"
+      ADMIN_PASSWORD: "golfclub2024"
+      DB_CLIENT: "sqlite3"
+      DB_FILENAME: "/directus/database/data.db"
+      WEBSOCKETS_ENABLED: "true"
+      CORS_ENABLED: "true"
+      CORS_ORIGIN: "true"
+      PUBLIC_URL: "http://localhost:8055"
+      MARKETPLACE_TRUST: "all"

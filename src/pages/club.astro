@@ -1,14 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getTeam, getClubmeister, bildUrl } from '../lib/directus';
 
-// Team laden
-let teamMembers: any[] = [];
-try {
-  const files = import.meta.glob('../content/team/*.json', { eager: true });
-  teamMembers = Object.values(files)
-    .map((f: any) => f.default ?? f)
-    .sort((a: any, b: any) => (a.reihenfolge ?? 99) - (b.reihenfolge ?? 99));
-} catch {}
+const teamMembers = await getTeam();
+const clubmeister = await getClubmeister();
 
 const gruppenLabels: Record<string, string> = {
   vorstand_gf: 'Geschäftsführender Vorstand',
@@ -19,19 +14,6 @@ const gruppenLabels: Record<string, string> = {
 };
 
 const gruppen = ['vorstand_gf', 'vorstand', 'geschaeftsstelle', 'trainer', 'ehren'];
-
-// Clubmeister laden
-let clubmeister: any[] = [];
-try {
-  const files = import.meta.glob('../content/clubmeister/*.json', { eager: true });
-  clubmeister = Object.values(files)
-    .map((f: any) => f.default ?? f)
-    .sort((a: any, b: any) => {
-      const jA = parseInt(String(a.titel ?? 0));
-      const jB = parseInt(String(b.titel ?? 0));
-      return jB - jA;
-    });
-} catch {}
 ---
 
 <Layout title="Unser Club" description="Golfclub Schwäbisch Hall – Geschichte, Vorstand, Teams und Mitgliedschaft seit 1987">
@@ -139,7 +121,7 @@ try {
                 <div class="overflow-hidden bg-[#f5f5f0] aspect-[4/3]">
                   {person.bild ? (
                     <img
-                      src={person.bild}
+                      src={bildUrl(person.bild)}
                       alt={person.name}
                       class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
                     />
@@ -190,7 +172,7 @@ try {
             <tbody class="divide-y divide-gray-100">
               {clubmeister.map((cm: any, i: number) => (
                 <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#faf9f7]'}>
-                  <td class="px-5 py-3 font-semibold text-[#c4a94a]">{cm.titel}</td>
+                  <td class="px-5 py-3 font-semibold text-[#c4a94a]">{cm.jahr}</td>
                   <td class="px-5 py-3 text-[#132e21]">{cm.herren ?? '–'}</td>
                   <td class="px-5 py-3 text-[#132e21]">{cm.damen ?? '–'}</td>
                   <td class="px-5 py-3 text-gray-500 hidden md:table-cell">{cm.senioren ?? '–'}</td>

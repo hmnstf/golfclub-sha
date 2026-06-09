@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getSpielgruppen } from '../lib/directus';
 
-// Spielgruppen aus Keystatic laden
-import spielgruppenData from '../content/spielgruppen/index.json';
+const spielgruppenData = await getSpielgruppen();
 
 const icons = [
   'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
@@ -10,7 +10,7 @@ const icons = [
 ];
 const farben = ['#c4a94a', '#132e21'];
 
-const gruppen = (spielgruppenData.gruppen ?? []).map((g: any, i: number) => ({
+const gruppen = (spielgruppenData?.gruppen ?? []).map((g: any, i: number) => ({
   name: g.name,
   icon: icons[i % icons.length],
   farbe: farben[i % farben.length],

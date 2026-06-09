@@ -1,24 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getHoleInOne } from '../lib/directus';
 
-// Hole-in-One Einträge aus Keystatic laden
-const files = import.meta.glob('../content/holeinone/*.json', { eager: true });
-const eintraege = Object.values(files)
-  .map((f: any) => {
-    const d = f.default ?? f;
-    // Slug als Anzeigename umwandeln (z.B. "fritz-scheufele" → "Fritz Scheufele")
-    const anzeigeName = d.name
-      .replace(/-\d{4}$/, '') // Jahressuffix entfernen (werner-strecker-2001 → werner-strecker)
-      .split('-')
-      .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
-      .join(' ')
-      .replace(/^Dr /, 'Dr. '); // "Dr " → "Dr. "
-    // Datum formatieren: "1991-09-07" → "07.09.1991"
-    const [year, month, day] = (d.datum ?? '').split('-');
-    const datumFormatiert = year ? `${day}.${month}.${year}` : d.datum;
-    return { datum: datumFormatiert, bahn: d.bahn, name: anzeigeName, _raw: d.datum };
-  })
-  .sort((a: any, b: any) => a._raw.localeCompare(b._raw));
+const rawEintraege = await getHoleInOne();
+const eintraege = rawEintraege.map(d => {
+  const [year, month, day] = (d.datum ?? '').split('-');
+  const datumFormatiert = year ? `${day}.${month}.${year}` : d.datum;
+  return { datum: datumFormatiert, bahn: d.bahn, name: d.name, _raw: d.datum };
+});
 ---
 
 <Layout title="Hole-in-One" description="Die Hole-in-One Liste des Golfclub Schwäbisch Hall">

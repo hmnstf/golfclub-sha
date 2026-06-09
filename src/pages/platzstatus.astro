@@ -2,7 +2,9 @@
 import Layout from '../layouts/Layout.astro';
 import { resolveStatus, getSperrzeit, getUpcomingSperrzeiten } from '../lib/platzstatus';
 
-let rawStatus: any = {
+import { getPlatzstatus } from '../lib/directus';
+
+const defaults: any = {
   hauptplatz: 'auto', kurzplatz: 'auto', drivingRange: 'auto', cafe: 'auto', carts: 'open',
   hinweis: '', sperrzeiten: [],
   zeitsteuerung: {
@@ -12,10 +14,8 @@ let rawStatus: any = {
     cafeOeffnet: '09:00', cafeSchliesst: '21:00',
   },
 };
-try {
-  const f = await import('../content/platzstatus/index.json').catch(() => null);
-  if (f?.default) rawStatus = { ...rawStatus, ...f.default };
-} catch {}
+const fromCMS = await getPlatzstatus();
+const rawStatus = { ...defaults, ...(fromCMS ?? {}) };
 
 const zt = rawStatus.zeitsteuerung ?? {};
 const sperrzeiten = rawStatus.sperrzeiten ?? [];

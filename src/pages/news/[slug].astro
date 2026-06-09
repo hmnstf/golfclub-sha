@@ -1,0 +1,96 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getNews, getNewsArtikel, bildUrl, bildUrlMitFormat } from '../../lib/directus';
+
+// Da output: server → dynamisch rendern (Directus liefert aktuelle Daten)
+// Bei Bedarf: export const prerender = true + getStaticPaths für statischen Build
+
+const { slug } = Astro.params;
+const artikel = await getNewsArtikel(slug);
+
+if (!artikel) {
+  return Astro.redirect('/news', 302);
+}
+
+function formatDatum(iso: string) {
+  if (!iso) return '';
+  const [y, m, d] = iso.split('-');
+  return new Date(parseInt(y), parseInt(m) - 1, parseInt(d))
+    .toLocaleDateString('de-DE', { day: 'numeric', month: 'long', year: 'numeric' });
+}
+
+const seoTitel    = artikel.seo_titel        || `${artikel.titel} | GC Schwäbisch Hall`;
+const seoDesc     = artikel.seo_beschreibung || artikel.zusammenfassung || '';
+const titelbild   = bildUrlMitFormat(artikel.bild, { width: 1200, quality: 80 });
+const titelbildSm = bildUrlMitFormat(artikel.bild, { width: 800, quality: 75 });
+---
+
+<Layout title={seoTitel} description={seoDesc}>
+
+  <!-- Hero mit Titelbild -->
+  {titelbild ? (
+    <div class="relative h-64 md:h-96 overflow-hidden">
+      <img src={titelbild} alt={artikel.titel} class="w-full h-full object-cover"/>
+      <div class="absolute inset-0 bg-gradient-to-t from-[#132e21]/80 to-transparent"/>
+      <div class="absolute bottom-0 left-0 right-0 max-w-4xl mx-auto px-4 pb-8">
+        <p class="text-[#c4a94a] text-xs font-bold uppercase tracking-widest mb-2">{formatDatum(artikel.datum)}</p>
+        <h1 class="font-serif text-3xl md:text-4xl text-white leading-tight">{artikel.titel}</h1>
+      </div>
+    </div>
+  ) : (
+    <div class="bg-[#132e21] py-20">
+      <div class="max-w-4xl mx-auto px-4">
+        <p class="text-[#c4a94a] text-xs font-bold uppercase tracking-widest mb-3">{formatDatum(artikel.datum)}</p>
+        <h1 class="font-serif text-4xl md:text-5xl text-white leading-tight">{artikel.titel}</h1>
+      </div>
+    </div>
+  )}
+
+  <!-- Artikel-Inhalt -->
+  <article class="py-12 bg-white">
+    <div class="max-w-3xl mx-auto px-4">
+
+      {artikel.zusammenfassung && (
+        <p class="text-lg text-gray-600 leading-relaxed mb-10 pb-10 border-b border-gray-100 font-medium">
+          {artikel.zusammenfassung}
+        </p>
+      )}
+
+      <!-- Rich Text Inhalt vom Flexible Editor -->
+      <div class="prose prose-lg prose-headings:font-serif prose-headings:text-[#132e21] prose-a:text-[#c4a94a] prose-a:no-underline hover:prose-a:underline max-w-none">
+        <Fragment set:html={artikel.inhalt ?? ''} />
+      </div>
+
+      <!-- Back + Share -->
+      <div class="mt-16 pt-8 border-t border-gray-100 flex items-center justify-between gap-4">
+        <a href="/news" class="text-sm font-semibold text-[#132e21] hover:text-[#c4a94a] transition-colors">
+          ← Alle News
+        </a>
+        <div class="flex items-center gap-3">
+          <span class="text-xs text-gray-400 uppercase tracking-wider">Teilen:</span>
+          <a
+            href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(Astro.url.href)}`}
+            target="_blank" rel="noopener"
+            class="text-gray-400 hover:text-[#c4a94a] transition-colors"
+            aria-label="Auf Facebook teilen"
+          >
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+            </svg>
+          </a>
+          <a
+            href={`mailto:?subject=${encodeURIComponent(artikel.titel)}&body=${encodeURIComponent(Astro.url.href)}`}
+            class="text-gray-400 hover:text-[#c4a94a] transition-colors"
+            aria-label="Per E-Mail teilen"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </article>
+
+</Layout>

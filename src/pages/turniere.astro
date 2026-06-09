@@ -1,17 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getEvents } from '../lib/directus';
 
-let events: any[] = [];
-try {
-  const files = import.meta.glob('../content/events/*.json', { eager: true });
-  events = Object.values(files)
-    .map((f: any) => f.default ?? f)
-    .sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime());
-} catch {}
-
+const events = await getEvents();
 const today = new Date().toISOString().split('T')[0];
-const upcoming = events.filter((e: any) => e.date >= today);
-const past = events.filter((e: any) => e.date < today).reverse();
+const upcoming = events.filter(e => (e.datum_von ?? '') >= today);
+const past = events.filter(e => (e.datum_von ?? '') < today).reverse();
 
 const categoryColors: Record<string, string> = {
   turnier:    'bg-[#c4a94a] text-[#132e21]',
@@ -93,7 +87,7 @@ function formatDate(date: string, endDate?: string | null) {
                         )}
                       </div>
                       <h3 class="font-serif text-xl text-[#132e21] group-hover:text-[#c4a94a] transition-colors">
-                        {event.title?.value ?? event.title}
+                        {event.titel}
                       </h3>
                     </div>
 
@@ -168,7 +162,7 @@ function formatDate(date: string, endDate?: string | null) {
                     <div class="text-gray-300 text-xs uppercase">{d.toLocaleDateString('de-DE', { month: 'short' })}</div>
                   </div>
                   <div>
-                    <div class="font-medium text-gray-500 text-sm">{event.title?.value ?? event.title}</div>
+                    <div class="font-medium text-gray-500 text-sm">{event.titel}</div>
                     <div class="text-xs text-gray-400">{categoryLabels[cat] ?? cat}</div>
                   </div>
                 </div>

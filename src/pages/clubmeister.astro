@@ -1,14 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getClubmeister, bildUrl } from '../lib/directus';
 
-let clubmeister: any[] = [];
-try {
-  const files = import.meta.glob('../content/clubmeister/*.json', { eager: true });
-  clubmeister = Object.values(files)
-    .map((f: any) => f.default ?? f)
-    .sort((a: any, b: any) => parseInt(String(b.titel ?? 0)) - parseInt(String(a.titel ?? 0)));
-} catch {}
-
+const clubmeister = await getClubmeister();
 const current = clubmeister[0];
 
 const kategorien = [
@@ -39,7 +33,7 @@ const kategorien = [
     <section class="py-20 bg-white">
       <div class="max-w-7xl mx-auto px-4">
         <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Aktuelle Titelträger</p>
-        <h2 class="font-serif text-4xl text-[#132e21] mb-10">{current.titel}</h2>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-10">{current.jahr}</h2>
         <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {kategorien.filter(k => current[k.key]).map(k => (
             <div class="group">
@@ -47,7 +41,7 @@ const kategorien = [
               <div class="aspect-square bg-[#f5f5f0] mb-4 overflow-hidden">
                 {current[k.bildKey] ? (
                   <img
-                    src={current[k.bildKey]}
+                    src={bildUrl(current[k.bildKey])}
                     alt={current[k.key]}
                     class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"
                   />
@@ -63,7 +57,7 @@ const kategorien = [
               <div class="border-l-2 border-[#c4a94a] pl-4">
                 <div class="text-xs font-bold text-[#c4a94a] uppercase tracking-widest mb-1">{k.label}</div>
                 <div class="font-serif text-xl text-[#132e21]">{current[k.key]}</div>
-                <div class="text-gray-400 text-xs mt-0.5">Clubmeister {current.titel}</div>
+                <div class="text-gray-400 text-xs mt-0.5">Clubmeister {current.jahr}</div>
               </div>
             </div>
           ))}
@@ -93,7 +87,7 @@ const kategorien = [
             {clubmeister.map((cm: any, i: number) => (
               <tr class={`${i === 0 ? 'bg-[#faf8f2]' : i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'} hover:bg-[#f5f5f0] transition-colors`}>
                 <td class="px-4 py-3 font-bold text-[#c4a94a]">
-                  {cm.titel}
+                  {cm.jahr}
                   {i === 0 && <span class="ml-2 text-[10px] bg-[#c4a94a] text-[#132e21] px-1.5 py-0.5 font-bold uppercase tracking-wider">aktuell</span>}
                 </td>
                 <td class="px-4 py-3 text-[#132e21] font-medium">{cm.herren || '–'}</td>

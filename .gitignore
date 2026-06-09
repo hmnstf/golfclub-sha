@@ -22,3 +22,8 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Directus lokale Daten (nicht ins Repo!)
+directus/database/
+directus/uploads/
+directus/extensions/node_modules/
