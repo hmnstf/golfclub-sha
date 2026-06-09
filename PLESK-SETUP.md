@@ -47,6 +47,21 @@ npx directus bootstrap
 npm start
 ```
 
+Nach dem ersten Start — **Public Read Permissions setzen** (einmalig!):
+
+```bash
+node -e "
+const BASE='https://cms.gc-sha.de';
+const r = await fetch(BASE+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:'admin@gc-sha.de',password:'DEIN_PASSWORT'})}).then(r=>r.json());
+const T = r.data.access_token;
+const h = {Authorization:'Bearer '+T,'Content-Type':'application/json'};
+const P = (await fetch(BASE+'/policies',{headers:h}).then(r=>r.json())).data.find(p=>p.name.includes('public')||p.name.includes('Public'))?.id;
+console.log('Public Policy:', P);
+const cols = ['team','holeinone','mannschaften','clubmeister','events','news','spielgebuehren','spielgruppen','restaurant','platzstatus','settings','directus_files'];
+for(const col of cols){const res=await fetch(BASE+'/permissions',{method:'POST',headers:h,body:JSON.stringify({policy:P,collection:col,action:'read',fields:['*']})}).then(r=>r.json());console.log(res.data?.id?'✅':'❌',col);}
+" --input-type=module
+```
+
 ---
 
 ## 4. Astro-Website deployen
