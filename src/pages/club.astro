@@ -1,9 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getTeam, getClubmeister, bildUrl } from '../lib/directus';
+import { getTeam, getClubmeister, getSeitenbilder, bildUrl, bildUrlMitFormat } from '../lib/directus';
 
 const teamMembers = await getTeam();
 const clubmeister = await getClubmeister();
+const seitenbilder = await getSeitenbilder();
+const heroUrl = bildUrlMitFormat(seitenbilder?.club_hero, { width: 1600, quality: 80 });
 
 const gruppenLabels: Record<string, string> = {
   vorstand_gf: 'Geschäftsführender Vorstand',
@@ -19,14 +21,12 @@ const gruppen = ['vorstand_gf', 'vorstand', 'geschaeftsstelle', 'trainer', 'ehre
 <Layout title="Unser Club" description="Golfclub Schwäbisch Hall – Geschichte, Vorstand, Teams und Mitgliedschaft seit 1987">
 
   <!-- Hero -->
-  <div class="bg-[#132e21] py-24 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-      <img src="/images/gallery/golf1.jpg" alt="" class="w-full h-full object-cover"/>
-    </div>
-    <div class="relative max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Über uns</p>
-      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Unser Club</h1>
-      <p class="text-white/60 max-w-xl">Seit 1987 – Golf, Gemeinschaft und Natur in der Hohenloher Landschaft.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf1.jpg"} alt="Unser Club" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Über uns</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Unser Club</h1>
     </div>
   </div>
 

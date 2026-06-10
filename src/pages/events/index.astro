@@ -1,0 +1,103 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getEvents, getSeitenbilder, bildUrlMitFormat } from '../../lib/directus';
+
+const [events, bilder] = await Promise.all([getEvents(), getSeitenbilder()]);
+const today = new Date().toISOString().split('T')[0];
+const heroUrl = bildUrlMitFormat(bilder?.turniere_hero, { width: 1920, height: 400, quality: 85 }) || '';
+
+const upcoming = events.filter(e => (e.datum_von ?? '') >= today);
+const past     = events.filter(e => (e.datum_von ?? '') <  today).reverse();
+
+const catLabel: Record<string,string> = {
+  turnier:'Turnier', club:'Clubveranstaltung', golfschule:'Golfschule',
+  restaurant:'Restaurant', sonstiges:'Sonstiges',
+};
+const catColor: Record<string,string> = {
+  turnier:'bg-[#132e21] text-white', club:'bg-[#c4a94a] text-[#132e21]',
+  golfschule:'bg-blue-100 text-blue-800', restaurant:'bg-purple-100 text-purple-800',
+  sonstiges:'bg-gray-100 text-gray-600',
+};
+
+const allGroups = [
+  { label: 'Kommende Veranstaltungen', items: upcoming },
+  { label: 'Vergangene Veranstaltungen', items: past, muted: true },
+];
+---
+
+<Layout title="Alle Events & Turniere" description="Alle Veranstaltungen und Turniere des Golfclub Schwäbisch Hall">
+
+  <!-- Hero -->
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    {heroUrl && <img src={heroUrl} alt="Events" class="absolute inset-0 w-full h-full object-cover"/>}
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Programm</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Alle Events &amp; Turniere</h1>
+    </div>
+  </div>
+
+  <section class="py-14 bg-white">
+    <div class="max-w-4xl mx-auto px-6 md:px-8">
+      <div class="flex items-center gap-4 mb-10">
+        <a href="/turniere" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#132e21] transition-colors">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+          </svg>
+          Zurück zum Kalender
+        </a>
+      </div>
+
+      {allGroups.map(({ label, items, muted }) => items.length > 0 && (
+        <div class={`mb-14 ${muted ? 'opacity-60' : ''}`}>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-6">{label}</p>
+          <div class="divide-y divide-gray-100">
+            {items.map((e: any) => {
+              const d = new Date(e.datum_von);
+              const cat = e.typ ?? 'sonstiges';
+              const bildUrl = bildUrlMitFormat(e.bild, { width: 120, height: 80, quality: 75 });
+              return (
+                <a href={`/events/${e.id}`} class="flex items-center gap-5 py-5 group hover:bg-[#fafaf8] -mx-4 px-4 transition-colors">
+                  <!-- Datum -->
+                  <div class="shrink-0 w-12 text-center">
+                    <div class="font-serif text-2xl font-bold text-[#c4a94a] leading-none">{d.getDate()}</div>
+                    <div class="text-xs text-gray-400 uppercase mt-0.5">{d.toLocaleDateString('de-DE',{month:'short'})}</div>
+                    <div class="text-xs text-gray-300">{d.getFullYear()}</div>
+                  </div>
+                  <!-- Bild -->
+                  {bildUrl && (
+                    <div class="shrink-0 w-16 h-11 overflow-hidden bg-gray-100">
+                      <img src={bildUrl} alt={e.titel} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                    </div>
+                  )}
+                  <!-- Info -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1 flex-wrap">
+                      <span class={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 ${catColor[cat] ?? catColor.sonstiges}`}>
+                        {catLabel[cat] ?? cat}
+                      </span>
+                      {e.ort && <span class="text-xs text-gray-400">{e.ort}</span>}
+                      {e.uhrzeit_von && <span class="text-xs text-gray-400">{e.uhrzeit_von}{e.uhrzeit_bis ? ` – ${e.uhrzeit_bis}` : ''} Uhr</span>}
+                    </div>
+                    <div class="font-serif text-base text-[#132e21] group-hover:text-[#c4a94a] transition-colors truncate">{e.titel}</div>
+                  </div>
+                  <!-- Pfeil -->
+                  <svg class="w-4 h-4 text-[#c4a94a] shrink-0 opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                  </svg>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+
+      {upcoming.length === 0 && past.length === 0 && (
+        <div class="text-center py-24 text-gray-400">
+          <p class="text-lg font-medium mb-1">Keine Veranstaltungen gefunden</p>
+          <p class="text-sm">Schauen Sie bald wieder vorbei.</p>
+        </div>
+      )}
+    </div>
+  </section>
+</Layout>

@@ -1,34 +1,39 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { resolveStatus, getSperrzeit } from '../lib/platzstatus';
-import { getPlatzstatus, getNews, getEvents, bildUrl } from '../lib/directus';
+import { resolveStatus } from '../lib/platzstatus';
+import { getPlatzstatus, getPlatzstatusKalenderHeute, getNews, getEvents, getSeitenbilder, bildUrl, bildUrlMitFormat } from '../lib/directus';
 
 // ── Platzstatus laden ──────────────────────────────────────────────
-const defaults: any = {
-  hauptplatz: 'auto', kurzplatz: 'auto', drivingRange: 'auto', cafe: 'auto', carts: 'open',
-  hinweis: '', sperrzeiten: [],
-  zeitsteuerung: {
-    hauptplatzOeffnet: '07:00', hauptplatzSchliesst: '20:00',
-    kurzplatzOeffnet: '07:00', kurzplatzSchliesst: '21:00',
-    drivingRangeOeffnet: '07:00', drivingRangeSchliesst: '21:00',
-    cafeOeffnet: '09:00', cafeSchliesst: '21:00',
-  },
-};
-const rawStatus = { ...defaults, ...((await getPlatzstatus()) ?? {}) };
+const [rawStatus, kalenderHeute] = await Promise.all([
+  getPlatzstatus(),
+  getPlatzstatusKalenderHeute(),
+]);
 
-const zt = rawStatus.zeitsteuerung ?? {};
-const sperrzeiten = rawStatus.sperrzeiten ?? [];
-const sz = {
-  hauptplatz:   getSperrzeit(sperrzeiten, 'hauptplatz'),
-  kurzplatz:    getSperrzeit(sperrzeiten, 'kurzplatz'),
-  drivingRange: getSperrzeit(sperrzeiten, 'drivingRange'),
-  carts:        getSperrzeit(sperrzeiten, 'carts'),
+// Kalender-Eintrag überschreibt den Basis-Status (nur gesetzte Felder)
+function getStatus(feld: string, basisWert: string): string {
+  const kalWert = (kalenderHeute as any)?.[feld];
+  if (kalWert) return kalWert;          // Kalender-Override hat Vorrang
+  return basisWert ?? 'auto';
+}
+
+// Öffnungszeiten aus neuen Feldern
+const zt = {
+  hauptplatzOeffnet:      rawStatus?.hauptplatz_oeffnet      ?? '07:00',
+  hauptplatzSchliesst:    rawStatus?.hauptplatz_schliesst    ?? '20:00',
+  kurzplatzOeffnet:       rawStatus?.kurzplatz_oeffnet       ?? '07:00',
+  kurzplatzSchliesst:     rawStatus?.kurzplatz_schliesst     ?? '21:00',
+  drivingRangeOeffnet:    rawStatus?.driving_range_oeffnet   ?? '07:00',
+  drivingRangeSchliesst:  rawStatus?.driving_range_schliesst ?? '21:00',
+  cafeOeffnet:            rawStatus?.cafe_oeffnet            ?? '09:00',
+  cafeSchliesst:          rawStatus?.cafe_schliesst          ?? '21:00',
 };
+
 const status = {
-  hauptplatz:   resolveStatus(rawStatus.hauptplatz,   zt.hauptplatzOeffnet,   zt.hauptplatzSchliesst,   sz.hauptplatz),
-  kurzplatz:    resolveStatus(rawStatus.kurzplatz,    zt.kurzplatzOeffnet,    zt.kurzplatzSchliesst,    sz.kurzplatz),
-  drivingRange: resolveStatus(rawStatus.drivingRange, zt.drivingRangeOeffnet, zt.drivingRangeSchliesst, sz.drivingRange),
-  cafe:         resolveStatus(rawStatus.cafe,         zt.cafeOeffnet,         zt.cafeSchliesst),
+  hauptplatz:   resolveStatus(getStatus('hauptplatz',   rawStatus?.hauptplatz   ?? 'auto'), zt.hauptplatzOeffnet,   zt.hauptplatzSchliesst),
+  kurzplatz:    resolveStatus(getStatus('kurzplatz',    rawStatus?.kurzplatz    ?? 'auto'), zt.kurzplatzOeffnet,    zt.kurzplatzSchliesst),
+  drivingRange: resolveStatus(getStatus('drivingRange', rawStatus?.drivingRange ?? 'auto'), zt.drivingRangeOeffnet, zt.drivingRangeSchliesst),
+  cafe:         resolveStatus(getStatus('cafe',         rawStatus?.cafe         ?? 'auto'), zt.cafeOeffnet,         zt.cafeSchliesst),
+  carts:        resolveStatus(getStatus('carts',        rawStatus?.carts        ?? 'open')),
 };
 
 const statusUI: Record<string, { dot: string; label: string; labelCarts?: string }> = {
@@ -36,8 +41,6 @@ const statusUI: Record<string, { dot: string; label: string; labelCarts?: string
   limited: { dot: 'bg-amber-400',   label: 'Eingeschränkt',  labelCarts: 'Eingeschränkt' },
   closed:  { dot: 'bg-red-500',     label: 'Geschlossen',    labelCarts: 'Nicht erlaubt' },
 };
-
-const cartsStatus = resolveStatus(rawStatus.carts ?? 'open', undefined, undefined, sz.carts);
 
 const platzItems = [
   {
@@ -62,11 +65,15 @@ const platzItems = [
   },
   {
     label: 'Carts',
-    status: cartsStatus,
+    status: status.carts,
     isCarts: true,
     icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 17H3a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v9a2 2 0 01-2 2h-2M9 21a2 2 0 100-4 2 2 0 000 4zm10 0a2 2 0 100-4 2 2 0 000 4"/>`,
   },
 ];
+
+// ── Seiten-Bilder laden ────────────────────────────────────────────
+const seitenbilder = await getSeitenbilder();
+const homepageHero = bildUrlMitFormat(seitenbilder?.homepage_hero, { width: 1920, quality: 80 });
 
 // ── News laden ─────────────────────────────────────────────────────
 const news = await getNews({ nurVeroeffentlicht: true, nurHighlights: true, limit: 3 });
@@ -84,7 +91,7 @@ const events = allEvents.slice(0, 4);
     <!-- Bild-Wrapper hat overflow-hidden, Section selbst nicht -->
     <div class="absolute inset-0 overflow-hidden">
       <img
-        src="/images/hero/course.jpg"
+        src={homepageHero || "/images/hero/course.jpg"}
         alt="Golfclub Schwäbisch Hall"
         class="w-full h-full object-cover"
       />
@@ -331,28 +338,31 @@ const events = allEvents.slice(0, 4);
           <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Aktuell</p>
           <h2 class="font-serif text-4xl text-[#132e21]">News & Highlights</h2>
         </div>
-        <a href="/turniere" class="hidden sm:flex items-center gap-1 text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">
-          Alle Events
+        <a href="/news" class="hidden sm:flex items-center gap-1 text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors">
+          Alle News
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
         </a>
       </div>
 
       {news.length > 0 ? (
         <div class="grid md:grid-cols-3 gap-6">
-          {news.map((item: any) => (
-            <article class="group border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden">
+          {news.map((item: any) => {
+            const [y,m,d] = (item.datum ?? '').split('-');
+            const datumText = item.datum ? `${d}.${m}.${y}` : '';
+            return (
+            <a href={`/news/${item.slug}`} class="group border border-gray-100 hover:shadow-lg transition-all duration-300 overflow-hidden block">
               <div class="aspect-video overflow-hidden bg-[#132e21]">
                 {bildUrl(item.bild) && <img src={bildUrl(item.bild)} alt={item.titel} class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition-transform duration-500"/>}
               </div>
               <div class="p-6">
                 <div class="text-xs text-[#c4a94a] font-semibold uppercase tracking-wider mb-2">
-                  {new Date(item.date).toLocaleDateString('de-DE', { day: '2-digit', month: 'long', year: 'numeric' })}
+                  {datumText}
                 </div>
-                <h3 class="font-serif text-xl text-[#132e21] mb-2">{item.titel}</h3>
-                <p class="text-gray-500 text-sm leading-relaxed">{item.excerpt}</p>
+                <h3 class="font-serif text-xl text-[#132e21] mb-2 group-hover:text-[#c4a94a] transition-colors">{item.titel}</h3>
+                {item.zusammenfassung && <p class="text-gray-500 text-sm leading-relaxed line-clamp-2">{item.zusammenfassung}</p>}
               </div>
-            </article>
-          ))}
+            </a>
+          )})}
         </div>
       ) : (
         <!-- Placeholder-News, solange noch keine eingetragen -->

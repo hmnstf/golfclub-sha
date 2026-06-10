@@ -34,9 +34,9 @@ const navItems = [
 const currentPath = Astro.url.pathname;
 ---
 
-<header class="bg-[#132e21] text-white sticky top-0 z-50 shadow-lg">
+<header class="sticky top-0 z-50 shadow-lg">
   <!-- Topbar -->
-  <div class="border-b border-white/10 text-xs">
+  <div class="bg-[#132e21] text-white border-b border-white/10 text-xs">
     <div class="max-w-7xl mx-auto px-4 flex items-center justify-between py-1.5">
       <div class="flex items-center gap-4 text-white/60">
         <a href="/platzstatus" class="hover:text-white transition-colors flex items-center gap-1">
@@ -83,6 +83,7 @@ const currentPath = Astro.url.pathname;
   </div>
 
   <!-- Main Nav -->
+  <div class="bg-white border-b border-gray-100">
   <div class="max-w-7xl mx-auto px-4">
     <div class="flex items-center justify-between h-16">
       <!-- Logo -->
@@ -91,7 +92,6 @@ const currentPath = Astro.url.pathname;
           src="/Logo-GC-SHA-1024x282.jpg"
           alt="Golfclub Schwäbisch Hall"
           class="h-12 w-auto rounded"
-          style="background: white; padding: 4px 8px;"
         />
       </a>
 
@@ -103,7 +103,7 @@ const currentPath = Astro.url.pathname;
               href={item.href}
               class:list={[
                 'px-3 py-2 text-sm font-medium transition-colors hover:text-[#c4a94a] flex items-center gap-1',
-                currentPath.startsWith(item.href) ? 'text-[#c4a94a]' : 'text-white/90'
+                currentPath.startsWith(item.href) ? 'text-[#c4a94a]' : 'text-[#132e21]'
               ]}
             >
               {item.label}
@@ -150,7 +150,7 @@ const currentPath = Astro.url.pathname;
       <!-- Mobile menu button -->
       <button
         id="mobile-menu-btn"
-        class="lg:hidden p-2 text-white/80 hover:text-white"
+        class="lg:hidden p-2 text-gray-600 hover:text-[#132e21]"
         aria-label="Menü öffnen"
         aria-expanded="false"
         aria-controls="mobile-menu"
@@ -160,6 +160,7 @@ const currentPath = Astro.url.pathname;
         </svg>
       </button>
     </div>
+  </div>
   </div>
 
   <!-- Mobile Nav -->

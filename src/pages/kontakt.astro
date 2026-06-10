@@ -1,226 +1,384 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getKontakt, getSeitenbilder, getSettings, bildUrlMitFormat } from '../lib/directus';
+
+const [data, bilder, settings] = await Promise.all([getKontakt(), getSeitenbilder(), getSettings()]);
+const recaptchaSiteKey = settings?.recaptcha_site_key ?? '';
+const successParam = Astro.url.searchParams.get('success');
+const errorParam   = Astro.url.searchParams.get('error');
+
+const adresse            = data?.adresse             ?? 'Am Golfplatz 1';
+const ort                = data?.ort                 ?? '74523 Schwäbisch Hall';
+const telefonSekretariat = data?.telefon_sekretariat ?? '+49 7907 8190';
+const fax                = data?.fax                 ?? '+49 7907 8180';
+const email              = data?.email               ?? 'info@gc-sha.de';
+const routen             = data?.anfahrt_routen      ?? [];
+
+const heroUrl       = bildUrlMitFormat(bilder?.kontakt_hero,        { width: 1920, height: 600, quality: 85 }) || '/images/hero-fallback.jpg';
+const formularBild  = bildUrlMitFormat(bilder?.kontakt_formular_bild, { width: 900, height: 700, quality: 85 }) || '/images/clubhaus.jpg';
+
+// Google Maps – hardcoded mit echter Adresse
+const MAPS_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent('Golfclub Schwäbisch Hall e.V., Am Golfplatz 1, 74523 Schwäbisch Hall')}&output=embed&z=15&hl=de`;
+const MAPS_LINK  = `https://maps.google.com/?q=${encodeURIComponent('Golfclub Schwäbisch Hall e.V., Am Golfplatz 1, 74523 Schwäbisch Hall')}`;
 ---
 
-<Layout title="Kontakt" description="Kontaktieren Sie den Golfclub Schwäbisch Hall">
-  <div class="bg-[#132e21] py-20">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Anfahrt & Kontakt</p>
-      <h1 class="font-serif text-5xl text-white">Wir sind für Sie da</h1>
+<Layout title="Kontakt & Anfahrt" description="Kontaktieren Sie den Golfclub Schwäbisch Hall – Adresse, Telefon und Anfahrtsbeschreibungen">
+
+  <!-- ── Hero ── -->
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl} alt="Golfclub Schwäbisch Hall" class="absolute inset-0 w-full h-full object-cover" />
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-16 px-6 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Kontakt & Anfahrt</p>
+      <h1 class="font-serif text-5xl md:text-6xl text-white mb-3">Kontakt</h1>
+      <p class="text-white/70 text-lg">Wir sind gerne für Sie da.</p>
     </div>
   </div>
 
-  <section class="py-16 bg-white">
-    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16">
-      <!-- Kontaktinfo -->
-      <div>
-        <h2 class="font-serif text-3xl text-[#132e21] mb-8">Kontaktdaten</h2>
-        <div class="space-y-6 mb-10">
-          {[
-            {
-              label: 'Adresse',
-              icon: 'M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z',
-              content: 'Am Golfplatz 1\n74523 Schwäbisch Hall',
-            },
-            {
-              label: 'Telefon Sekretariat',
-              icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
-              content: '+49 7907 8190',
-              href: 'tel:+4979078190',
-            },
-            {
-              label: 'Telefon Restaurant',
-              icon: 'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z',
-              content: '+49 7907 94 02 42',
-              href: 'tel:+49790794 0242',
-            },
-            {
-              label: 'E-Mail',
-              icon: 'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z',
-              content: 'info@gc-sha.de',
-              href: 'mailto:info@gc-sha.de',
-            },
-          ].map(({ label, icon, content, href }) => (
-            <div class="flex gap-4">
-              <div class="w-10 h-10 bg-[#f5f5f0] flex items-center justify-center shrink-0">
-                <svg class="w-5 h-5 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon}/>
-                </svg>
-              </div>
-              <div>
-                <div class="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-0.5">{label}</div>
-                {href ? (
-                  <a href={href} class="text-[#132e21] hover:text-[#c4a94a] transition-colors whitespace-pre-line">{content}</a>
-                ) : (
-                  <div class="text-[#132e21] whitespace-pre-line">{content}</div>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
+  <!-- ── Adresse + Karte ── -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-16 items-start">
 
-        <!-- Google Maps (nur nach Cookie-Zustimmung) -->
-        <div class="aspect-video border border-gray-200 overflow-hidden mb-6 relative bg-[#f5f5f0]">
-          <div id="maps-placeholder" class="absolute inset-0 flex flex-col items-center justify-center gap-4 p-6 text-center">
-            <svg class="w-10 h-10 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-            </svg>
-            <p class="text-sm text-gray-400 max-w-xs">Google Maps ist deaktiviert. Bitte akzeptieren Sie die Cookies, um die Karte zu sehen.</p>
-            <button id="maps-consent-btn" class="bg-[#132e21] text-white text-xs px-4 py-2 uppercase tracking-wider hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors">
-              Karte aktivieren
-            </button>
+      <!-- Links: Kontaktdaten -->
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-4">Kontakt & Anfahrt</p>
+        <h2 class="font-serif text-4xl text-[#132e21] leading-snug mb-10">
+          Wir freuen uns auf<br/>Ihre Nachricht oder<br/>Ihren Besuch.
+        </h2>
+
+        <div class="space-y-7">
+          <!-- Adresse -->
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-[#f5f5f0] flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-[#132e21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+            </div>
+            <div class="text-sm text-gray-700 leading-relaxed">
+              <div class="font-semibold text-[#132e21]">Golfclub Schwäbisch Hall e.V.</div>
+              <div>{adresse}</div>
+              <div>{ort}</div>
+            </div>
           </div>
+
+          <!-- E-Mail -->
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-[#f5f5f0] flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-[#132e21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+              </svg>
+            </div>
+            <a href={`mailto:${email}`} class="text-sm text-gray-700 hover:text-[#c4a94a] transition-colors">
+              E-Mail: {email}
+            </a>
+          </div>
+
+          <!-- Website -->
+          <div class="flex items-center gap-4">
+            <div class="w-10 h-10 rounded-full bg-[#f5f5f0] flex items-center justify-center shrink-0">
+              <svg class="w-5 h-5 text-[#132e21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/>
+              </svg>
+            </div>
+            <a href="https://www.gc-sha.de" target="_blank" rel="noopener noreferrer" class="text-sm text-gray-700 hover:text-[#c4a94a] transition-colors">
+              www.gc-sha.de
+            </a>
+          </div>
+
+          <!-- Telefon -->
+          <div class="flex items-start gap-4">
+            <div class="w-10 h-10 rounded-full bg-[#f5f5f0] flex items-center justify-center shrink-0 mt-0.5">
+              <svg class="w-5 h-5 text-[#132e21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
+              </svg>
+            </div>
+            <div class="text-sm text-gray-700 leading-relaxed">
+              <div class="font-semibold text-[#132e21]">Geschäftsstelle</div>
+              <div>Tel.: <a href={`tel:${telefonSekretariat.replace(/\s/g,'')}`} class="hover:text-[#c4a94a] transition-colors">{telefonSekretariat}</a></div>
+              {fax && <div>Fax: {fax}</div>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rechts: Google Maps + Anfahrt-Button direkt darunter -->
+      <div class="w-full">
+        <div class="h-[380px] overflow-hidden shadow-sm">
           <iframe
-            id="maps-iframe"
-            data-src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2601.5!2d9.7404!3d49.1128!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4798e6b0e9b1e1c7%3A0x1!2sGolfclub+Schw%C3%A4bisch+Hall!5e0!3m2!1sde!2sde!4v1"
-            width="100%" height="100%" style="border:0; display:none;"
-            allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+            src={MAPS_EMBED}
+            width="100%" height="100%"
+            style="border:0;"
+            allowfullscreen=""
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
             title="Golfclub Schwäbisch Hall auf Google Maps"
           ></iframe>
         </div>
-        <script>
-          function loadMap() {
-            const iframe = document.getElementById('maps-iframe');
-            const placeholder = document.getElementById('maps-placeholder');
-            if (iframe && placeholder) {
-              iframe.setAttribute('src', iframe.getAttribute('data-src') || '');
-              iframe.style.display = 'block';
-              placeholder.style.display = 'none';
-            }
-          }
-          document.addEventListener('DOMContentLoaded', () => {
-            if (window.CookieConsent?.acceptedCategory('maps')) loadMap();
-            document.getElementById('maps-consent-btn')?.addEventListener('click', () => {
-              window.CookieConsent?.acceptCategory('maps');
-              loadMap();
-            });
-          });
-          window.addEventListener('cc:onConsent', () => { if (window.CookieConsent?.acceptedCategory('maps')) loadMap(); });
-          window.addEventListener('cc:onChange',  () => { if (window.CookieConsent?.acceptedCategory('maps')) loadMap(); });
-        </script>
-        <a
-          href="https://maps.google.com/?q=Am+Golfplatz+1,+74523+Schwäbisch+Hall"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="inline-flex items-center gap-2 text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors mb-10"
+        <!-- Anfahrt-Button mit Abstand zur Karte -->
+        <button
+          id="anfahrt-btn"
+          class="w-full flex items-center justify-between px-5 py-4 mt-3 bg-[#f5f5f0] border border-gray-200 group text-left hover:bg-[#eaeae4] transition-colors"
+          aria-expanded="false"
+          aria-controls="anfahrt-modal"
         >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+          <div class="flex items-center gap-3">
+            <div class="w-9 h-9 border border-gray-300 flex items-center justify-center shrink-0 group-hover:border-[#132e21] transition-colors bg-white">
+              <svg class="w-4 h-4 text-[#132e21]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0zM13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10l2.22.738a4.5 4.5 0 015.56 0L13 16zM16 6h2l3 5v5h-5V6z"/>
+              </svg>
+            </div>
+            <div>
+              <span class="font-serif text-sm text-[#132e21]">Anfahrt</span>
+              <span class="text-xs text-gray-500 ml-2">Wegbeschreibungen anzeigen</span>
+            </div>
+          </div>
+          <svg class="w-4 h-4 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
           </svg>
-          In Google Maps öffnen
-        </a>
-
-        <!-- Anfahrt -->
-        <div id="anfahrt">
-          <h2 class="font-serif text-2xl text-[#132e21] mb-6">Anfahrt</h2>
-          <div class="space-y-4 text-sm text-gray-600">
-            {[
-              { von: 'B14 aus Richtung Stuttgart / Backnang', text: 'Durch Schwäbisch Hall bis Bausparkasse. Dort Richtung Vellberg/Ellwangen die L 1060. Nach ca. 11 km in Dörrenzimmern rechts zum Golfplatz.' },
-              { von: 'A6 aus Richtung Heilbronn', text: 'Ausfahrt Schwäbisch Hall/Hessental. Auf der B19 Richtung Schwäbisch Hall. Links vor der Stadteinfahrt Richtung Vellberg über Erlach. Nach Vellberg rechts Richtung Schwäbisch Hall. Nach ca. 2 km links zum Golfplatz.' },
-              { von: 'A6 aus Richtung Nürnberg', text: 'Ausfahrt Kirchberg nach Vellberg über Großaltdorf. Nach Vellberg rechts Richtung Schwäbisch Hall. Nach ca. 2 km links zum Golfplatz.' },
-              { von: 'A7 aus Richtung Würzburg', text: 'Bis zum Autobahnkreuz Crailsheim/Feuchtwangen. Weiter wie Beschreibung „aus Richtung Nürnberg".' },
-              { von: 'A7 aus Richtung Ulm', text: 'Ausfahrt Ellwangen. L 1060 in Richtung Schwäbisch Hall, über Rosenberg, Bühlertann und Vellberg. Nach ca. 2 km links zum Golfplatz.' },
-            ].map(({ von, text }) => (
-              <div class="p-4 bg-[#f5f5f0]">
-                <div class="font-semibold text-[#132e21] mb-1 text-xs uppercase tracking-wide">{von}</div>
-                <div>{text}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <!-- Kontaktformular / Mitgliedschaft -->
-      <div>
-        <h2 id="mitglied" class="font-serif text-3xl text-[#132e21] mb-2">Mitglied werden</h2>
-        <p class="text-gray-500 text-sm mb-8">
-          Interessieren Sie sich für eine Mitgliedschaft? Füllen Sie das Formular aus und wir melden uns schnellstmöglich bei Ihnen.
-        </p>
-
-        <form
-          method="POST"
-          action="/api/kontakt"
-          class="space-y-5"
-        >
-          <div class="grid sm:grid-cols-2 gap-5">
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="vorname">Vorname *</label>
-              <input
-                type="text"
-                id="vorname"
-                name="vorname"
-                required
-                class="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"
-              />
-            </div>
-            <div>
-              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="nachname">Nachname *</label>
-              <input
-                type="text"
-                id="nachname"
-                name="nachname"
-                required
-                class="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"
-              />
-            </div>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="email">E-Mail *</label>
-            <input
-              type="email"
-              id="email"
-              name="email"
-              required
-              class="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="telefon">Telefon</label>
-            <input
-              type="tel"
-              id="telefon"
-              name="telefon"
-              class="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"
-            />
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="interesse">Interesse</label>
-            <select
-              id="interesse"
-              name="interesse"
-              class="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors bg-white"
-            >
-              <option value="">Bitte wählen</option>
-              <option value="mitgliedschaft">Mitgliedschaft</option>
-              <option value="greenfee">Greenfee / Gast</option>
-              <option value="golfschule">Golfschule / Kurs</option>
-              <option value="event">Veranstaltung / Event</option>
-              <option value="sonstiges">Sonstiges</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="nachricht">Nachricht</label>
-            <textarea
-              id="nachricht"
-              name="nachricht"
-              rows={5}
-              class="w-full border border-gray-200 px-4 py-2.5 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors resize-none"
-            ></textarea>
-          </div>
-          <div class="flex items-start gap-3">
-            <input type="checkbox" id="datenschutz" name="datenschutz" required class="mt-0.5" />
-            <label for="datenschutz" class="text-xs text-gray-500">
-              Ich habe die <a href="/datenschutz" class="text-[#c4a94a] hover:underline">Datenschutzerklärung</a> gelesen und stimme der Verarbeitung meiner Daten zu. *
-            </label>
-          </div>
-          <button
-            type="submit"
-            class="w-full bg-[#132e21] text-white py-3.5 text-sm font-semibold uppercase tracking-wider hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors"
-          >
-            Anfrage senden
-          </button>
-        </form>
+        </button>
       </div>
     </div>
   </section>
+
+  <!-- ── Anfahrt Modal ── -->
+  <div
+    id="anfahrt-modal"
+    class="fixed inset-0 z-50 hidden"
+    role="dialog"
+    aria-modal="true"
+    aria-label="Anfahrtsbeschreibungen"
+  >
+    <!-- Backdrop -->
+    <div id="anfahrt-backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+    <!-- Panel -->
+    <div class="absolute bottom-0 left-0 right-0 md:inset-0 md:flex md:items-center md:justify-center p-0 md:p-6">
+      <div class="relative bg-white w-full md:max-w-xl md:max-h-[80vh] overflow-y-auto shadow-2xl">
+
+        <!-- Header -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-gray-100 sticky top-0 bg-white z-10">
+          <div>
+            <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-0.5">Wegbeschreibung</p>
+            <h2 class="font-serif text-xl text-[#132e21]">Anfahrt zum Golfclub</h2>
+          </div>
+          <button id="anfahrt-close" class="w-9 h-9 flex items-center justify-center text-gray-400 hover:text-[#132e21] hover:bg-gray-100 transition-colors" aria-label="Schließen">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Routen -->
+        <div class="divide-y divide-gray-100">
+          {routen.length > 0 ? routen.map((route: any) => (
+            <div class="px-6 py-5">
+              <div class="flex items-center gap-2 mb-2">
+                <svg class="w-4 h-4 text-[#c4a94a] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                <span class="text-xs font-semibold uppercase tracking-widest text-[#132e21]">{route.von}</span>
+              </div>
+              <p class="text-sm text-gray-600 leading-relaxed">{route.text}</p>
+            </div>
+          )) : (
+            <div class="px-6 py-5 text-sm text-gray-500">
+              Über die B19 aus Richtung Schwäbisch Hall — dem Schild „Golfclub" folgen.
+            </div>
+          )}
+        </div>
+
+        <!-- Footer mit Maps-Link -->
+        <div class="px-6 py-4 bg-[#f5f5f0] border-t border-gray-100">
+          <a
+            href={MAPS_LINK}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex items-center gap-2 text-sm font-medium text-[#132e21] hover:text-[#c4a94a] transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            In Google Maps öffnen
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btn      = document.getElementById('anfahrt-btn');
+    const modal    = document.getElementById('anfahrt-modal');
+    const close    = document.getElementById('anfahrt-close');
+    const backdrop = document.getElementById('anfahrt-backdrop');
+
+    const open  = () => { modal?.classList.remove('hidden'); document.body.style.overflow = 'hidden'; btn?.setAttribute('aria-expanded','true'); };
+    const shut  = () => { modal?.classList.add('hidden');    document.body.style.overflow = '';       btn?.setAttribute('aria-expanded','false'); };
+
+    btn?.addEventListener('click', open);
+    close?.addEventListener('click', shut);
+    backdrop?.addEventListener('click', shut);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') shut(); });
+  </script>
+
+  <!-- ── Kontaktformular ── -->
+  <section class="py-12 bg-white">
+    <div class="max-w-7xl mx-auto px-6 md:px-8 grid lg:grid-cols-2 gap-16 items-start">
+
+      <!-- Links: Formular -->
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-4">Kontakt Formular</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-10">Schreiben Sie uns</h2>
+
+        {successParam === '1' && (
+          <div class="mb-8 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm">
+            <strong>Vielen Dank!</strong> Ihre Nachricht wurde erfolgreich übermittelt. Wir melden uns so schnell wie möglich.
+          </div>
+        )}
+        {errorParam === 'spam' && (
+          <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+            Ihre Nachricht wurde als Spam erkannt. Bitte versuchen Sie es erneut.
+          </div>
+        )}
+        {errorParam === 'missing' && (
+          <div class="mb-8 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm">
+            Bitte füllen Sie alle Pflichtfelder aus.
+          </div>
+        )}
+
+        <form method="POST" action="/api/kontakt" class="space-y-5">
+          <div class="grid sm:grid-cols-2 gap-5">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="name">Ihr Name *</label>
+              <input type="text" id="name" name="name" required
+                class="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"/>
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="email-form">Ihre E-Mail-Adresse *</label>
+              <input type="email" id="email-form" name="email" required
+                class="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"/>
+            </div>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="telefon">Telefonnummer</label>
+            <input type="tel" id="telefon" name="telefon"
+              class="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="betreff">Betreff</label>
+            <input type="text" id="betreff" name="betreff"
+              class="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors"/>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1.5" for="nachricht">Ihre Nachricht *</label>
+            <textarea id="nachricht" name="nachricht" rows={5} required
+              class="w-full border border-gray-200 px-4 py-3 text-sm focus:outline-none focus:border-[#c4a94a] transition-colors resize-none"></textarea>
+          </div>
+          <div class="flex items-start gap-3">
+            <input type="checkbox" id="datenschutz" name="datenschutz" required
+              class="mt-0.5 w-4 h-4 accent-[#132e21]"/>
+            <label for="datenschutz" class="text-xs text-gray-500 leading-relaxed">
+              Ich habe die <a href="/datenschutz" class="text-[#c4a94a] hover:underline">Datenschutzerklärung</a> gelesen und akzeptiere diese.
+            </label>
+          </div>
+          <input type="hidden" name="recaptcha_token" id="recaptcha_token" />
+
+          <button type="submit" id="submit-btn"
+            class="w-full bg-[#132e21] text-white py-4 text-sm font-semibold uppercase tracking-widest hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+            Nachricht senden
+          </button>
+
+          <p class="text-xs text-gray-400 text-center mt-3">
+            Geschützt durch reCAPTCHA –
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener" class="hover:text-gray-600">Datenschutz</a> &amp;
+            <a href="https://policies.google.com/terms" target="_blank" rel="noopener" class="hover:text-gray-600">Nutzungsbedingungen</a> von Google.
+          </p>
+        </form>
+
+        {recaptchaSiteKey && (
+          <script define:vars={{ recaptchaSiteKey }}>
+            // reCAPTCHA v3 laden und Token vor dem Absenden einholen
+            const script = document.createElement('script');
+            script.src = `https://www.google.com/recaptcha/api.js?render=${recaptchaSiteKey}`;
+            script.async = true;
+            document.head.appendChild(script);
+
+            script.onload = () => {
+              const form = document.querySelector('form[action="/api/kontakt"]');
+              if (!form) return;
+              form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const btn = document.getElementById('submit-btn');
+                if (btn) btn.setAttribute('disabled', 'true');
+                try {
+                  const token = await grecaptcha.execute(recaptchaSiteKey, { action: 'contact' });
+                  document.getElementById('recaptcha_token').value = token;
+                  form.submit();
+                } catch {
+                  if (btn) btn.removeAttribute('disabled');
+                }
+              });
+            };
+          </script>
+        )}
+      </div>
+
+      <!-- Rechts: Bild + Öffnungszeiten-Karte -->
+      <div class="relative">
+        <img
+          src={formularBild}
+          alt="Golfclub Schwäbisch Hall"
+          class="w-full h-[520px] object-cover"
+        />
+        <!-- Öffnungszeiten-Overlay -->
+        <div class="absolute bottom-0 left-0 right-6 bg-white/95 backdrop-blur-sm p-6 shadow-lg">
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Öffnungszeiten</p>
+          <h3 class="font-serif text-xl text-[#132e21] mb-3">Geschäftsstelle</h3>
+          <div class="space-y-1 text-sm text-gray-700">
+            <div class="flex justify-between gap-6">
+              <span>Montag – Freitag</span>
+              <span class="font-medium text-[#132e21]">08:00 – 12:00 Uhr</span>
+            </div>
+            <div class="flex justify-between gap-6">
+              <span>und</span>
+              <span class="font-medium text-[#132e21]">13:00 – 17:00 Uhr</span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-3 leading-relaxed">
+            Gerne können Sie auch außerhalb der Öffnungszeiten telefonisch einen Termin vereinbaren.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── Weitere Wege ── -->
+  <section class="py-16 bg-[#f5f5f0] border-t border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 md:px-8">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-10 text-center">Weitere Wege zu uns</p>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-3">
+        {[
+          { icon:'M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z', label:'Telefon', sub: telefonSekretariat, href:`tel:${telefonSekretariat.replace(/\s/g,'')}` },
+          { icon:'M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z', label:'E-Mail', sub: email, href:`mailto:${email}` },
+          { icon:'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label:'Startzeit buchen', sub:'Online reservieren', href:'#' },
+          { icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', label:'Mitglied werden', sub:'Mehr erfahren', href:'/club#mitglied' },
+        ].map(item => (
+          <a href={item.href} class="flex items-center justify-between gap-4 bg-white px-6 py-6 group hover:bg-[#132e21] transition-colors duration-200">
+            <div class="flex items-center gap-4">
+              <svg class="w-6 h-6 text-[#c4a94a] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={item.icon}/>
+              </svg>
+              <div>
+                <div class="text-sm font-semibold text-[#132e21] group-hover:text-white transition-colors">{item.label}</div>
+                <div class="text-xs text-gray-500 group-hover:text-white/60 transition-colors">{item.sub}</div>
+              </div>
+            </div>
+            <svg class="w-5 h-5 text-[#c4a94a] shrink-0 translate-x-0 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+            </svg>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
 </Layout>

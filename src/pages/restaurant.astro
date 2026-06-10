@@ -1,24 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getRestaurant } from '../lib/directus';
+import { getRestaurant, bildUrlMitFormat } from '../lib/directus';
 
 const restaurantData = await getRestaurant();
 const oeffnungszeiten = restaurantData?.oeffnungszeiten ?? [];
 const hinweis         = restaurantData?.hinweis         ?? '';
 const telefon         = restaurantData?.reservierungTelefon ?? '+49 7907 94 02 42';
 const email           = restaurantData?.reservierungEmail   ?? '';
+const heroUrl         = bildUrlMitFormat(restaurantData?.hero_bild,  { width: 1600, quality: 80 });
+const innenUrl        = bildUrlMitFormat(restaurantData?.bild_innen, { width: 800,  quality: 80 });
 ---
 
 <Layout title="Restaurant Brassie" description="Restaurant Brassie im Golfclub Schwäbisch Hall – Hausgemachte deutsche Spezialitäten mit Blick auf das 18. Grün">
 
-  <div class="bg-[#132e21] py-24 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-15">
-      <img src="/images/gallery/golf5.jpg" alt="" class="w-full h-full object-cover"/>
-    </div>
-    <div class="relative max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Gastronomie</p>
-      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Restaurant Brassie</h1>
-      <p class="text-white/60 max-w-xl">Hausgemachte Spezialitäten mit Blick auf das 18. Grün und die Driving Range.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf5.jpg"} alt="Restaurant Brassie" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Gastronomie</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Restaurant Brassie</h1>
     </div>
   </div>
 
@@ -64,7 +64,7 @@ const email           = restaurantData?.reservierungEmail   ?? '';
       <!-- Bild + Highlights -->
       <div class="space-y-4">
         <div class="relative overflow-hidden h-64">
-          <img src="/images/gallery/golf4.jpg" alt="Restaurant Brassie" class="w-full h-full object-cover"/>
+          <img src={innenUrl || "/images/gallery/golf4.jpg"} alt="Restaurant Brassie" class="w-full h-full object-cover"/>
           <div class="absolute inset-0 bg-gradient-to-t from-[#132e21]/60 to-transparent flex items-end p-6">
             <div class="font-serif text-white text-xl">Terrasse mit Blick auf Bahn 18</div>
           </div>

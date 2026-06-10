@@ -19,3 +19,4 @@ services:
       CORS_ORIGIN: "true"
       PUBLIC_URL: "http://localhost:8055"
       MARKETPLACE_TRUST: "all"
+      UNSPLASH_KEY: "${UNSPLASH_KEY:-}"

@@ -1,9 +1,11 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getClubmeister, bildUrl } from '../lib/directus';
+import { getClubmeister, getSeitenbilder, bildUrl, bildUrlMitFormat } from '../lib/directus';
 
 const clubmeister = await getClubmeister();
 const current = clubmeister[0];
+const seitenbilder = await getSeitenbilder();
+const heroUrl = bildUrlMitFormat(seitenbilder?.clubmeister_hero, { width: 1600, quality: 80 });
 
 const kategorien = [
   { key: 'herren',      bildKey: 'herren_bild',      label: 'Herren' },
@@ -17,14 +19,12 @@ const kategorien = [
 
 <Layout title="Clubmeister" description="Clubmeister des Golfclub Schwäbisch Hall – die Ehrenliste seit 1992">
 
-  <div class="bg-[#132e21] py-24 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-5">
-      <img src="/images/gallery/golf1.jpg" alt="" class="w-full h-full object-cover"/>
-    </div>
-    <div class="relative max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Ehrenliste</p>
-      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Clubmeister</h1>
-      <p class="text-white/60 max-w-xl">Die Clubmeister des GC Schwäbisch Hall seit 1992.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf1.jpg"} alt="Clubmeister" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Ehrenliste</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Clubmeister</h1>
     </div>
   </div>
 

@@ -1,17 +1,24 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import { getGolfErleben, bildUrlMitFormat } from '../lib/directus';
+
+const ge = await getGolfErleben();
+const heroUrl      = bildUrlMitFormat(ge?.hero_bild,      { width: 1920, quality: 80 });
+const galerie1     = bildUrlMitFormat(ge?.galerie_bild_1, { width: 800,  quality: 80 });
+const galerie2     = bildUrlMitFormat(ge?.galerie_bild_2, { width: 600,  quality: 80 });
+const galerie3     = bildUrlMitFormat(ge?.galerie_bild_3, { width: 600,  quality: 80 });
+const kurzplatzUrl = bildUrlMitFormat(ge?.kurzplatz_bild, { width: 900,  quality: 80 });
+const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality: 85 });
 ---
 
 <Layout title="Golf Erleben – Golfanlage" description="18-Loch-Meisterschaftsplatz und 6-Loch-Kurzplatz des Golfclub Schwäbisch Hall in der Hohenloher Landschaft">
 
-  <div class="bg-[#132e21] py-24 relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10">
-      <img src="/images/hero/course.jpg" alt="" class="w-full h-full object-cover"/>
-    </div>
-    <div class="relative max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Unsere Anlage</p>
-      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Golf Erleben</h1>
-      <p class="text-white/60 max-w-xl">18-Loch-Meisterschaftsplatz und 6-Loch-Kurzplatz in der Hohenloher Landschaft.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/hero/course.jpg"} alt="Golf Erleben" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Unsere Anlage</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Golf Erleben</h1>
     </div>
   </div>
 
@@ -101,17 +108,17 @@ import Layout from '../layouts/Layout.astro';
       </div>
       <div class="grid grid-cols-2 gap-3 h-[420px]">
         <div class="row-span-2 relative overflow-hidden">
-          <img src="/images/platz/golfanlage1.jpg" alt="Meisterschaftsplatz" class="w-full h-full object-cover"/>
+          <img src={galerie1 || "/images/platz/golfanlage1.jpg"} alt="Meisterschaftsplatz" class="w-full h-full object-cover"/>
           <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-4">
             <div class="text-[#c4a94a] text-xs uppercase tracking-wider">18 Loch</div>
             <div class="font-serif text-white text-sm">Meisterschaftsplatz</div>
           </div>
         </div>
         <div class="relative overflow-hidden">
-          <img src="/images/platz/bruecke-herbst.jpg" alt="Brücke im Herbst" class="w-full h-full object-cover"/>
+          <img src={galerie2 || "/images/platz/bruecke-herbst.jpg"} alt="Brücke im Herbst" class="w-full h-full object-cover"/>
         </div>
         <div class="relative overflow-hidden">
-          <img src="/images/platz/golfanlage2.jpg" alt="Golfanlage" class="w-full h-full object-cover"/>
+          <img src={galerie3 || "/images/platz/golfanlage2.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
         </div>
       </div>
     </div>
@@ -123,7 +130,7 @@ import Layout from '../layouts/Layout.astro';
       <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Übersicht</p>
       <h2 class="font-serif text-3xl text-[#132e21] mb-6">Platzgrafik</h2>
       <div class="overflow-x-auto">
-        <img src="/images/platz/platzgrafik.png" alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full border border-gray-200"/>
+        <img src={platzgrafikUrl || "/images/platz/platzgrafik.png"} alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full border border-gray-200"/>
       </div>
     </div>
   </section>
@@ -133,7 +140,7 @@ import Layout from '../layouts/Layout.astro';
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
       <div class="grid grid-cols-2 gap-3 h-72 lg:h-auto lg:min-h-[340px] order-2 lg:order-1">
         <div class="relative overflow-hidden col-span-2">
-          <img src="/images/platz/kurzplatz-luft.jpg" alt="Kurzplatz Luftbild" class="w-full h-full object-cover"/>
+          <img src={kurzplatzUrl || "/images/platz/kurzplatz-luft.jpg"} alt="Kurzplatz Luftbild" class="w-full h-full object-cover"/>
           <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-5">
             <div class="text-[#c4a94a] text-xs uppercase tracking-wider">6 Loch</div>
             <div class="font-serif text-white">Kurzplatz – offen für Gäste</div>

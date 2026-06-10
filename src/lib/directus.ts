@@ -82,11 +82,14 @@ export interface Event {
   titel: string;
   datum_von: string;
   datum_bis: string | null;
+  uhrzeit_von: string | null;
+  uhrzeit_bis: string | null;
   typ: string;
   beschreibung: string;
   ort: string;
   anmeldelink: string;
   highlight: boolean;
+  bild: string | DirectusFile | null;
 }
 
 export interface NewsArtikel {
@@ -130,6 +133,30 @@ export interface RestaurantData {
   hinweis: string;
   reservierungTelefon: string;
   reservierungEmail: string;
+  hero_bild: string | DirectusFile | null;
+  bild_innen: string | DirectusFile | null;
+}
+
+export interface SeitenbilderData {
+  homepage_hero:       string | DirectusFile | null;
+  club_hero:           string | DirectusFile | null;
+  clubmeister_hero:    string | DirectusFile | null;
+  golf_lernen_hero:    string | DirectusFile | null;
+  turniere_hero:       string | DirectusFile | null;
+  spielgruppen_hero:   string | DirectusFile | null;
+  spielgebuehren_hero: string | DirectusFile | null;
+  platzstatus_hero:       string | DirectusFile | null;
+  kontakt_hero:           string | DirectusFile | null;
+  kontakt_formular_bild:  string | DirectusFile | null;
+}
+
+export interface GolfErlebenData {
+  hero_bild:      string | DirectusFile | null;
+  galerie_bild_1: string | DirectusFile | null;
+  galerie_bild_2: string | DirectusFile | null;
+  galerie_bild_3: string | DirectusFile | null;
+  kurzplatz_bild: string | DirectusFile | null;
+  platzgrafik:    string | DirectusFile | null;
 }
 
 export interface PlatzstatusData {
@@ -139,8 +166,29 @@ export interface PlatzstatusData {
   cafe: string;
   carts: string;
   hinweis: string;
-  zeitsteuerung: Record<string, string>;
-  sperrzeiten: any[];
+  // Neue Zeitfelder (ersetzen zeitsteuerung JSON)
+  hauptplatz_oeffnet:      string;
+  hauptplatz_schliesst:    string;
+  kurzplatz_oeffnet:       string;
+  kurzplatz_schliesst:     string;
+  driving_range_oeffnet:   string;
+  driving_range_schliesst: string;
+  cafe_oeffnet:            string;
+  cafe_schliesst:          string;
+  // Legacy (versteckt, aber noch vorhanden)
+  zeitsteuerung?: Record<string, string>;
+  sperrzeiten?: any[];
+}
+
+export interface PlatzstatusKalenderEintrag {
+  id: number;
+  datum: string;
+  hinweis: string | null;
+  hauptplatz: string | null;
+  kurzplatz: string | null;
+  drivingRange: string | null;
+  cafe: string | null;
+  carts: string | null;
 }
 
 // ── Bild-URL Helper ───────────────────────────────────────────────────────────
@@ -202,7 +250,7 @@ export async function getEvents(nurZukuenftige = false): Promise<Event[]> {
     ? `&filter[datum_von][_gte]=${today}`
     : '';
   const data = await fetchDirectus<Event[]>(
-    `/items/events?sort=datum_von&limit=200${filter}`
+    `/items/events?sort=datum_von&limit=200&fields=*,bild.id${filter}`
   );
   return data ?? [];
 }
@@ -238,9 +286,69 @@ export async function getSpielgruppen(): Promise<SpielgruppenData | null> {
 }
 
 export async function getRestaurant(): Promise<RestaurantData | null> {
-  return fetchDirectus<RestaurantData>('/items/restaurant');
+  return fetchDirectus<RestaurantData>(
+    '/items/restaurant?fields=*,hero_bild.id,bild_innen.id'
+  );
 }
 
 export async function getPlatzstatus(): Promise<PlatzstatusData | null> {
   return fetchDirectus<PlatzstatusData>('/items/platzstatus');
+}
+
+export async function getPlatzstatusKalenderHeute(): Promise<PlatzstatusKalenderEintrag | null> {
+  const today = new Date().toISOString().split('T')[0];
+  const data = await fetchDirectus<PlatzstatusKalenderEintrag[]>(
+    `/items/platzstatus_kalender?filter[datum][_eq]=${today}&limit=1`
+  );
+  return data?.[0] ?? null;
+}
+
+export async function getPlatzstatusKalender(von?: string, bis?: string): Promise<PlatzstatusKalenderEintrag[]> {
+  const params = new URLSearchParams({ sort: 'datum', limit: '90' });
+  if (von) params.set('filter[datum][_gte]', von);
+  if (bis) params.set('filter[datum][_lte]', bis);
+  const data = await fetchDirectus<PlatzstatusKalenderEintrag[]>(`/items/platzstatus_kalender?${params}`);
+  return data ?? [];
+}
+
+export interface KontaktData {
+  adresse: string;
+  ort: string;
+  telefon_sekretariat: string;
+  telefon_restaurant: string;
+  email: string;
+  fax?: string;
+  google_maps_embed: string;
+  anfahrt_routen: { von: string; text: string }[];
+}
+
+export async function getKontakt(): Promise<KontaktData | null> {
+  return fetchDirectus<KontaktData>('/items/kontakt');
+}
+
+export async function getSeitenbilder(): Promise<SeitenbilderData | null> {
+  return fetchDirectus<SeitenbilderData>(
+    '/items/seitenbilder?fields=*,homepage_hero.id,club_hero.id,clubmeister_hero.id,golf_lernen_hero.id,turniere_hero.id,spielgruppen_hero.id,spielgebuehren_hero.id,platzstatus_hero.id,kontakt_hero.id,kontakt_formular_bild.id'
+  );
+}
+
+export interface SiteSettings {
+  clubName: string;
+  telefon: string;
+  email: string;
+  adresse: string;
+  instagram: string;
+  pccaddieUrl: string;
+  recaptcha_site_key: string | null;
+  recaptcha_secret_key: string | null;
+}
+
+export async function getSettings(): Promise<SiteSettings | null> {
+  return fetchDirectus<SiteSettings>('/items/settings/1');
+}
+
+export async function getGolfErleben(): Promise<GolfErlebenData | null> {
+  return fetchDirectus<GolfErlebenData>(
+    '/items/golf_erleben?fields=*,hero_bild.id,galerie_bild_1.id,galerie_bild_2.id,galerie_bild_3.id,kurzplatz_bild.id,platzgrafik.id'
+  );
 }

@@ -1,0 +1,127 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getEvents, bildUrlMitFormat } from '../../lib/directus';
+
+export const prerender = false;
+
+const { id } = Astro.params;
+const events = await getEvents();
+const event = events.find(e => String(e.id) === id);
+
+if (!event) return Astro.redirect('/events');
+
+const d = new Date(event.datum_von);
+const dBis = event.datum_bis ? new Date(event.datum_bis) : null;
+const bildUrl = bildUrlMitFormat(event.bild, { width: 1200, height: 500, quality: 85 });
+
+const catLabel: Record<string,string> = {
+  turnier:'Turnier', club:'Clubveranstaltung', golfschule:'Golfschule',
+  restaurant:'Restaurant', sonstiges:'Sonstiges',
+};
+const catColor: Record<string,string> = {
+  turnier:'bg-[#132e21] text-white', club:'bg-[#c4a94a] text-[#132e21]',
+  golfschule:'bg-blue-100 text-blue-800', restaurant:'bg-purple-100 text-purple-800',
+  sonstiges:'bg-gray-100 text-gray-600',
+};
+
+const cat = event.typ ?? 'sonstiges';
+
+const datumText = (() => {
+  const opts: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+  if (!dBis) return d.toLocaleDateString('de-DE', opts);
+  if (d.getMonth() === dBis.getMonth() && d.getFullYear() === dBis.getFullYear())
+    return `${d.getDate()}. – ${dBis.toLocaleDateString('de-DE', opts)}`;
+  return `${d.toLocaleDateString('de-DE', opts)} – ${dBis.toLocaleDateString('de-DE', opts)}`;
+})();
+---
+
+<Layout title={event.titel} description={event.beschreibung?.slice(0, 160) ?? event.titel}>
+
+  <!-- Zurück-Link -->
+  <div class="bg-[#f5f5f0] border-b border-gray-200">
+    <div class="max-w-4xl mx-auto px-6 md:px-8 py-3 flex items-center gap-2">
+      <a href="/events" class="flex items-center gap-1.5 text-xs text-gray-400 hover:text-[#132e21] transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Alle Events
+      </a>
+      <span class="text-gray-300">/</span>
+      <span class="text-xs text-gray-400 truncate">{event.titel}</span>
+    </div>
+  </div>
+
+  <article class="py-12 bg-white">
+    <div class="max-w-4xl mx-auto px-6 md:px-8">
+
+      <!-- Header -->
+      <div class="mb-8">
+        <div class="flex flex-wrap items-center gap-3 mb-4">
+          <span class={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 ${catColor[cat] ?? catColor.sonstiges}`}>
+            {catLabel[cat] ?? cat}
+          </span>
+          {event.highlight && (
+            <span class="text-xs font-semibold text-[#c4a94a] uppercase tracking-wider">★ Highlight</span>
+          )}
+        </div>
+        <h1 class="font-serif text-4xl md:text-5xl text-[#132e21] mb-6 leading-tight">{event.titel}</h1>
+
+        <!-- Meta-Infos -->
+        <div class="flex flex-wrap gap-6 text-sm text-gray-600 pb-6 border-b border-gray-100">
+          <div class="flex items-center gap-2">
+            <svg class="w-4 h-4 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            <span>{datumText}</span>
+          </div>
+          {(event.uhrzeit_von || event.uhrzeit_bis) && (
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span>{event.uhrzeit_von}{event.uhrzeit_bis ? ` – ${event.uhrzeit_bis}` : ''} Uhr</span>
+            </div>
+          )}
+          {event.ort && (
+            <div class="flex items-center gap-2">
+              <svg class="w-4 h-4 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+              </svg>
+              <span>{event.ort}</span>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <!-- Bild -->
+      {bildUrl && (
+        <div class="mb-8 overflow-hidden">
+          <img src={bildUrl} alt={event.titel} class="w-full h-72 md:h-96 object-cover"/>
+        </div>
+      )}
+
+      <!-- Beschreibung (WYSIWYG-Output) -->
+      {event.beschreibung && (
+        <div class="prose prose-lg max-w-none text-gray-600 leading-relaxed mb-10
+                    prose-headings:font-serif prose-headings:text-[#132e21]
+                    prose-a:text-[#c4a94a] prose-a:no-underline hover:prose-a:underline"
+             set:html={event.beschreibung}>
+        </div>
+      )}
+
+      <!-- Anmelde-Button -->
+      {event.anmeldelink && (
+        <div class="pt-6 border-t border-gray-100">
+          <a
+            href={event.anmeldelink}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-block bg-[#132e21] text-white text-sm font-bold uppercase tracking-widest px-8 py-4 hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors"
+          >
+            Jetzt anmelden →
+          </a>
+        </div>
+      )}
+    </div>
+  </article>
+</Layout>

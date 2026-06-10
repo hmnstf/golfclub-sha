@@ -1,205 +1,362 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getEvents } from '../lib/directus';
+import { getEvents, getSeitenbilder, bildUrlMitFormat } from '../lib/directus';
 
-const events = await getEvents();
+const [events, bilder] = await Promise.all([getEvents(), getSeitenbilder()]);
 const today = new Date().toISOString().split('T')[0];
-const upcoming = events.filter(e => (e.datum_von ?? '') >= today);
-const past = events.filter(e => (e.datum_von ?? '') < today).reverse();
 
-const categoryColors: Record<string, string> = {
-  turnier:    'bg-[#c4a94a] text-[#132e21]',
-  club:       'bg-emerald-100 text-emerald-800',
-  golfschule: 'bg-blue-100 text-blue-800',
-  restaurant: 'bg-purple-100 text-purple-800',
-  sonstiges:  'bg-gray-100 text-gray-700',
+const upcoming  = events.filter(e => (e.datum_von ?? '') >= today);
+const turniere  = upcoming.filter(e => e.typ === 'turnier');
+const eventsNonTurnier = upcoming.filter(e => e.typ !== 'turnier');
+
+const heroUrl = bildUrlMitFormat(bilder?.turniere_hero, { width: 1920, height: 700, quality: 85 }) || '/images/hero-fallback.jpg';
+
+const catLabel: Record<string,string> = {
+  turnier:'Turnier', club:'Clubveranstaltung', golfschule:'Golfschule',
+  restaurant:'Restaurant', sonstiges:'Sonstiges',
 };
 
-const categoryLabels: Record<string, string> = {
-  turnier:    'Turnier',
-  club:       'Clubveranstaltung',
-  golfschule: 'Golfschule',
-  restaurant: 'Restaurant',
-  sonstiges:  'Sonstiges',
-};
+// Daten für den Client-Kalender serialisieren
+const calEvents = upcoming.map(e => ({
+  date: e.datum_von,
+  typ:  e.typ ?? 'sonstiges',
+  titel: e.titel,
+}));
 
-function formatDate(date: string, endDate?: string | null) {
-  const d = new Date(date);
-  const opts: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'long', year: 'numeric' };
-  if (!endDate) return d.toLocaleDateString('de-DE', opts);
-  const e = new Date(endDate);
-  if (d.getMonth() === e.getMonth() && d.getFullYear() === e.getFullYear()) {
-    return `${d.getDate()}. – ${e.toLocaleDateString('de-DE', opts)}`;
-  }
-  return `${d.toLocaleDateString('de-DE', opts)} – ${e.toLocaleDateString('de-DE', opts)}`;
-}
+// Nächste 3 Turniere für die rechte Spalte
+const nextTurniere = upcoming.slice(0, 3);
+
+const fallbackImg = bildUrlMitFormat(bilder?.turniere_hero, { width: 600, height: 400, quality: 80 }) || '';
+
+// Vorberechnete Daten für Event-Karten
+const eventCards = eventsNonTurnier.slice(0, 4).map(e => {
+  const d = new Date(e.datum_von);
+  return {
+    ...e,
+    dayNum:   d.getDate(),
+    monthStr: d.toLocaleDateString('de-DE', { month: 'short' }).toUpperCase(),
+    bildUrl:  bildUrlMitFormat(e.bild, { width: 600, height: 400, quality: 80 }) || fallbackImg,
+  };
+});
+
+// Nächste 3 Turniere mit vorberechneten Datumswerten
+const nextTurniereCards = nextTurniere.map(e => {
+  const d = new Date(e.datum_von);
+  return {
+    ...e,
+    dayNum:   d.getDate(),
+    monthStr: d.toLocaleDateString('de-DE', { month: 'short' }).toUpperCase(),
+    bildUrl:  bildUrlMitFormat(e.bild, { width: 200, height: 120, quality: 75 }) || fallbackImg,
+  };
+});
 ---
 
-<Layout title="Turniere & Events" description="Alle Turniere und Veranstaltungen des Golfclub Schwäbisch Hall">
-  <div class="bg-[#132e21] py-20">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Programm</p>
-      <h1 class="font-serif text-5xl text-white">Turniere & Events</h1>
+<Layout title="Turniere & Events" description="Turnierkalender und Veranstaltungen des Golfclub Schwäbisch Hall">
+
+  <!-- ── Hero ── -->
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl} alt="Turniere & Events" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Veranstaltungen</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white mb-4">Turniere &amp; Events</h1>
+      <div class="flex flex-wrap gap-3">
+        <a href="#turnierkalender"
+          class="bg-[#c4a94a] text-[#132e21] text-xs font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-[#d4b85a] transition-colors">
+          Turnierkalender
+        </a>
+        <a href="#events"
+          class="border border-white text-white text-xs font-bold uppercase tracking-widest px-5 py-2.5 hover:bg-white hover:text-[#132e21] transition-colors">
+          Events entdecken
+        </a>
+      </div>
     </div>
   </div>
 
-  <section class="py-16 bg-white">
-    <div class="max-w-4xl mx-auto px-4">
+  <!-- ── Turnierkalender ── -->
+  <section id="turnierkalender" class="py-16 bg-white">
+    <div class="max-w-7xl mx-auto px-6 md:px-8">
+      <p class="text-xs font-semibold uppercase tracking-widest text-[#132e21] mb-8">Turnierkalender</p>
 
-      {upcoming.length > 0 ? (
-        <>
-          <h2 class="font-serif text-3xl text-[#132e21] mb-8">Kommende Veranstaltungen</h2>
-          <div class="divide-y divide-gray-100" id="upcoming-list">
-            {upcoming.map((event: any, i: number) => {
-              const d = new Date(event.date);
-              const cat = event.category ?? 'sonstiges';
-              const id = `event-${i}`;
-              return (
-                <div class="event-item">
-                  <!-- Klickbare Kopfzeile -->
-                  <button
-                    class="w-full flex items-center gap-5 py-5 text-left group"
-                    aria-expanded="false"
-                    data-target={id}
-                  >
-                    <!-- Datum-Badge -->
-                    <div class="shrink-0 w-14 text-center">
-                      <div class="font-serif text-3xl text-[#c4a94a] font-bold leading-none">{d.getDate()}</div>
-                      <div class="text-gray-400 text-xs uppercase mt-0.5">
-                        {d.toLocaleDateString('de-DE', { month: 'short' })}
-                      </div>
-                      <div class="text-gray-300 text-xs">{d.getFullYear()}</div>
-                    </div>
+      <div class="grid lg:grid-cols-[1fr_1.1fr] gap-10">
 
-                    <!-- Titel + Kategorie -->
-                    <div class="flex-1 min-w-0">
-                      <div class="flex flex-wrap items-center gap-2 mb-1">
-                        <span class={`text-xs font-bold px-2 py-0.5 uppercase tracking-wide ${categoryColors[cat] ?? 'bg-gray-100 text-gray-700'}`}>
-                          {categoryLabels[cat] ?? cat}
-                        </span>
-                        {event.location && (
-                          <span class="text-xs text-gray-400 flex items-center gap-0.5">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                            </svg>
-                            {event.location}
-                          </span>
-                        )}
-                      </div>
-                      <h3 class="font-serif text-xl text-[#132e21] group-hover:text-[#c4a94a] transition-colors">
-                        {event.titel}
-                      </h3>
-                    </div>
-
-                    <!-- Chevron -->
-                    <svg class="chevron w-5 h-5 text-[#c4a94a] shrink-0 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
-                    </svg>
-                  </button>
-
-                  <!-- Aufklappbarer Inhalt -->
-                  <div id={id} class="accordion-body hidden pb-6 pl-19">
-                    <div class="ml-[4.75rem] border-l-2 border-[#c4a94a]/30 pl-6">
-                      <dl class="grid sm:grid-cols-2 gap-x-8 gap-y-3 mb-5 text-sm">
-                        <div>
-                          <dt class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-0.5">Datum</dt>
-                          <dd class="text-[#132e21]">{formatDate(event.date, event.endDate)}</dd>
-                        </div>
-                        {event.location && (
-                          <div>
-                            <dt class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-0.5">Ort</dt>
-                            <dd class="text-[#132e21]">{event.location}</dd>
-                          </div>
-                        )}
-                        <div>
-                          <dt class="text-xs font-bold uppercase tracking-wider text-gray-400 mb-0.5">Kategorie</dt>
-                          <dd class="text-[#132e21]">{categoryLabels[cat] ?? cat}</dd>
-                        </div>
-                      </dl>
-
-                      {event.description && (
-                        <p class="text-gray-600 text-sm leading-relaxed mb-5">{event.description}</p>
-                      )}
-
-                      {event.registrationLink && (
-                        <a
-                          href={event.registrationLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          class="inline-block bg-[#132e21] text-white text-xs font-bold uppercase tracking-wider px-5 py-2.5 hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors"
-                        >
-                          Jetzt anmelden →
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
+        <!-- Kalender Widget -->
+        <div>
+          <!-- Kalender-Header -->
+          <div class="flex items-center justify-between mb-5">
+            <button id="cal-prev" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#132e21] transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+              </svg>
+            </button>
+            <span id="cal-title" class="font-serif text-lg text-[#132e21]"></span>
+            <button id="cal-next" class="w-8 h-8 flex items-center justify-center text-gray-400 hover:text-[#132e21] transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+              </svg>
+            </button>
           </div>
-        </>
-      ) : (
-        <div class="text-center py-24">
-          <svg class="w-16 h-16 mx-auto mb-4 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
-          </svg>
-          <p class="text-gray-400 text-lg font-medium mb-2">Keine anstehenden Veranstaltungen</p>
-          <p class="text-gray-300 text-sm">Schauen Sie bald wieder vorbei.</p>
-        </div>
-      )}
 
-      {past.length > 0 && (
-        <div class="mt-16">
-          <h2 class="font-serif text-xl text-gray-300 mb-4">Vergangene Veranstaltungen</h2>
-          <div class="divide-y divide-gray-100 opacity-50">
-            {past.slice(0, 5).map((event: any) => {
-              const d = new Date(event.date);
-              const cat = event.category ?? 'sonstiges';
-              return (
-                <div class="flex items-center gap-5 py-4">
-                  <div class="shrink-0 w-14 text-center">
-                    <div class="font-serif text-2xl text-gray-400">{d.getDate()}</div>
-                    <div class="text-gray-300 text-xs uppercase">{d.toLocaleDateString('de-DE', { month: 'short' })}</div>
-                  </div>
-                  <div>
-                    <div class="font-medium text-gray-500 text-sm">{event.titel}</div>
-                    <div class="text-xs text-gray-400">{categoryLabels[cat] ?? cat}</div>
-                  </div>
-                </div>
-              );
-            })}
+          <!-- Wochentage -->
+          <div class="grid grid-cols-7 mb-2">
+            {['MO','DI','MI','DO','FR','SA','SO'].map(d => (
+              <div class="text-center text-xs font-semibold text-gray-400 py-1">{d}</div>
+            ))}
+          </div>
+
+          <!-- Kalendertage (via JS gefüllt) -->
+          <div id="cal-grid" class="grid grid-cols-7 gap-y-1"></div>
+
+          <!-- Legende -->
+          <div class="flex flex-wrap items-center gap-5 mt-6 pt-4 border-t border-gray-100">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#132e21] shrink-0"></span>
+              <span class="text-xs text-gray-500">Clubturnier</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-[#c4a94a] shrink-0"></span>
+              <span class="text-xs text-gray-500">Offenes Turnier</span>
+            </div>
+            <div class="flex items-center gap-1.5">
+              <span class="w-2 h-2 rounded-full bg-blue-400 shrink-0"></span>
+              <span class="text-xs text-gray-500">Event</span>
+            </div>
+            <a href="/events" class="ml-auto text-xs font-semibold text-[#c4a94a] hover:underline flex items-center gap-1">
+              Zum Kalender
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
           </div>
         </div>
-      )}
 
+        <!-- Kommende Turniere -->
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-5">Kommende Turniere</p>
+          <div class="divide-y divide-gray-100">
+            {nextTurniereCards.length > 0 ? nextTurniereCards.map((e: any) => (
+              <a href={`/events/${e.id}`} class="flex items-center gap-4 py-4 group">
+                <!-- Datum -->
+                <div class="shrink-0 w-12 text-center">
+                  <div class="font-serif text-2xl font-bold text-[#132e21] leading-none">{e.dayNum}</div>
+                  <div class="text-xs text-gray-400 uppercase mt-0.5">{e.monthStr}</div>
+                </div>
+                <!-- Bild -->
+                {e.bildUrl && (
+                  <div class="shrink-0 w-16 h-12 overflow-hidden bg-gray-100">
+                    <img src={e.bildUrl} alt={e.titel} class="w-full h-full object-cover"/>
+                  </div>
+                )}
+                <!-- Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="font-serif text-sm text-[#132e21] font-semibold group-hover:text-[#c4a94a] transition-colors truncate">{e.titel}</div>
+                  {e.beschreibung && <div class="text-xs text-gray-500 mt-0.5 truncate">{e.beschreibung}</div>}
+                  {e.ort && <div class="text-xs text-gray-400 mt-0.5">{e.ort}</div>}
+                </div>
+                <svg class="w-4 h-4 text-[#c4a94a] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                </svg>
+              </a>
+            )) : (
+              <p class="text-sm text-gray-400 py-4">Keine kommenden Turniere eingetragen.</p>
+            )}
+          </div>
+          <div class="mt-4 text-right">
+            <a href="/events" class="text-xs font-semibold uppercase tracking-widest text-[#c4a94a] hover:underline flex items-center gap-1 justify-end">
+              Alle Turniere anzeigen
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
+
+  <!-- ── Events & Veranstaltungen ── -->
+  {eventCards.length > 0 && (
+    <section id="events" class="py-16 bg-[#f5f5f0]">
+      <div class="max-w-7xl mx-auto px-6 md:px-8">
+        <p class="text-xs font-semibold uppercase tracking-widest text-[#132e21] mb-8">Events &amp; Veranstaltungen</p>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          {eventCards.map((e: any) => (
+            <a href={`/events/${e.id}`} class="bg-white group block">
+              <!-- Bild mit Datum-Badge -->
+              <div class="relative h-44 overflow-hidden bg-gray-200">
+                {e.bildUrl
+                  ? <img src={e.bildUrl} alt={e.titel} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                  : <div class="w-full h-full bg-gradient-to-br from-[#132e21] to-[#1e4a32]"></div>
+                }
+                <!-- Datum-Badge -->
+                <div class="absolute bottom-3 left-3 bg-white/95 px-2 py-1 text-center min-w-[44px]">
+                  <div class="font-serif text-lg font-bold text-[#132e21] leading-none">{e.dayNum}</div>
+                  <div class="text-[10px] font-semibold text-gray-500 uppercase">{e.monthStr}</div>
+                </div>
+              </div>
+              <!-- Text -->
+              <div class="p-4">
+                <h3 class="font-serif text-base text-[#132e21] mb-2 group-hover:text-[#c4a94a] transition-colors">{e.titel}</h3>
+                {e.beschreibung && (
+                  <p class="text-xs text-gray-500 leading-relaxed mb-3 line-clamp-3">{e.beschreibung}</p>
+                )}
+                {e.anmeldelink
+                  ? <a href={e.anmeldelink} target="_blank" rel="noopener noreferrer"
+                      class="inline-flex items-center gap-1 text-xs font-semibold text-[#c4a94a] hover:underline uppercase tracking-wider">
+                      Mehr erfahren
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                      </svg>
+                    </a>
+                  : <span class="inline-flex items-center gap-1 text-xs font-semibold text-[#c4a94a] uppercase tracking-wider">
+                      Mehr erfahren
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+                      </svg>
+                    </span>
+                }
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- ── Firmenevents CTA ── -->
+  <section class="grid md:grid-cols-2 min-h-[360px]">
+    <div class="bg-[#132e21] flex flex-col justify-center px-10 md:px-16 py-16">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-4">Firmenevents &amp; Turniere</p>
+      <h2 class="font-serif text-3xl md:text-4xl text-white mb-5 leading-snug">
+        Ihr Event in<br/>besonderer Kulisse
+      </h2>
+      <p class="text-white/60 text-sm leading-relaxed mb-8">
+        Ob Kundenevent, Firmencup oder Teambuilding – wir planen und
+        organisieren Ihr individuelles Event auf und neben dem Platz.
+      </p>
+      <a href="/kontakt"
+        class="self-start bg-[#c4a94a] text-[#132e21] text-sm font-bold uppercase tracking-widest px-6 py-3 hover:bg-[#d4b85a] transition-colors">
+        Mehr erfahren
+      </a>
+    </div>
+    <div class="relative min-h-[280px] md:min-h-0">
+      <img src={heroUrl} alt="Firmenevents" class="absolute inset-0 w-full h-full object-cover"/>
+      <div class="absolute inset-0 bg-black/20"></div>
+    </div>
+  </section>
+
+  <!-- ── Feature-Boxen ── -->
+  <section class="py-14 bg-[#f5f5f0] border-t border-gray-200">
+    <div class="max-w-7xl mx-auto px-6 md:px-8">
+      <div class="grid md:grid-cols-3 gap-8">
+        {[
+          { icon:'M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z', label:'Wettkampf', text:'Zahlreiche Clubturniere und offene Turniere für jedes Spielniveau.' },
+          { icon:'M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z', label:'Gemeinschaft', text:'Erleben Sie sportliche Fairness und gesellige Momente.' },
+          { icon:'M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z', label:'Vielfalt', text:'Ein abwechslungsreicher Turnierkalender für Mitglieder und Gäste.' },
+        ].map(f => (
+          <div class="flex items-start gap-5">
+            <div class="w-12 h-12 border border-[#c4a94a]/40 flex items-center justify-center shrink-0">
+              <svg class="w-6 h-6 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={f.icon}/>
+              </svg>
+            </div>
+            <div>
+              <div class="font-semibold text-sm uppercase tracking-wider text-[#132e21] mb-1">{f.label}</div>
+              <p class="text-sm text-gray-500 leading-relaxed">{f.text}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
 </Layout>
 
-<script>
-  // Accordion-Logik
-  document.querySelectorAll<HTMLButtonElement>('[data-target]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const targetId = btn.dataset.target!;
-      const body = document.getElementById(targetId);
-      const chevron = btn.querySelector('.chevron') as SVGElement | null;
-      const isOpen = btn.getAttribute('aria-expanded') === 'true';
+<script define:vars={{ calEvents }}>
+  // Kalender-Logik
+  const monthNames = ['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  let cur = new Date();
+  cur.setDate(1);
 
-      // Alle anderen schließen
-      document.querySelectorAll('[data-target]').forEach(other => {
-        if (other === btn) return;
-        const otherId = (other as HTMLButtonElement).dataset.target!;
-        const otherBody = document.getElementById(otherId);
-        const otherChevron = other.querySelector('.chevron') as SVGElement | null;
-        other.setAttribute('aria-expanded', 'false');
-        otherBody?.classList.add('hidden');
-        if (otherChevron) otherChevron.style.transform = '';
-      });
+  const eventMap = {};
+  for (const e of calEvents) {
+    const key = e.date; // YYYY-MM-DD
+    if (!eventMap[key]) eventMap[key] = [];
+    eventMap[key].push(e.typ);
+  }
 
-      // Aktuellen togglen
-      btn.setAttribute('aria-expanded', isOpen ? 'false' : 'true');
-      body?.classList.toggle('hidden', isOpen);
-      if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
-    });
+  const dotColor = (typ) => {
+    if (typ === 'turnier') return 'bg-[#132e21]';
+    if (typ === 'club' || typ === 'sonstiges') return 'bg-[#c4a94a]';
+    return 'bg-blue-400';
+  };
+
+  function render() {
+    const grid = document.getElementById('cal-grid');
+    const title = document.getElementById('cal-title');
+    if (!grid || !title) return;
+
+    title.textContent = `${monthNames[cur.getMonth()]} ${cur.getFullYear()}`;
+
+    const year = cur.getFullYear();
+    const month = cur.getMonth();
+    const firstDay = new Date(year, month, 1).getDay(); // 0=So
+    const startOffset = (firstDay === 0 ? 6 : firstDay - 1); // MO=0
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const todayStr = new Date().toISOString().split('T')[0];
+
+    grid.innerHTML = '';
+
+    // Leere Zellen am Anfang
+    for (let i = 0; i < startOffset; i++) {
+      const cell = document.createElement('div');
+      cell.className = 'h-9 flex flex-col items-center justify-start pt-1';
+      grid.appendChild(cell);
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dateStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const isToday = dateStr === todayStr;
+      const types = eventMap[dateStr] || [];
+
+      const cell = document.createElement('div');
+      cell.className = 'h-9 flex flex-col items-center justify-start pt-1';
+
+      const num = document.createElement('div');
+      num.textContent = String(d);
+      num.className = `text-sm w-7 h-7 flex items-center justify-center rounded-full transition-colors ${
+        isToday
+          ? 'bg-[#132e21] text-white font-bold'
+          : types.length > 0
+            ? 'text-[#132e21] font-semibold hover:bg-[#f5f5f0] cursor-pointer'
+            : 'text-gray-400'
+      }`;
+      cell.appendChild(num);
+
+      if (types.length > 0) {
+        const dots = document.createElement('div');
+        dots.className = 'flex gap-0.5 mt-0.5';
+        const shown = [...new Set(types)].slice(0, 2);
+        for (const t of shown) {
+          const dot = document.createElement('span');
+          dot.className = `w-1 h-1 rounded-full ${dotColor(t)}`;
+          dots.appendChild(dot);
+        }
+        cell.appendChild(dots);
+      }
+
+      grid.appendChild(cell);
+    }
+  }
+
+  document.getElementById('cal-prev')?.addEventListener('click', () => {
+    cur.setMonth(cur.getMonth() - 1);
+    render();
   });
+  document.getElementById('cal-next')?.addEventListener('click', () => {
+    cur.setMonth(cur.getMonth() + 1);
+    render();
+  });
+
+  render();
 </script>
