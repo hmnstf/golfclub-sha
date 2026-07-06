@@ -26,5 +26,9 @@ export const onRequest = defineMiddleware(async ({ url, cookies, redirect }, nex
     }
   }
 
-  return next();
+  // iframe-Einbettung für Directus-Vorschau erlauben
+  const response = await next();
+  response.headers.set('X-Frame-Options', 'ALLOWALL');
+  response.headers.set('Content-Security-Policy', "frame-ancestors *");
+  return response;
 });

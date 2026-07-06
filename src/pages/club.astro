@@ -1,11 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getTeam, getClubmeister, getSeitenbilder, bildUrl, bildUrlMitFormat } from '../lib/directus';
+import { getTeam, getClubmeister, getSettings, bildUrl, bildUrlMitFormat } from '../lib/directus';
 
-const teamMembers = await getTeam();
-const clubmeister = await getClubmeister();
-const seitenbilder = await getSeitenbilder();
-const heroUrl = bildUrlMitFormat(seitenbilder?.club_hero, { width: 1600, quality: 80 });
+const [teamMembers, clubmeister, settings] = await Promise.all([getTeam(), getClubmeister(), getSettings()]);
+const heroUrl = bildUrlMitFormat(settings?.bild_club, { width: 1600, quality: 80 });
 
 const gruppenLabels: Record<string, string> = {
   vorstand_gf: 'Geschäftsführender Vorstand',

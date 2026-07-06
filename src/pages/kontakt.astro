@@ -1,8 +1,8 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getKontakt, getSeitenbilder, getSettings, bildUrlMitFormat } from '../lib/directus';
+import { getKontakt, getSettings, bildUrlMitFormat } from '../lib/directus';
 
-const [data, bilder, settings] = await Promise.all([getKontakt(), getSeitenbilder(), getSettings()]);
+const [data, settings] = await Promise.all([getKontakt(), getSettings()]);
 const recaptchaSiteKey = settings?.recaptcha_site_key ?? '';
 const successParam = Astro.url.searchParams.get('success');
 const errorParam   = Astro.url.searchParams.get('error');
@@ -14,8 +14,8 @@ const fax                = data?.fax                 ?? '+49 7907 8180';
 const email              = data?.email               ?? 'info@gc-sha.de';
 const routen             = data?.anfahrt_routen      ?? [];
 
-const heroUrl       = bildUrlMitFormat(bilder?.kontakt_hero,        { width: 1920, height: 600, quality: 85 }) || '/images/hero-fallback.jpg';
-const formularBild  = bildUrlMitFormat(bilder?.kontakt_formular_bild, { width: 900, height: 700, quality: 85 }) || '/images/clubhaus.jpg';
+const heroUrl       = bildUrlMitFormat(data?.hero_bild,    { width: 1920, height: 600, quality: 85 }) || '/images/hero-fallback.jpg';
+const formularBild  = bildUrlMitFormat(data?.formular_bild, { width: 900, height: 700, quality: 85 }) || '/images/clubhaus.jpg';
 
 // Google Maps – hardcoded mit echter Adresse
 const MAPS_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent('Golfclub Schwäbisch Hall e.V., Am Golfplatz 1, 74523 Schwäbisch Hall')}&output=embed&z=15&hl=de`;

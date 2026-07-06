@@ -1,11 +1,10 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getClubmeister, getSeitenbilder, bildUrl, bildUrlMitFormat } from '../lib/directus';
+import { getClubmeister, getSettings, bildUrl, bildUrlMitFormat } from '../lib/directus';
 
-const clubmeister = await getClubmeister();
+const [clubmeister, settings] = await Promise.all([getClubmeister(), getSettings()]);
 const current = clubmeister[0];
-const seitenbilder = await getSeitenbilder();
-const heroUrl = bildUrlMitFormat(seitenbilder?.clubmeister_hero, { width: 1600, quality: 80 });
+const heroUrl = bildUrlMitFormat(settings?.bild_clubmeister, { width: 1600, quality: 80 });
 
 const kategorien = [
   { key: 'herren',      bildKey: 'herren_bild',      label: 'Herren' },

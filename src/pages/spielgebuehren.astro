@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getSpielgebuehren } from '../lib/directus';
+import { getSpielgebuehren, bildUrlMitFormat } from '../lib/directus';
 
 const gebuehrenData = await getSpielgebuehren();
+const heroUrl = bildUrlMitFormat(gebuehrenData?.hero_bild, { width: 1600, quality: 80 });
 const greenfee18    = gebuehrenData?.greenfee18    ?? [];
 const greenfee9     = gebuehrenData?.greenfee9     ?? [];
 const kurzplatz     = gebuehrenData?.kurzplatz     ?? [];
@@ -13,11 +14,12 @@ const saison        = gebuehrenData?.saison        ?? '';
 
 <Layout title="Spielgebühren & Greenfee" description="Aktuelle Spielgebühren und Greenfee-Preise des Golfclub Schwäbisch Hall">
 
-  <div class="bg-[#132e21] py-24">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Golfanlage</p>
-      <h1 class="font-serif text-5xl md:text-6xl text-white mb-4">Spielgebühren</h1>
-      <p class="text-white/60 max-w-xl">Aktuelle Greenfee-Preise für Mitglieder und Gäste.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf4.jpg"} alt="Spielgebühren" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Golfanlage</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Spielgebühren</h1>
     </div>
   </div>
 

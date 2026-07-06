@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getHoleInOne } from '../lib/directus';
+import { getHoleInOne, getSettings, bildUrlMitFormat } from '../lib/directus';
 
-const rawEintraege = await getHoleInOne();
+const [rawEintraege, settings] = await Promise.all([getHoleInOne(), getSettings()]);
+const heroUrl = bildUrlMitFormat(settings?.bild_holeinone, { width: 1600, quality: 80 });
 const eintraege = rawEintraege.map(d => {
   const [year, month, day] = (d.datum ?? '').split('-');
   const datumFormatiert = year ? `${day}.${month}.${year}` : d.datum;
@@ -12,11 +13,12 @@ const eintraege = rawEintraege.map(d => {
 
 <Layout title="Hole-in-One" description="Die Hole-in-One Liste des Golfclub Schwäbisch Hall">
 
-  <div class="bg-[#132e21] py-20">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Club</p>
-      <h1 class="font-serif text-5xl text-white mb-4">Hole-in-One</h1>
-      <p class="text-white/60 max-w-2xl">Das seltene Kunststück – ein Schlag, ein Loch. Herzlichen Glückwunsch an alle, denen dieses besondere Erlebnis vergönnt war.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf2.jpg"} alt="Hole-in-One" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Club</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Hole-in-One</h1>
     </div>
   </div>
 

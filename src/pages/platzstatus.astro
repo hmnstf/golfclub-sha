@@ -1,12 +1,13 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import { resolveStatus } from '../lib/platzstatus';
-import { getPlatzstatus, getPlatzstatusKalenderHeute, getPlatzstatusKalender } from '../lib/directus';
+import { getPlatzstatus, getPlatzstatusKalenderHeute, getPlatzstatusKalender, bildUrlMitFormat } from '../lib/directus';
 
 const [rawStatus, kalenderHeute] = await Promise.all([
   getPlatzstatus(),
   getPlatzstatusKalenderHeute(),
 ]);
+const heroUrl = bildUrlMitFormat(rawStatus?.hero_bild, { width: 1600, quality: 80 });
 
 // Kalender-Override hat Vorrang vor Basis-Status
 function getStatus(feld: string, basisWert: string): string {
@@ -84,11 +85,12 @@ function formatDate(d: string) {
 ---
 
 <Layout title="Platzstatus" description="Aktueller Platzstatus – Golfclub Schwäbisch Hall">
-  <div class="bg-[#132e21] py-20">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Aktuell</p>
-      <h1 class="font-serif text-5xl text-white mb-2">Platzstatus</h1>
-      <p class="text-white/50 text-sm">Wird täglich aktualisiert. Stand: heute</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf1.jpg"} alt="Platzstatus" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Aktuell</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Platzstatus</h1>
     </div>
   </div>
 

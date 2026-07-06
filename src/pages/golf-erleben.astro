@@ -3,27 +3,134 @@ import Layout from '../layouts/Layout.astro';
 import { getGolfErleben, bildUrlMitFormat } from '../lib/directus';
 
 const ge = await getGolfErleben();
-const heroUrl      = bildUrlMitFormat(ge?.hero_bild,      { width: 1920, quality: 80 });
-const galerie1     = bildUrlMitFormat(ge?.galerie_bild_1, { width: 800,  quality: 80 });
-const galerie2     = bildUrlMitFormat(ge?.galerie_bild_2, { width: 600,  quality: 80 });
-const galerie3     = bildUrlMitFormat(ge?.galerie_bild_3, { width: 600,  quality: 80 });
-const kurzplatzUrl = bildUrlMitFormat(ge?.kurzplatz_bild, { width: 900,  quality: 80 });
-const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality: 85 });
+const heroUrl        = bildUrlMitFormat(ge?.hero_bild, { width: 1920, quality: 80 });
+const galerie1       = bildUrlMitFormat(ge?.galerie_bild_1, { width: 800,  quality: 80 });
+const galerie2       = bildUrlMitFormat(ge?.galerie_bild_2, { width: 600,  quality: 80 });
+const galerie3       = bildUrlMitFormat(ge?.galerie_bild_3, { width: 600,  quality: 80 });
+const kurzplatzUrl   = bildUrlMitFormat(ge?.kurzplatz_bild, { width: 900,  quality: 80 });
+const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,    { width: 1200, quality: 85 });
 ---
 
 <Layout title="Golf Erleben – Golfanlage" description="18-Loch-Meisterschaftsplatz und 6-Loch-Kurzplatz des Golfclub Schwäbisch Hall in der Hohenloher Landschaft">
 
+  <!-- Hero -->
   <div class="relative h-[300px] md:h-[360px] overflow-hidden">
     <img src={heroUrl || "/images/hero/course.jpg"} alt="Golf Erleben" class="absolute inset-0 w-full h-full object-cover"/>
     <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
     <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
       <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Unsere Anlage</p>
-      <h1 class="font-serif text-4xl md:text-5xl text-white">Golf Erleben</h1>
+      <h1 class="font-serif text-4xl md:text-5xl text-white mb-3">Golf Erleben</h1>
+      <p class="text-white/80 text-sm md:text-base max-w-lg">Unsere Anlage bietet beste Bedingungen für unvergessliche Golferlebnisse – für Mitglieder, Gäste und Einsteiger.</p>
     </div>
   </div>
 
+  <!-- Sub-Navigation -->
+  <div class="bg-white border-b border-gray-100 sticky top-[57px] z-40">
+    <div class="max-w-7xl mx-auto px-4 overflow-x-auto">
+      <nav class="flex gap-0 min-w-max">
+        {[
+          { label: 'Platzübersicht',  href: '#uebersicht' },
+          { label: '18-Loch-Platz',   href: '#meisterschaft' },
+          { label: 'Kurzplatz',       href: '#kurzplatz' },
+          { label: 'Übungsanlage',    href: '#uebungsanlage' },
+          { label: 'Greenfee & Gäste',href: '#greenfee' },
+          { label: 'Platzstatus',     href: '/platzstatus' },
+          { label: 'Birdiebook',      href: '#birdiebook' },
+        ].map(({ label, href }) => (
+          <a href={href} class="px-4 py-3.5 text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-[#132e21] hover:border-b-2 hover:border-[#c4a94a] transition-all whitespace-nowrap">
+            {label}
+          </a>
+        ))}
+      </nav>
+    </div>
+  </div>
+
+  <!-- Platzübersicht: 4 Kacheln -->
+  <section id="uebersicht" class="py-16 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Golfvergnügen auf höchstem Niveau</p>
+      <h2 class="font-serif text-3xl md:text-4xl text-[#132e21] mb-10">Unsere Anlage im Überblick</h2>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          {
+            title: '18-Loch-Platz',
+            desc: 'Sportlich, anspruchsvoll, abwechslungsreich.',
+            href: '#meisterschaft',
+            icon: 'M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7',
+          },
+          {
+            title: 'Kurzplatz',
+            desc: 'Ideal für Einsteiger und zum Trainieren.',
+            href: '#kurzplatz',
+            icon: 'M13 10V3L4 14h7v7l9-11h-7z',
+          },
+          {
+            title: 'Übungsanlage',
+            desc: 'Perfekte Bedingungen für Ihr Training.',
+            href: '#uebungsanlage',
+            icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
+          },
+          {
+            title: 'Greenfee & Gäste',
+            desc: 'Willkommen auf unserem Platz.',
+            href: '#greenfee',
+            icon: 'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z',
+          },
+        ].map(({ title, desc, href, icon }) => (
+          <a href={href} class="group bg-white p-6 hover:shadow-md transition-shadow">
+            <svg class="w-8 h-8 text-[#c4a94a] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon}/>
+            </svg>
+            <h3 class="font-serif text-lg text-[#132e21] mb-1">{title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed mb-4">{desc}</p>
+            <span class="text-xs font-bold uppercase tracking-widest text-[#c4a94a] group-hover:text-[#132e21] transition-colors">Mehr erfahren →</span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Platzkarte -->
+  <section class="py-14 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="grid lg:grid-cols-[1fr_220px] gap-10 items-start">
+        <div>
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Übersicht</p>
+          <h2 class="font-serif text-3xl text-[#132e21] mb-6">Platzgrafik</h2>
+          <div class="overflow-x-auto border border-gray-100">
+            <img src={platzgrafikUrl || "/images/platz/platzgrafik.png"} alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full"/>
+          </div>
+        </div>
+        <!-- Legende -->
+        <div class="lg:pt-16">
+          <p class="text-xs font-semibold uppercase tracking-widest text-gray-400 mb-4">Legende</p>
+          <div class="space-y-3">
+            {[
+              { color: 'bg-[#132e21]', label: 'Clubhaus' },
+              { color: 'bg-[#c4a94a]', label: 'Übungsanlage' },
+              { color: 'bg-blue-400',  label: 'Kurzplatz' },
+              { color: 'bg-gray-400',  label: 'Parkplatz' },
+            ].map(({ color, label }) => (
+              <div class="flex items-center gap-3">
+                <span class={`w-3 h-3 rounded-sm shrink-0 ${color}`}></span>
+                <span class="text-sm text-gray-600">{label}</span>
+              </div>
+            ))}
+          </div>
+          <a href="/downloads/scorekarte-18loch.pdf" target="_blank"
+            class="mt-8 flex items-center gap-2 text-xs font-semibold text-[#132e21] border border-[#132e21]/20 px-3 py-2.5 hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Scorekarte herunterladen
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- 18-Loch -->
-  <section id="meisterschaft" class="py-20 bg-white">
+  <section id="meisterschaft" class="py-20 bg-[#f5f5f0]">
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
       <div>
         <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Meisterschaftskurs</p>
@@ -37,21 +144,21 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
         <p class="text-gray-600 leading-relaxed mb-8">
           Wasserhindernisse, Bunker und natürliches Rough sorgen für sportliche Herausforderung
           auf allen Spielniveaus. Das Clubhaus mit Locker Rooms, Duschen und Restaurant bietet
-          nach der Runde den perfekten Ausklang – mit Blick auf das 18. Grün.
+          nach der Runde den perfekten Ausklang.
         </p>
-        <div class="grid grid-cols-3 gap-4 mb-4">
+        <div class="grid grid-cols-3 gap-4 mb-6">
           {[
             { val: '18', label: 'Bahnen' },
             { val: 'Par 72', label: 'Gesamtpar' },
             { val: '85 ha', label: 'Gesamtfläche' },
           ].map(({ val, label }) => (
-            <div class="bg-[#f5f5f0] p-4 text-center">
+            <div class="bg-white p-4 text-center">
               <div class="font-serif text-xl text-[#c4a94a] font-bold">{val}</div>
               <div class="text-gray-400 text-xs mt-0.5 uppercase tracking-wider">{label}</div>
             </div>
           ))}
         </div>
-        <!-- Abschlag-Tabelle mit CR/Slope -->
+        <!-- Abschlag-Tabelle -->
         <div class="overflow-x-auto mb-6">
           <table class="w-full text-xs border-collapse">
             <thead>
@@ -82,22 +189,6 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
             </tbody>
           </table>
         </div>
-        <!-- Downloads -->
-        <div class="flex flex-wrap gap-3 mb-6">
-          {[
-            { label: 'Scorekarte', href: '/downloads/scorekarte-18loch.pdf' },
-            { label: 'Birdiebook 2025', href: '/downloads/birdiebook-2025.pdf' },
-            { label: 'Spielvorgabentabelle', href: '/downloads/spielvorgabentabelle.pdf' },
-          ].map(({ label, href }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer"
-              class="flex items-center gap-2 text-xs font-semibold text-[#132e21] border border-[#132e21]/20 px-3 py-2 hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-              </svg>
-              {label}
-            </a>
-          ))}
-        </div>
         <a
           href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
           target="_blank" rel="noopener noreferrer"
@@ -115,7 +206,7 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
           </div>
         </div>
         <div class="relative overflow-hidden">
-          <img src={galerie2 || "/images/platz/bruecke-herbst.jpg"} alt="Brücke im Herbst" class="w-full h-full object-cover"/>
+          <img src={galerie2 || "/images/platz/bruecke-herbst.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
         </div>
         <div class="relative overflow-hidden">
           <img src={galerie3 || "/images/platz/golfanlage2.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
@@ -124,27 +215,14 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
     </div>
   </section>
 
-  <!-- Platzgrafik -->
-  <section class="py-14 bg-[#f5f5f0]">
-    <div class="max-w-5xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Übersicht</p>
-      <h2 class="font-serif text-3xl text-[#132e21] mb-6">Platzgrafik</h2>
-      <div class="overflow-x-auto">
-        <img src={platzgrafikUrl || "/images/platz/platzgrafik.png"} alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full border border-gray-200"/>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6-Loch -->
-  <section id="kurzplatz" class="py-20 bg-[#f5f5f0]">
+  <!-- 6-Loch Kurzplatz -->
+  <section id="kurzplatz" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
-      <div class="grid grid-cols-2 gap-3 h-72 lg:h-auto lg:min-h-[340px] order-2 lg:order-1">
-        <div class="relative overflow-hidden col-span-2">
-          <img src={kurzplatzUrl || "/images/platz/kurzplatz-luft.jpg"} alt="Kurzplatz Luftbild" class="w-full h-full object-cover"/>
-          <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-5">
-            <div class="text-[#c4a94a] text-xs uppercase tracking-wider">6 Loch</div>
-            <div class="font-serif text-white">Kurzplatz – offen für Gäste</div>
-          </div>
+      <div class="relative overflow-hidden h-72 lg:h-[400px] order-2 lg:order-1">
+        <img src={kurzplatzUrl || "/images/platz/kurzplatz-luft.jpg"} alt="Kurzplatz" class="w-full h-full object-cover"/>
+        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-5">
+          <div class="text-[#c4a94a] text-xs uppercase tracking-wider">6 Loch</div>
+          <div class="font-serif text-white">Kurzplatz – offen für Gäste</div>
         </div>
       </div>
       <div class="order-1 lg:order-2">
@@ -154,23 +232,19 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
           Unser 6-Loch-Kurzplatz ist für jeden zugänglich – auch ohne Platzreife.
           Ideal für Einsteiger, Jugendliche und Gäste, die Golf unverbindlich ausprobieren möchten.
         </p>
-        <p class="text-gray-600 leading-relaxed mb-6">
-          Der Kurzplatz eignet sich hervorragend zur Technikverfeinerung und als
-          entspannter Einstieg in den Golfsport – ohne Leistungsdruck.
-        </p>
         <div class="grid grid-cols-3 gap-3 mb-6">
           {[
             { val: 'Par 19', label: '1 Runde' },
             { val: '803 m', label: 'Gesamtlänge' },
             { val: '230 m', label: 'Längstes Loch' },
           ].map(({ val, label }) => (
-            <div class="bg-white p-3 text-center">
+            <div class="bg-[#f5f5f0] p-3 text-center">
               <div class="font-serif text-base text-[#c4a94a] font-bold">{val}</div>
               <div class="text-gray-400 text-xs mt-0.5">{label}</div>
             </div>
           ))}
         </div>
-        <div class="space-y-2 text-sm text-gray-600 mb-6">
+        <div class="space-y-2 text-sm text-gray-600 mb-8">
           {[
             'Kein DGV-Ausweis erforderlich',
             'Ideal für Einsteiger und Jugendliche',
@@ -183,15 +257,6 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
             </div>
           ))}
         </div>
-        <div class="flex flex-wrap gap-3 mb-4">
-          <a href="/downloads/scorekarte-kurzplatz.pdf" target="_blank" rel="noopener noreferrer"
-            class="flex items-center gap-2 text-xs font-semibold text-[#132e21] border border-[#132e21]/20 px-3 py-2 hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
-            </svg>
-            Scorekarte Kurzplatz
-          </a>
-        </div>
         <a href="/spielgebuehren" class="text-xs font-bold uppercase tracking-widest text-[#c4a94a] hover:text-[#132e21] transition-colors">
           Spielgebühren ansehen →
         </a>
@@ -200,7 +265,7 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
   </section>
 
   <!-- Übungsanlage -->
-  <section class="py-20 bg-white">
+  <section id="uebungsanlage" class="py-20 bg-[#f5f5f0]">
     <div class="max-w-7xl mx-auto px-4">
       <div class="mb-12">
         <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Training & Übung</p>
@@ -224,7 +289,7 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
             icon: 'M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z',
           },
         ].map(({ title, desc, icon }) => (
-          <div class="bg-[#f5f5f0] p-6">
+          <div class="bg-white p-6">
             <svg class="w-8 h-8 text-[#c4a94a] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d={icon}/>
             </svg>
@@ -236,28 +301,113 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,  { width: 1200, quality
     </div>
   </section>
 
-  <!-- CTA -->
-  <section class="bg-[#132e21] py-16">
-    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
-      <div>
-        <div class="font-serif text-2xl text-white mb-1">Jetzt eine Startzeit buchen</div>
-        <div class="text-white/60 text-sm">Online über golf.de oder telefonisch: +49 7907 8190</div>
+  <!-- Greenfee & Gäste -->
+  <section id="greenfee" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid lg:grid-cols-2 gap-16 items-start">
+        <div>
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Greenfee-Preise</p>
+          <h2 class="font-serif text-4xl text-[#132e21] mb-6">Willkommen als Gast</h2>
+          <p class="text-gray-600 leading-relaxed mb-8">
+            Gäste sind bei uns herzlich willkommen. Mit einem gültigen DGV-Ausweis können Sie
+            unseren 18-Loch-Meisterschaftsplatz jederzeit genießen.
+            Der 6-Loch-Kurzplatz ist auch ohne Platzreife zugänglich.
+          </p>
+          <!-- Greenfee Tabelle -->
+          <div class="overflow-x-auto mb-6">
+            <table class="w-full text-sm border-collapse">
+              <thead>
+                <tr class="bg-[#132e21] text-white">
+                  <th class="text-left px-4 py-3 font-medium">Kategorie</th>
+                  <th class="text-center px-4 py-3 font-medium">Wochentag</th>
+                  <th class="text-center px-4 py-3 font-medium">Wochenende</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-100">
+                {[
+                  { kat: '18 Loch',   wt: '55,00 €', we: '65,00 €' },
+                  { kat: '9 Loch',    wt: '35,00 €', we: '40,00 €' },
+                  { kat: 'Kurzplatz', wt: '12,00 €', we: '12,00 €' },
+                ].map(({ kat, wt, we }, i) => (
+                  <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#fafafa]'}>
+                    <td class="px-4 py-3 text-[#132e21] font-medium">{kat}</td>
+                    <td class="px-4 py-3 text-center text-gray-600">{wt}</td>
+                    <td class="px-4 py-3 text-center text-gray-600">{we}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <p class="text-xs text-gray-400 mb-6">Jugendliche bis 18 Jahre spielen kostenfrei. Genaue Preise und Bedingungen auf Anfrage.</p>
+          <a href="/spielgebuehren" class="inline-block bg-[#132e21] text-white font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:bg-[#c4a94a] hover:text-[#132e21] transition-colors">
+            Alle Spielgebühren
+          </a>
+        </div>
+        <!-- Pro Shop & Werkstatt -->
+        <div class="space-y-6">
+          <div class="bg-[#f5f5f0] p-8">
+            <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Pro Shop</p>
+            <h3 class="font-serif text-2xl text-[#132e21] mb-3">Sporthaus Saemann</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">
+              Der Pro-Shop wird betrieben von Sporthaus Saemann GmbH & Co. KG.
+              Hier finden Sie alles rund um die Golfausrüstung – von Schlägern bis zu Textilien.
+            </p>
+          </div>
+          <div class="bg-[#f5f5f0] p-8">
+            <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Werkstatt</p>
+            <h3 class="font-serif text-2xl text-[#132e21] mb-3">Club-Repair</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">
+              Gebrochene Schäfte, verschlissene Griffe – unsere Werkstatt repariert Ihre Schläger.
+              Griffwechsel: 48-Stunden-Service, Sonderbestellungen in 72 Stunden.
+            </p>
+          </div>
+        </div>
       </div>
-      <div class="flex flex-wrap gap-4">
-        <a
-          href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
-          target="_blank"
-          rel="noopener noreferrer"
-          class="shrink-0 bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
-        >
-          Online buchen
-        </a>
-        <a
-          href="/kontakt"
-          class="shrink-0 border border-white/40 text-white px-8 py-3 font-semibold uppercase tracking-wider text-sm hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors"
-        >
-          Kontakt
-        </a>
+    </div>
+  </section>
+
+  <!-- Birdiebook -->
+  <section id="birdiebook" class="py-20 bg-[#132e21]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div>
+          <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Birdiebook</p>
+          <h2 class="font-serif text-4xl text-white mb-6">Unser Birdiebook</h2>
+          <p class="text-white/70 leading-relaxed mb-8">
+            Laden Sie das aktuelle Birdiebook als PDF herunter. Es enthält alle wichtigen
+            Informationen zu unserem Platz, Anfahrt, Lochbeschreibungen und Greenfee-Preise.
+          </p>
+          <div class="flex flex-wrap gap-4">
+            <a href="/downloads/birdiebook-2025.pdf" target="_blank" rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 bg-[#c4a94a] text-[#132e21] font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              Birdiebook herunterladen
+            </a>
+            <a href="/downloads/scorekarte-18loch.pdf" target="_blank" rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
+              Scorekarte
+            </a>
+          </div>
+        </div>
+        <!-- CTA Startzeit -->
+        <div class="border border-white/10 p-10">
+          <svg class="w-10 h-10 text-[#c4a94a] mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <h3 class="font-serif text-2xl text-white mb-3">Startzeit buchen</h3>
+          <p class="text-white/60 text-sm leading-relaxed mb-6">
+            Buchen Sie jetzt Ihre Startzeit und finden Sie sich an Ihrem Startpunkt ein.
+          </p>
+          <a
+            href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
+            target="_blank" rel="noopener noreferrer"
+            class="inline-block bg-[#c4a94a] text-[#132e21] font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors"
+          >
+            Jetzt buchen
+          </a>
+        </div>
       </div>
     </div>
   </section>

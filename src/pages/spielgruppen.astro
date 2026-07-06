@@ -1,8 +1,9 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getSpielgruppen } from '../lib/directus';
+import { getSpielgruppen, bildUrlMitFormat } from '../lib/directus';
 
 const spielgruppenData = await getSpielgruppen();
+const heroUrl = bildUrlMitFormat(spielgruppenData?.hero_bild, { width: 1600, quality: 80 });
 
 const icons = [
   'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z',
@@ -27,11 +28,12 @@ const gruppen = (spielgruppenData?.gruppen ?? []).map((g: any, i: number) => ({
 
 <Layout title="Spielgruppen" description="Spielgruppen des Golfclub Schwäbisch Hall – Ladies und Senioren">
 
-  <div class="bg-[#132e21] py-20">
-    <div class="max-w-7xl mx-auto px-4">
-      <p class="text-[#c4a94a] text-sm font-medium uppercase tracking-widest mb-3">Club</p>
-      <h1 class="font-serif text-5xl text-white mb-4">Spielgruppen</h1>
-      <p class="text-white/60 max-w-2xl">Golf mit Gleichgesinnten – unsere Spielgruppen treffen sich regelmäßig und bieten weit mehr als nur Golf.</p>
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf5.jpg"} alt="Spielgruppen" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Club</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white">Spielgruppen</h1>
     </div>
   </div>
 
