@@ -110,6 +110,7 @@ export interface NewsArtikel {
 export interface Spielgebuehren {
   saison: string;
   hinweis: string;
+  hero_bild: string | DirectusFile | null;
   greenfee18: { kategorie: string; wochentag: string; wochenende: string }[];
   greenfee9:  { kategorie: string; wochentag: string; wochenende: string }[];
   kurzplatz:  { kategorie: string; wochentag: string; wochenende: string }[];
@@ -117,6 +118,7 @@ export interface Spielgebuehren {
 }
 
 export interface SpielgruppenData {
+  hero_bild: string | DirectusFile | null;
   gruppen: {
     name: string;
     beschreibung: string;
@@ -137,17 +139,23 @@ export interface RestaurantData {
   bild_innen: string | DirectusFile | null;
 }
 
-export interface SeitenbilderData {
-  homepage_hero:       string | DirectusFile | null;
-  club_hero:           string | DirectusFile | null;
-  clubmeister_hero:    string | DirectusFile | null;
-  golf_lernen_hero:    string | DirectusFile | null;
-  turniere_hero:       string | DirectusFile | null;
-  spielgruppen_hero:   string | DirectusFile | null;
-  spielgebuehren_hero: string | DirectusFile | null;
-  platzstatus_hero:       string | DirectusFile | null;
-  kontakt_hero:           string | DirectusFile | null;
-  kontakt_formular_bild:  string | DirectusFile | null;
+
+export interface MitgliedschaftModell {
+  id: number;
+  name: string;
+  preis: string;
+  preis_hinweis: string | null;
+  highlight: boolean;
+  reihenfolge: number;
+  features: { text: string; enthalten: boolean }[];
+  button_text: string;
+}
+
+export interface MitgliedschaftData {
+  hero_bild: string | DirectusFile | null;
+  intro_text: string | null;
+  aufnahme_bild: string | DirectusFile | null;
+  gemeinschaft_bild: string | DirectusFile | null;
 }
 
 export interface GolfErlebenData {
@@ -160,6 +168,7 @@ export interface GolfErlebenData {
 }
 
 export interface PlatzstatusData {
+  hero_bild: string | DirectusFile | null;
   hauptplatz: string;
   kurzplatz: string;
   drivingRange: string;
@@ -278,11 +287,11 @@ export async function getNewsArtikel(slug: string): Promise<NewsArtikel | null> 
 }
 
 export async function getSpielgebuehren(): Promise<Spielgebuehren | null> {
-  return fetchDirectus<Spielgebuehren>('/items/spielgebuehren');
+  return fetchDirectus<Spielgebuehren>('/items/spielgebuehren?fields=*,hero_bild.id');
 }
 
 export async function getSpielgruppen(): Promise<SpielgruppenData | null> {
-  return fetchDirectus<SpielgruppenData>('/items/spielgruppen');
+  return fetchDirectus<SpielgruppenData>('/items/spielgruppen?fields=*,hero_bild.id');
 }
 
 export async function getRestaurant(): Promise<RestaurantData | null> {
@@ -292,7 +301,7 @@ export async function getRestaurant(): Promise<RestaurantData | null> {
 }
 
 export async function getPlatzstatus(): Promise<PlatzstatusData | null> {
-  return fetchDirectus<PlatzstatusData>('/items/platzstatus');
+  return fetchDirectus<PlatzstatusData>('/items/platzstatus?fields=*,hero_bild.id');
 }
 
 export async function getPlatzstatusKalenderHeute(): Promise<PlatzstatusKalenderEintrag | null> {
@@ -312,6 +321,8 @@ export async function getPlatzstatusKalender(von?: string, bis?: string): Promis
 }
 
 export interface KontaktData {
+  hero_bild: string | DirectusFile | null;
+  formular_bild: string | DirectusFile | null;
   adresse: string;
   ort: string;
   telefon_sekretariat: string;
@@ -323,14 +334,9 @@ export interface KontaktData {
 }
 
 export async function getKontakt(): Promise<KontaktData | null> {
-  return fetchDirectus<KontaktData>('/items/kontakt');
+  return fetchDirectus<KontaktData>('/items/kontakt?fields=*,hero_bild.id,formular_bild.id');
 }
 
-export async function getSeitenbilder(): Promise<SeitenbilderData | null> {
-  return fetchDirectus<SeitenbilderData>(
-    '/items/seitenbilder?fields=*,homepage_hero.id,club_hero.id,clubmeister_hero.id,golf_lernen_hero.id,turniere_hero.id,spielgruppen_hero.id,spielgebuehren_hero.id,platzstatus_hero.id,kontakt_hero.id,kontakt_formular_bild.id'
-  );
-}
 
 export interface SiteSettings {
   clubName: string;
@@ -341,14 +347,39 @@ export interface SiteSettings {
   pccaddieUrl: string;
   recaptcha_site_key: string | null;
   recaptcha_secret_key: string | null;
+  bild_startseite:   string | DirectusFile | null;
+  bild_club:         string | DirectusFile | null;
+  bild_clubmeister:  string | DirectusFile | null;
+  bild_mannschaften: string | DirectusFile | null;
+  bild_holeinone:    string | DirectusFile | null;
+  bild_turniere:     string | DirectusFile | null;
+  bild_firmenevents: string | DirectusFile | null;
+  bild_golf_lernen:  string | DirectusFile | null;
+  bild_golf_lernen_training: string | DirectusFile | null;
+  bild_historie:     string | DirectusFile | null;
 }
 
 export async function getSettings(): Promise<SiteSettings | null> {
-  return fetchDirectus<SiteSettings>('/items/settings/1');
+  return fetchDirectus<SiteSettings>(
+    '/items/settings/1?fields=*,bild_startseite.id,bild_club.id,bild_clubmeister.id,bild_mannschaften.id,bild_holeinone.id,bild_turniere.id,bild_firmenevents.id,bild_golf_lernen.id,bild_golf_lernen_training.id,bild_historie.id'
+  );
 }
 
 export async function getGolfErleben(): Promise<GolfErlebenData | null> {
   return fetchDirectus<GolfErlebenData>(
     '/items/golf_erleben?fields=*,hero_bild.id,galerie_bild_1.id,galerie_bild_2.id,galerie_bild_3.id,kurzplatz_bild.id,platzgrafik.id'
   );
+}
+
+export async function getMitgliedschaft(): Promise<MitgliedschaftData | null> {
+  return fetchDirectus<MitgliedschaftData>(
+    '/items/mitgliedschaft?fields=*,hero_bild.id,aufnahme_bild.id,gemeinschaft_bild.id'
+  );
+}
+
+export async function getMitgliedschaftModelle(): Promise<MitgliedschaftModell[]> {
+  const data = await fetchDirectus<MitgliedschaftModell[]>(
+    '/items/mitgliedschaft_modelle?sort=reihenfolge&limit=20'
+  );
+  return data ?? [];
 }

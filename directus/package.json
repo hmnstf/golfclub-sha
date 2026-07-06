@@ -4,10 +4,11 @@
   "description": "Directus CMS für Golfclub Schwäbisch Hall",
   "scripts": {
     "start": "directus start",
-    "bootstrap": "directus bootstrap"
+    "bootstrap": "directus bootstrap",
+    "migrate": "directus database migrate:latest"
   },
   "dependencies": {
-    "directus": "^11.0.0",
+    "directus": "^12.0.0",
     "directus-extension-flexible-editor": "^1.8.4",
     "@directus-labs/seo-plugin": "^1.1.1",
     "@samfurlong/directus-panel-calendar": "^1.0.3",

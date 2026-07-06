@@ -1,15 +1,16 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getEvents, getSeitenbilder, bildUrlMitFormat } from '../lib/directus';
+import { getEvents, getSettings, bildUrlMitFormat } from '../lib/directus';
 
-const [events, bilder] = await Promise.all([getEvents(), getSeitenbilder()]);
+const [events, settings] = await Promise.all([getEvents(), getSettings()]);
 const today = new Date().toISOString().split('T')[0];
 
 const upcoming  = events.filter(e => (e.datum_von ?? '') >= today);
 const turniere  = upcoming.filter(e => e.typ === 'turnier');
 const eventsNonTurnier = upcoming.filter(e => e.typ !== 'turnier');
 
-const heroUrl = bildUrlMitFormat(bilder?.turniere_hero, { width: 1920, height: 700, quality: 85 }) || '/images/hero-fallback.jpg';
+const heroUrl = bildUrlMitFormat(settings?.bild_turniere, { width: 1920, height: 700, quality: 85 }) || '/images/hero-fallback.jpg';
+const firmenEventsUrl = bildUrlMitFormat(settings?.bild_firmenevents, { width: 1200, height: 900, quality: 85 }) || heroUrl;
 
 const catLabel: Record<string,string> = {
   turnier:'Turnier', club:'Clubveranstaltung', golfschule:'Golfschule',
@@ -26,7 +27,7 @@ const calEvents = upcoming.map(e => ({
 // Nächste 3 Turniere für die rechte Spalte
 const nextTurniere = upcoming.slice(0, 3);
 
-const fallbackImg = bildUrlMitFormat(bilder?.turniere_hero, { width: 600, height: 400, quality: 80 }) || '';
+const fallbackImg = bildUrlMitFormat(settings?.bild_turniere, { width: 600, height: 400, quality: 80 }) || '';
 
 // Vorberechnete Daten für Event-Karten
 const eventCards = eventsNonTurnier.slice(0, 4).map(e => {
@@ -240,7 +241,7 @@ const nextTurniereCards = nextTurniere.map(e => {
       </a>
     </div>
     <div class="relative min-h-[280px] md:min-h-0">
-      <img src={heroUrl} alt="Firmenevents" class="absolute inset-0 w-full h-full object-cover"/>
+      <img src={firmenEventsUrl} alt="Firmenevents" class="absolute inset-0 w-full h-full object-cover"/>
       <div class="absolute inset-0 bg-black/20"></div>
     </div>
   </section>

@@ -1,5 +1,9 @@
-FROM directus/directus:11
+FROM directus/directus:12
 
+USER root
+RUN npm install -g pnpm
+
+USER node
 # Als node User bleiben (Standard im Image) und Extensions installieren
 RUN cd /directus && \
     pnpm add \

@@ -1,0 +1,295 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getMitgliedschaft, getMitgliedschaftModelle, bildUrlMitFormat } from '../lib/directus';
+
+const [mitgliedschaft, modelle] = await Promise.all([
+  getMitgliedschaft(),
+  getMitgliedschaftModelle(),
+]);
+
+const heroUrl = bildUrlMitFormat(mitgliedschaft?.hero_bild, { width: 1920, quality: 80 });
+const aufnahmeBild = bildUrlMitFormat(mitgliedschaft?.aufnahme_bild, { width: 800, quality: 80 });
+const gemeinschaftBild = bildUrlMitFormat(mitgliedschaft?.gemeinschaft_bild, { width: 800, quality: 80 });
+---
+
+<Layout title="Mitgliedschaft" description="Mehr als nur ein Golfclub. Werden Sie Teil unserer Gemeinschaft in Schwäbisch Hall.">
+
+  <!-- Hero -->
+  <div class="relative h-[300px] md:h-[360px] overflow-hidden">
+    <img src={heroUrl || "/images/gallery/golf5.jpg"} alt="Mitgliedschaft" class="absolute inset-0 w-full h-full object-cover"/>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/60"></div>
+    <div class="absolute inset-0 flex flex-col justify-end pb-10 px-8 md:px-16 max-w-7xl mx-auto w-full">
+      <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Werden Sie Teil</p>
+      <h1 class="font-serif text-4xl md:text-5xl text-white mb-3">Mitgliedschaft</h1>
+      <p class="text-white/80 text-base max-w-lg">
+        Mehr als nur ein Golfclub. Werden Sie Teil einer starken Gemeinschaft für Sport, Natur und Geselligkeit auf höchstem Niveau.
+      </p>
+      <div class="flex flex-wrap gap-3 mt-6">
+        <a href="#aufnahme" class="bg-[#c4a94a] text-[#132e21] font-semibold px-6 py-2.5 text-sm uppercase tracking-wider hover:bg-[#d4bc6a] transition-colors">
+          Mitglied werden
+        </a>
+        <a href="#vorteile" class="border border-white/50 text-white font-medium px-6 py-2.5 text-sm hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
+          Vorteile entdecken
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vorteile -->
+  <section id="vorteile" class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-14">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Ihre Vorteile</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Ihre Vorteile als Mitglied</h2>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        {[
+          {
+            icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 21V3m0 0l9 4 9-4v18l-9-4-9 4"/>`,
+            title: 'Unbegrenztes Spielen',
+            desc: 'Spielen Sie auf unserem 18-Loch-Meisterschaftsplatz so oft Sie möchten – ohne zusätzliche Greenfee.',
+          },
+          {
+            icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>`,
+            title: 'Exklusive Trainingsangebote',
+            desc: 'Spezielle Konditionen bei unserer Golf Academy, Trainerstunden und Gruppenkursen.',
+          },
+          {
+            icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>`,
+            title: 'Lebendige Gemeinschaft',
+            desc: 'Turniere, Clubveranstaltungen und gesellige Events – werden Sie Teil unserer aktiven Clubfamilie.',
+          },
+          {
+            icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>`,
+            title: 'DGV-Mitgliedschaft',
+            desc: 'Als Mitglied erhalten Sie Ihre offizielle Handicap-Verwaltung über den Deutschen Golf Verband.',
+          },
+          {
+            icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>`,
+            title: 'Kurzplatz & Übungsanlage',
+            desc: 'Freier Zugang zum 6-Loch-Kurzplatz, Chipping Area und Putting Green für Ihr tägliches Training.',
+          },
+          {
+            icon: `<rect x="3" y="4" width="18" height="18" rx="2" ry="2" stroke-width="1.5"/><line x1="16" y1="2" x2="16" y2="6" stroke-width="1.5"/><line x1="8" y1="2" x2="8" y2="6" stroke-width="1.5"/><line x1="3" y1="10" x2="21" y2="10" stroke-width="1.5"/>`,
+            title: 'Turnierteilnahme',
+            desc: 'Nehmen Sie an allen Clubturnieren teil und messen Sie sich mit anderen Mitgliedern.',
+          },
+          {
+            icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/>`,
+            title: 'Restaurant-Vergünstigungen',
+            desc: 'Genießen Sie besondere Konditionen im Restaurant Brassie für Mitglieder und ihre Gäste.',
+          },
+          {
+            icon: `<circle cx="12" cy="12" r="10" stroke-width="1.5"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3"/>`,
+            title: 'Flexible Startzeiten',
+            desc: 'Priorität bei der Startzeit-Buchung – spielen Sie wann immer Sie möchten.',
+          },
+        ].map(({ icon, title, desc }) => (
+          <div class="text-center">
+            <div class="w-14 h-14 bg-[#f5f5f0] flex items-center justify-center mx-auto mb-4">
+              <svg class="w-7 h-7 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icon}></svg>
+            </div>
+            <h3 class="font-serif text-base text-[#132e21] mb-2">{title}</h3>
+            <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ MITGLIEDSCHAFTSMODELLE (hidden – zum Aktivieren class="hidden" entfernen) ══ -->
+  <section class="hidden py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Übersicht</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Unsere Mitgliedschaftsmodelle</h2>
+      </div>
+      <div class="grid md:grid-cols-4 gap-4">
+        {(modelle.length > 0 ? modelle : [
+          { id: 1, name: 'Vollmitgliedschaft',    preis: 'auf Anfrage', preis_hinweis: null, highlight: true,  reihenfolge: 1, button_text: 'Anfragen', features: [{ text: 'Unbegrenzt 18-Loch-Platz', enthalten: true }, { text: 'Kurzplatz & Übungsanlage', enthalten: true }, { text: 'DGV-Mitgliedschaft & Handicap', enthalten: true }, { text: 'Alle Clubturniere', enthalten: true }, { text: 'Stimmrecht Hauptversammlung', enthalten: true }, { text: 'Restaurant-Vergünstigungen', enthalten: true }] },
+          { id: 2, name: 'Schnuppermitgliedschaft', preis: 'auf Anfrage', preis_hinweis: 'Laufzeit: 1 Jahr', highlight: false, reihenfolge: 2, button_text: 'Anfragen', features: [{ text: '18-Loch-Platz (eingeschränkt)', enthalten: true }, { text: 'Kurzplatz & Übungsanlage', enthalten: true }, { text: 'DGV-Mitgliedschaft & Handicap', enthalten: true }, { text: 'Ausgewählte Turniere', enthalten: true }, { text: 'Wechsel zur Vollmitgliedschaft', enthalten: true }, { text: 'Stimmrecht Hauptversammlung', enthalten: false }] },
+          { id: 3, name: 'Junior',               preis: 'auf Anfrage', preis_hinweis: 'Bis 18 Jahre',    highlight: false, reihenfolge: 3, button_text: 'Anfragen', features: [{ text: 'Voller Platzzugang', enthalten: true }, { text: 'Kurzplatz & Übungsanlage', enthalten: true }, { text: 'DGV-Mitgliedschaft & Handicap', enthalten: true }, { text: 'Jugendturnierteilnahme', enthalten: true }, { text: 'Jugendförderung', enthalten: true }, { text: 'Günstige Konditionen', enthalten: true }] },
+          { id: 4, name: 'Fernmitgliedschaft',   preis: 'auf Anfrage', preis_hinweis: 'Hauptwohnsitz >50 km', highlight: false, reihenfolge: 4, button_text: 'Anfragen', features: [{ text: 'Platzzugang bei Besuch', enthalten: true }, { text: 'Kurzplatz & Übungsanlage', enthalten: true }, { text: 'DGV-Mitgliedschaft & Handicap', enthalten: true }, { text: 'Clubturnierteilnahme', enthalten: true }, { text: 'Stimmrecht Hauptversammlung', enthalten: true }, { text: 'Vergünstigte Konditionen', enthalten: true }] },
+        ]).map((m: any) => (
+          <div class={`p-8 ${m.highlight ? 'bg-[#132e21] text-white' : 'bg-white'}`}>
+            <h3 class={`font-serif text-xl mb-1 ${m.highlight ? 'text-[#c4a94a]' : 'text-[#132e21]'}`}>{m.name}</h3>
+            <div class={`text-lg font-bold mb-1 ${m.highlight ? 'text-white' : 'text-[#132e21]'}`}>{m.preis}</div>
+            {m.preis_hinweis && <div class={`text-xs mb-5 ${m.highlight ? 'text-white/50' : 'text-gray-400'}`}>{m.preis_hinweis}</div>}
+            <ul class="space-y-2 mb-8 mt-4">
+              {(m.features ?? []).map((f: any) => (
+                <li class="flex items-start gap-2 text-sm">
+                  {f.enthalten ? (
+                    <svg class={`w-4 h-4 mt-0.5 shrink-0 ${m.highlight ? 'text-[#c4a94a]' : 'text-[#132e21]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    </svg>
+                  ) : (
+                    <svg class="w-4 h-4 mt-0.5 shrink-0 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  )}
+                  <span class={m.highlight ? 'text-white/80' : f.enthalten ? 'text-gray-600' : 'text-gray-300'}>{f.text}</span>
+                </li>
+              ))}
+            </ul>
+            <a href="#aufnahme" class={`block text-center text-xs font-bold uppercase tracking-wider px-4 py-3 transition-colors ${m.highlight ? 'bg-[#c4a94a] text-[#132e21] hover:bg-[#d4bc6a]' : 'border border-[#132e21] text-[#132e21] hover:bg-[#132e21] hover:text-white'}`}>
+              {m.button_text ?? 'Anfragen'}
+            </a>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+  <!-- ══ Ende Mitgliedschaftsmodelle ══════════════════════════════════════ -->
+
+  <!-- Aufnahmeprozess -->
+  <section id="aufnahme" class="py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <div class="relative overflow-hidden h-96 lg:h-[480px]">
+        <img src={aufnahmeBild || "/images/gallery/golf4.jpg"} alt="Aufnahmeprozess" class="w-full h-full object-cover"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#132e21]/50 to-transparent"></div>
+      </div>
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">So einfach geht's</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-8">Aufnahmeprozess</h2>
+        <div class="space-y-6">
+          {[
+            { step: '01', title: 'Mitglied werden', desc: 'Füllen Sie unser Aufnahmeformular aus oder kontaktieren Sie uns telefonisch – wir beraten Sie gerne persönlich.' },
+            { step: '02', title: 'Beratung & Besichtigung', desc: 'Lernen Sie unsere Anlage kennen. Wir zeigen Ihnen alles, was der Golfclub Schwäbisch Hall zu bieten hat.' },
+            { step: '03', title: 'Aufnahme & Willkommen', desc: 'Nach Aufnahme durch den Vorstand sind Sie offiziell Teil unserer Gemeinschaft und können sofort loslegen.' },
+          ].map(({ step, title, desc }) => (
+            <div class="flex gap-5">
+              <div class="w-10 h-10 bg-[#c4a94a] flex items-center justify-center shrink-0 font-bold text-[#132e21] text-sm">{step}</div>
+              <div>
+                <h3 class="font-semibold text-[#132e21] mb-1">{title}</h3>
+                <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div class="mt-10 flex flex-wrap gap-3">
+          <a href="/kontakt" class="bg-[#c4a94a] text-[#132e21] font-semibold px-7 py-3 text-sm uppercase tracking-wider hover:bg-[#d4bc6a] transition-colors">
+            Jetzt anfragen
+          </a>
+          <a href="tel:+497907940242" class="border border-[#132e21] text-[#132e21] font-medium px-7 py-3 text-sm hover:bg-[#132e21] hover:text-white transition-colors">
+            +49 7907 94 02 42
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Gemeinschaft erleben -->
+  <section class="py-20 bg-white">
+    <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
+      <div>
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Club & Community</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-6">Gemeinschaft erleben</h2>
+        <p class="text-gray-500 leading-relaxed mb-6">
+          Als Mitglied werden Sie Teil einer lebendigen Gemeinschaft von Golfbegeisterten aus der Region.
+          Ob gemeinsame Runden, Turniere oder gesellige Abende – das Clubhaus und unsere Anlage sind
+          Ihre zweite Heimat.
+        </p>
+        <p class="text-gray-500 leading-relaxed mb-8">
+          Unser vielfältiges Veranstaltungsprogramm bietet das ganze Jahr über Möglichkeiten zum
+          Spielen, Lernen und gemeinsamen Genießen. Neue Mitglieder werden herzlich willkommen geheißen
+          und schnell in die Clubfamilie integriert.
+        </p>
+        <ul class="space-y-2">
+          {[
+            'Jahreshauptturnier & Clubmeisterschaft',
+            'Gesellige Clubabende & Events',
+            'Jugendförderung & Nachwuchsarbeit',
+            'Damenrunden, Herrenrunden & Mixed',
+          ].map((item: string) => (
+            <li class="flex items-center gap-3 text-sm text-gray-600">
+              <svg class="w-4 h-4 text-[#c4a94a] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div class="relative overflow-hidden h-96 lg:h-[480px]">
+        <img src={gemeinschaftBild || "/images/gallery/golf5.jpg"} alt="Gemeinschaft" class="w-full h-full object-cover"/>
+        <div class="absolute inset-0 bg-gradient-to-t from-[#132e21]/50 to-transparent"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="py-20 bg-[#f5f5f0]">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Stimmen</p>
+        <h2 class="font-serif text-4xl text-[#132e21]">Das sagen unsere Mitglieder</h2>
+      </div>
+      <div class="grid md:grid-cols-3 gap-6">
+        {[
+          {
+            quote: 'Seit über 15 Jahren bin ich Mitglied und fühle mich hier wie zu Hause. Der Platz ist wunderschön, die Gemeinschaft herzlich.',
+            name: 'Thomas M.',
+            since: 'Mitglied seit 2009',
+          },
+          {
+            quote: 'Ich habe hier das Golfen gelernt und bin geblieben. Die Golf Academy ist top, und das Ambiente ist einfach unschlagbar.',
+            name: 'Sabine K.',
+            since: 'Mitglied seit 2018',
+          },
+          {
+            quote: 'Als Familie sind wir alle Mitglieder. Für die Kinder ist die Jugendförderung klasse – und wir Erwachsenen genießen die Runden.',
+            name: 'Familie R.',
+            since: 'Mitglieder seit 2015',
+          },
+        ].map(({ quote, name, since }) => (
+          <div class="bg-white p-8">
+            <svg class="w-8 h-8 text-[#c4a94a] mb-4" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+            </svg>
+            <p class="text-gray-600 leading-relaxed mb-6 italic">"{quote}"</p>
+            <div>
+              <div class="font-semibold text-[#132e21] text-sm">{name}</div>
+              <div class="text-[#c4a94a] text-xs">{since}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="bg-[#132e21] py-16">
+    <div class="max-w-7xl mx-auto px-4 text-center">
+      <h2 class="font-serif text-3xl text-white mb-4">Werden Sie Teil unserer Golfgemeinschaft</h2>
+      <p class="text-white/60 mb-8 max-w-xl mx-auto">
+        Haben Sie Fragen zur Mitgliedschaft? Wir beraten Sie gerne persönlich und zeigen Ihnen unsere Anlage.
+      </p>
+      <div class="flex flex-wrap gap-4 justify-center">
+        <a href="/kontakt" class="bg-[#c4a94a] text-[#132e21] font-semibold px-8 py-3 uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors">
+          Jetzt Kontakt aufnehmen
+        </a>
+        <a href="tel:+497907940242" class="border border-white/30 text-white px-8 py-3 text-sm hover:border-[#c4a94a] hover:text-[#c4a94a] transition-colors">
+          +49 7907 94 02 42
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Kontakt-Leiste -->
+  <section class="bg-[#0d1f16] py-8">
+    <div class="max-w-7xl mx-auto px-4 grid md:grid-cols-3 gap-8 text-center">
+      {[
+        { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>`, label: 'Telefon', value: '+49 7907 94 02 42', href: 'tel:+497907940242' },
+        { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>`, label: 'E-Mail', value: 'info@golfclub-sha.de', href: 'mailto:info@golfclub-sha.de' },
+        { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>`, label: 'Adresse', value: 'An Collobach 1, 74523 Schwäbisch Hall', href: '/kontakt' },
+      ].map(({ icon, label, value, href }) => (
+        <a href={href} class="flex flex-col items-center gap-2 group">
+          <svg class="w-5 h-5 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icon}></svg>
+          <div class="text-white/40 text-xs uppercase tracking-widest">{label}</div>
+          <div class="text-white/80 text-sm group-hover:text-[#c4a94a] transition-colors">{value}</div>
+        </a>
+      ))}
+    </div>
+  </section>
+
+</Layout>

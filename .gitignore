@@ -27,3 +27,6 @@ pnpm-debug.log*
 directus/database/
 directus/uploads/
 directus/extensions/node_modules/
+
+# Staging-Ordner für manuellen Directus-Bilder-Upload
+directus-uploads/
