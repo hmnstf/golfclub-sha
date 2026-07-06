@@ -346,7 +346,6 @@ export interface SiteSettings {
   instagram: string;
   pccaddieUrl: string;
   recaptcha_site_key: string | null;
-  recaptcha_secret_key: string | null;
   bild_startseite:   string | DirectusFile | null;
   bild_club:         string | DirectusFile | null;
   bild_clubmeister:  string | DirectusFile | null;

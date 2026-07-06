@@ -149,3 +149,58 @@ for(const col of cols){const res=await fetch(BASE+'/permissions',{method:'POST',
 - **Datenbank**: Plesk → Datenbanken → Export (automatische Backups empfohlen)
 - **Uploads** (`directus/uploads/`): Plesk Backup oder eigenes Skript
 - **Code**: liegt in Git → GitHub ist das Backup
+
+---
+
+## Admin-Passwort: Warum `.env` allein nicht reicht
+
+`ADMIN_EMAIL`/`ADMIN_PASSWORD` in `directus/.env` werden **nur beim allerersten Start**
+(`directus bootstrap`) verwendet, um den ersten Admin-Nutzer anzulegen. Das Passwort landet
+danach gehasht in der Datenbank – ein späteres Ändern von `.env` hat **keinerlei Effekt** auf
+das tatsächliche Login-Passwort, auch nicht nach einem Neustart.
+
+Deshalb kann es passieren, dass `.env` ein anderes Passwort zeigt als das, was wirklich
+funktioniert (z.B. weil beim ersten Bootstrap noch ein altes Passwort in `.env` stand und
+später jemand die Datei geändert hat, ohne das Passwort auch im System zu ändern).
+
+**Um das Passwort wirklich zu ändern:** In Directus einloggen → eigenes Profil (unten links) →
+Passwort ändern. Nur so wird die Datenbank aktualisiert.
+
+---
+
+## Datei-Uploads einschränken (nur Bilder, PDFs, Videos)
+
+**Wo wird überhaupt hochgeladen?** Jedes Bild-/Datei-Feld in einer Collection (z.B. `bild_turniere`)
+lädt direkt in die zentrale **Datei-Mediathek** von Directus (Symbol in der linken Sidebar,
+"Datei-Mediathek"/"File Library") hoch. Von dort aus kann grundsätzlich jeder mit Editor-Rechten
+auch unabhängig von einem Feld beliebige Dateien hochladen.
+
+Die erlaubten Dateitypen werden **nicht** über die Admin-Oberfläche gesteuert, sondern nur über
+eine Umgebungsvariable in `directus/.env` auf dem Server:
+
+```
+FILES_MIME_TYPE_ALLOW_LIST=image/*,video/*,application/pdf
+```
+
+(`image/*` deckt auch GIFs mit ab.) Danach Directus-App neu starten.
+
+---
+
+## Rate-Limiting aktivieren
+
+**Wofür:** Begrenzt, wie viele Anfragen eine einzelne IP-Adresse pro Sekunde an die Directus-API
+stellen darf – schützt vor Brute-Force-Login-Versuchen, Scraping und Überlastung durch Bots.
+Aktuell deaktiviert (`rateLimit: false` in `/server/info`).
+
+In `directus/.env` ergänzen:
+```
+RATE_LIMITER_ENABLED=true
+RATE_LIMITER_STORE=memory
+RATE_LIMITER_POINTS=50
+RATE_LIMITER_DURATION=1
+```
+
+Das ist Directus' eigener Standardwert: **50 Anfragen pro Sekunde pro IP**. Für eine kleine
+Vereins-Website ist das großzügig genug für echte Besucher (eine normale Seitenladung braucht
+selten mehr als ein paar API-Calls gleichzeitig), blockiert aber automatisierte Angriffe/Scraper.
+Bei Bedarf später enger stellen. Danach Directus-App neu starten.

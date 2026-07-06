@@ -244,6 +244,12 @@ const MAPS_LINK  = `https://maps.google.com/?q=${encodeURIComponent('Golfclub Sc
             Bitte füllen Sie alle Pflichtfelder aus.
           </div>
         )}
+        {(errorParam === 'mail' || errorParam === 'config') && (
+          <div class="mb-8 p-4 bg-red-50 border border-red-200 text-red-700 text-sm">
+            Ihre Nachricht konnte leider nicht versendet werden. Bitte versuchen Sie es später erneut
+            oder kontaktieren Sie uns telefonisch.
+          </div>
+        )}
 
         <form method="POST" action="/api/kontakt" class="space-y-5">
           <div class="grid sm:grid-cols-2 gap-5">

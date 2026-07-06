@@ -22,10 +22,18 @@
 
 ## 🔧 Technische Todos
 
-- [ ] Kontaktformular verdrahten (aktuell nur Ansicht, kein E-Mail-Versand)
+- [x] Kontaktformular verdrahten (sendet jetzt per SMTP – siehe unten, Zugangsdaten fehlen noch)
+- [ ] **SMTP-Zugangsdaten besorgen** (vom E-Mail-Hoster des Golfclubs) und in `.env`/Plesk eintragen:
+      `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` – ohne diese wird
+      keine Kontaktanfrage verschickt (Formular zeigt dann einen Fehler an, geht aber nicht verloren im Log)
+- [ ] **reCAPTCHA-Key besorgen**: unter https://www.google.com/recaptcha/admin (v3) registrieren,
+      Site Key → Directus (`settings.recaptcha_site_key`), Secret Key → **nicht** Directus,
+      sondern `RECAPTCHA_SECRET_KEY` in der Website-`.env` (Directus-API ist öffentlich lesbar!)
 - [ ] Google Maps / Anfahrt auf Kontaktseite einbinden
 - [ ] Favicon mit echtem GC-Logo ersetzen
 - [ ] Copyright-Jahr im Footer dynamisch machen
+- [ ] Admin-Passwort in Directus wirklich ändern (aktuell `golfclub2024` – `.env` allein reicht nicht, siehe PLESK-SETUP.md)
+- [ ] `FILES_MIME_TYPE_ALLOW_LIST` und Rate-Limiting in Directus-`.env` setzen (siehe PLESK-SETUP.md)
 
 ## 🔮 Später / Version 2
 

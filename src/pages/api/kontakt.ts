@@ -1,7 +1,18 @@
 export const prerender = false;
 
 import type { APIRoute } from 'astro';
+import nodemailer from 'nodemailer';
 import { getSettings } from '../../lib/directus';
+
+const RECAPTCHA_SECRET_KEY = import.meta.env.RECAPTCHA_SECRET_KEY ?? '';
+
+const SMTP_HOST     = import.meta.env.SMTP_HOST ?? '';
+const SMTP_PORT      = Number(import.meta.env.SMTP_PORT ?? 587);
+const SMTP_SECURE    = import.meta.env.SMTP_SECURE === 'true';
+const SMTP_USER      = import.meta.env.SMTP_USER ?? '';
+const SMTP_PASSWORD  = import.meta.env.SMTP_PASSWORD ?? '';
+const SMTP_FROM      = import.meta.env.SMTP_FROM ?? SMTP_USER;
+const CONTACT_EMAIL_TO = import.meta.env.CONTACT_EMAIL_TO ?? '';
 
 async function verifyRecaptcha(token: string, secretKey: string): Promise<boolean> {
   try {
@@ -13,6 +24,43 @@ async function verifyRecaptcha(token: string, secretKey: string): Promise<boolea
     // Score >= 0.5 = wahrscheinlich Mensch (0 = Bot, 1 = Mensch)
     return res.success === true && (res.score ?? 1) >= 0.5;
   } catch {
+    return false;
+  }
+}
+
+async function sendKontaktMail(opts: {
+  to: string; name: string; email: string; telefon: string; betreff: string; nachricht: string;
+}): Promise<boolean> {
+  if (!SMTP_HOST || !SMTP_USER || !SMTP_PASSWORD) {
+    console.error('SMTP nicht konfiguriert (SMTP_HOST/SMTP_USER/SMTP_PASSWORD fehlen) – Mail nicht versendet');
+    return false;
+  }
+
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: SMTP_PORT,
+    secure: SMTP_SECURE,
+    auth: { user: SMTP_USER, pass: SMTP_PASSWORD },
+  });
+
+  try {
+    await transporter.sendMail({
+      from: SMTP_FROM,
+      to: opts.to,
+      replyTo: opts.email,
+      subject: `Kontaktanfrage: ${opts.betreff || 'Ohne Betreff'}`,
+      text: [
+        `Name: ${opts.name}`,
+        `E-Mail: ${opts.email}`,
+        opts.telefon ? `Telefon: ${opts.telefon}` : null,
+        opts.betreff ? `Betreff: ${opts.betreff}` : null,
+        '',
+        opts.nachricht,
+      ].filter(Boolean).join('\n'),
+    });
+    return true;
+  } catch (err) {
+    console.error('Mailversand fehlgeschlagen:', err);
     return false;
   }
 }
@@ -32,17 +80,25 @@ export const POST: APIRoute = async ({ request, redirect }) => {
   }
 
   // reCAPTCHA prüfen wenn ein Secret Key hinterlegt ist
-  const settings = await getSettings();
-  const secretKey = settings?.recaptcha_secret_key ?? '';
-  if (secretKey && token) {
-    const valid = await verifyRecaptcha(token, secretKey);
+  if (RECAPTCHA_SECRET_KEY && token) {
+    const valid = await verifyRecaptcha(token, RECAPTCHA_SECRET_KEY);
     if (!valid) {
       return redirect('/kontakt?error=spam', 302);
     }
   }
 
-  // TODO: E-Mail-Versand einrichten (z.B. Resend, Nodemailer, SMTP)
-  console.log('📬 Kontaktanfrage:', { name, email, telefon, betreff, nachricht });
+  const settings = await getSettings();
+  const to = CONTACT_EMAIL_TO || settings?.email || '';
+
+  if (!to) {
+    console.error('Keine Empfänger-Adresse konfiguriert (CONTACT_EMAIL_TO oder settings.email)');
+    return redirect('/kontakt?error=config', 302);
+  }
+
+  const sent = await sendKontaktMail({ to, name, email, telefon, betreff, nachricht });
+  if (!sent) {
+    return redirect('/kontakt?error=mail', 302);
+  }
 
   return redirect('/kontakt?success=1', 302);
 };
