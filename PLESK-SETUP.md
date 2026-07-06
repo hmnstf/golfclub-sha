@@ -26,43 +26,60 @@
 
 ---
 
-## Native Module kompilieren (isolated-vm, sqlite3)
+## Native Module (isolated-vm, sqlite3)
 
-**Warum:** Diese Pakete enthalten C++-Code, der bei `npm install` für die Zielplattform kompiliert wird. Der Plesk-Server hat keine Compiler und wir haben keinen Root/SSH-Zugriff, um welche nachzuinstallieren. Lösung: lokal (auch auf Apple-Silicon-Macs) in einem Docker-Container kompilieren, der Linux x64 emuliert — nur die fertige `.node`-Datei muss hochgeladen werden, nicht der ganze `node_modules`-Ordner.
+**Warum überhaupt ein Problem:** Diese Pakete enthalten C++-Code. Der Plesk-Server hat keine Compiler (kein `gcc`/`make`) und wir haben keinen Root/SSH-Zugriff, um welche nachzuinstallieren. Der Plesk-"NPM install"-Button läuft außerdem mit `--ignore-scripts`, wodurch auch reguläre Install-Skripte (die z.B. fertige Binaries herunterladen würden) nie ausgeführt werden.
+
+Verifiziert (Stand Directus 12.0.2/12.1.1, Server-Node 26.4.0, ABI 147):
+
+### isolated-vm — braucht KEINEN manuellen Schritt mehr
+
+Directus verlangt intern `isolated-vm@^5.0.0`, aber Version 5.0.3 lässt sich gegen Node.js 26 gar nicht mehr kompilieren (V8-API-Inkompatibilität — getestet, schlägt mit einem Compile-Error fehl). Version `7.0.0` dagegen bringt **fertige Prebuilds** für Linux x64 (glibc, ABI 147) direkt im npm-Paket mit und lädt diese zur Laufzeit selbst — funktioniert nachweislich auch mit `--ignore-scripts`, ganz ohne Kompilieren.
+
+Deshalb steht in `directus/package.json` ein npm-`overrides`-Eintrag, der npm zwingt, überall `isolated-vm@7.0.0` zu verwenden statt der von Directus intern gewünschten (aber kaputten) 5.0.3:
+
+```json
+"overrides": {
+  "isolated-vm": "7.0.0"
+}
+```
+
+Das reicht — kein Docker, kein manuelles Hochladen einer `.node`-Datei nötig, auch nicht bei zukünftigen `npm install`-Läufen auf dem Server.
+
+### sqlite3 — braucht weiterhin eine manuell kompilierte Binärdatei
+
+sqlite3 bringt keine fertigen Prebuilds im Paket mit, sondern lädt sie normalerweise per Install-Skript nach (`prebuild-install`) — genau das läuft aber wegen `--ignore-scripts` auf dem Server nie. Deshalb muss die kompilierte `.node`-Datei weiterhin lokal per Docker gebaut und manuell hochgeladen werden:
 
 ```bash
-# 1. Sauberen Build-Ordner anlegen
 mkdir -p /tmp/native-build && cd /tmp/native-build
 npm init -y
 
-# 2. Im Linux/x64-Container kompilieren — Node-Version MUSS zur Server-Version passen!
+# Node-Version MUSS zur Server-Version passen! Aktuell: sqlite3@5.1.7 für Node 26 (ABI 147)
 docker run --rm --platform linux/amd64 \
   -v "$(pwd)":/build -w /build \
   node:26-bookworm bash -c "
-    apt-get update && apt-get install -y python3 make g++ && \
-    npm install isolated-vm sqlite3 --build-from-source
+    apt-get update -qq && apt-get install -y -qq python3 make g++ && \
+    npm install sqlite3@5.1.7 --build-from-source
   "
 ```
 
 Ergebnis liegt danach lokal in:
 ```
-/tmp/native-build/node_modules/isolated-vm/out/isolated_vm.node
-/tmp/native-build/node_modules/sqlite3/lib/binding/node-v147-linux-x64/node_sqlite3.node
+/tmp/native-build/node_modules/sqlite3/build/Release/node_sqlite3.node
 ```
 
-Der Ordnername `node-v147-linux-x64` enthält die **Node-ABI-Version** (147 = Node.js 26.x). Falls sich die Server-Node-Version mal ändert, ABI neu prüfen mit:
+Node-ABI bei Bedarf neu prüfen (147 = Node.js 26.x):
 ```bash
 docker run --rm --platform linux/amd64 node:26-bookworm node -e "console.log(process.version, process.versions.modules)"
 ```
 
 ### Hochladen auf den Server
 
-Nur die zwei `.node`-Dateien hochladen, an exakt diesen Pfaden im Plesk File Manager:
-- `directus/node_modules/isolated-vm/out/isolated_vm.node`
+Nur diese eine `.node`-Datei hochladen, an exakt diesem Pfad im Plesk File Manager:
 - `directus/node_modules/sqlite3/lib/binding/node-v147-linux-x64/node_sqlite3.node`
-  (Ordner `binding/` und `node-v147-linux-x64/` müssen ggf. manuell im File Manager angelegt werden — Rechtsklick → Neuer Ordner)
+  (Ordner `lib/binding/node-v147-linux-x64/` müssen ggf. manuell angelegt werden — Rechtsklick → Neuer Ordner)
 
-**Wichtig:** Der restliche JS-Code der Pakete ist plattformunabhängig und wird ganz normal per `npm install` installiert — nur diese eine kompilierte Datei pro Paket ist Linux/x64/Node-26-spezifisch und muss manuell ersetzt werden.
+**Wichtig:** Der restliche JS-Code des Pakets ist plattformunabhängig und wird ganz normal per `npm install` installiert — nur diese eine kompilierte Datei ist Linux/x64/Node-26-spezifisch und muss nach jedem frischen `npm install` erneut geprüft/hochgeladen werden (isolated-vm dagegen NICHT mehr, siehe oben).
 
 ---
 
@@ -72,9 +89,8 @@ Nur die zwei `.node`-Dateien hochladen, an exakt diesen Pfaden im Plesk File Man
 |---|---|---|
 | `/usr/bin/env: 'node': No such file or directory` | Plesk-Node nicht im PATH | PATH-Env-Var setzen (s.o.) |
 | `npm install` bricht mit Exit 254 ab | Application Root zeigt auf falschen Ordner | Root auf `directus/`-Unterordner setzen |
-| `Cannot find module './out/isolated_vm'` | Natives Modul nicht kompiliert/hochgeladen | Siehe "Native Module kompilieren" |
-| `Cannot find package 'isolated-vm'` | Ordner wurde gelöscht, aber nicht neu installiert | `npm install` erneut ausführen, dann Binary wieder reinlegen |
-| sqlite3-Bindings nicht gefunden | Binding-Ordner fehlt/falscher Pfad | `binding/node-v147-linux-x64/` Ordner manuell anlegen |
+| `Cannot find module './out/isolated_vm'` (ältere isolated-vm-Version) | isolated-vm 5.x lässt sich nicht gegen Node 26 kompilieren | `overrides` in `directus/package.json` auf `isolated-vm@7.0.0` (bringt Prebuilds mit, kein Kompilieren nötig) |
+| sqlite3-Bindings nicht gefunden | Binding-Ordner fehlt/falscher Pfad, `--ignore-scripts` überspringt den Download | `lib/binding/node-v147-linux-x64/` Ordner manuell anlegen + kompilierte Binary hochladen (s.o.) |
 | Port 8055 already in use | Directus + Passenger kämpfen um denselben Port, alte Prozesse bleiben hängen | Proxy-Pattern in `directus/server.mjs` (Directus intern auf Port 18055, Proxy übernimmt Passengers Port) |
 | Datenbank-Fehler nach Directus-Versionsupdate | Migrationen nicht eingespielt | `npm run migrate` ausführen |
 | SSL/HSTS-Fehler auf `*.plesk.page`-Domains | HSTS erzwingt HTTPS, kein gültiges Zertifikat | Let's Encrypt in Plesk aktivieren |

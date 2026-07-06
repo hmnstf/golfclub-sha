@@ -8,10 +8,13 @@
     "migrate": "directus database migrate:latest"
   },
   "dependencies": {
-    "directus": "^12.0.0",
+    "directus": "^12.1.1",
     "directus-extension-flexible-editor": "^1.8.4",
     "@directus-labs/seo-plugin": "^1.1.1",
     "@samfurlong/directus-panel-calendar": "^1.0.3",
     "@directus-labs/timeline-chart-panel": "^1.0.1"
+  },
+  "overrides": {
+    "isolated-vm": "7.0.0"
   }
 }
