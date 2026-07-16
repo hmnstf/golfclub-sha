@@ -1,0 +1,179 @@
+---
+// Barrierefreiheits-Widget: läuft komplett clientseitig, keine Drittanbieter.
+// Einstellungen werden in localStorage gespeichert und beim Laden per
+// Inline-Skript (im Layout, vor dem Rendern) angewendet, damit es nicht flackert.
+---
+
+<div id="a11y-widget" class="fixed bottom-5 right-5 z-[100]">
+  <button
+    id="a11y-toggle"
+    type="button"
+    aria-expanded="false"
+    aria-controls="a11y-panel"
+    aria-label="Barrierefreiheits-Einstellungen öffnen"
+    class="w-12 h-12 rounded-full bg-[#132e21] text-white shadow-lg flex items-center justify-center hover:bg-[#0d2118] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#c4a94a]"
+  >
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="12" cy="5" r="2" stroke-width="2"/>
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 9l7 2 7-2M12 11v9m0-9l-3 9m3-9l3 9"/>
+    </svg>
+  </button>
+
+  <div
+    id="a11y-panel"
+    role="dialog"
+    aria-label="Barrierefreiheits-Einstellungen"
+    hidden
+    class="absolute bottom-16 right-0 w-72 bg-white text-[#1a1a1a] shadow-2xl border border-gray-200 p-5"
+  >
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="font-serif text-lg text-[#132e21]">Barrierefreiheit</h2>
+      <button id="a11y-close" type="button" aria-label="Schließen" class="text-gray-400 hover:text-[#132e21] p-1">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="space-y-4 text-sm">
+      <!-- Schriftgröße -->
+      <div>
+        <span class="block font-semibold text-xs uppercase tracking-wider text-gray-500 mb-2">Textgröße</span>
+        <div class="flex items-center gap-2">
+          <button id="a11y-font-dec" type="button" class="w-9 h-9 border border-gray-300 hover:border-[#c4a94a] flex items-center justify-center font-bold" aria-label="Text verkleinern">A-</button>
+          <span id="a11y-font-value" class="flex-1 text-center text-gray-600">Standard</span>
+          <button id="a11y-font-inc" type="button" class="w-9 h-9 border border-gray-300 hover:border-[#c4a94a] flex items-center justify-center font-bold" aria-label="Text vergrößern">A+</button>
+        </div>
+      </div>
+
+      <!-- Kontrast -->
+      <label class="flex items-center justify-between cursor-pointer">
+        <span>Text kontrastreicher</span>
+        <input id="a11y-contrast" type="checkbox" class="w-5 h-5 accent-[#132e21]" />
+      </label>
+
+      <!-- Links unterstreichen -->
+      <label class="flex items-center justify-between cursor-pointer">
+        <span>Links unterstreichen</span>
+        <input id="a11y-underline" type="checkbox" class="w-5 h-5 accent-[#132e21]" />
+      </label>
+
+      <!-- Bewegung reduzieren -->
+      <label class="flex items-center justify-between cursor-pointer">
+        <span>Animationen reduzieren</span>
+        <input id="a11y-motion" type="checkbox" class="w-5 h-5 accent-[#132e21]" />
+      </label>
+
+      <button id="a11y-reset" type="button" class="w-full text-xs font-semibold uppercase tracking-wider text-gray-500 hover:text-[#132e21] pt-2 border-t border-gray-100">
+        Zurücksetzen
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const STORAGE_KEY = 'a11y-prefs';
+  const FONT_STEP_PX = 2;
+  const MIN_STEP = -2;
+  const MAX_STEP = 4;
+
+  type Prefs = { fontStep: number; contrast: boolean; underline: boolean; reducedMotion: boolean };
+
+  function loadPrefs(): Prefs {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) return { fontStep: 0, contrast: false, underline: false, reducedMotion: false, ...JSON.parse(raw) };
+    } catch {}
+    return { fontStep: 0, contrast: false, underline: false, reducedMotion: false };
+  }
+
+  function savePrefs(prefs: Prefs) {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(prefs));
+  }
+
+  function apply(prefs: Prefs) {
+    const html = document.documentElement;
+
+    // Basis-Schriftgröße kommt aus Directus (Layout.astro), wir merken sie uns einmalig
+    const baseFontSize = parseFloat(html.dataset.baseFontSize || '') || parseFloat(getComputedStyle(html).fontSize);
+    if (!html.dataset.baseFontSize) html.dataset.baseFontSize = String(baseFontSize);
+    html.style.fontSize = `${baseFontSize + prefs.fontStep * FONT_STEP_PX}px`;
+
+    html.classList.toggle('a11y-contrast', prefs.contrast);
+    html.classList.toggle('a11y-underline', prefs.underline);
+    html.classList.toggle('a11y-reduced-motion', prefs.reducedMotion);
+
+    const valueLabel = document.getElementById('a11y-font-value');
+    if (valueLabel) {
+      valueLabel.textContent = prefs.fontStep === 0 ? 'Standard' : `${prefs.fontStep > 0 ? '+' : ''}${prefs.fontStep}`;
+    }
+    const contrastEl = document.getElementById('a11y-contrast') as HTMLInputElement | null;
+    const underlineEl = document.getElementById('a11y-underline') as HTMLInputElement | null;
+    const motionEl = document.getElementById('a11y-motion') as HTMLInputElement | null;
+    if (contrastEl) contrastEl.checked = prefs.contrast;
+    if (underlineEl) underlineEl.checked = prefs.underline;
+    if (motionEl) motionEl.checked = prefs.reducedMotion;
+  }
+
+  let prefs = loadPrefs();
+  apply(prefs);
+
+  const toggleBtn = document.getElementById('a11y-toggle');
+  const panel = document.getElementById('a11y-panel');
+  const closeBtn = document.getElementById('a11y-close');
+
+  function openPanel() {
+    panel?.removeAttribute('hidden');
+    toggleBtn?.setAttribute('aria-expanded', 'true');
+    (panel?.querySelector('button, input') as HTMLElement | null)?.focus();
+  }
+  function closePanel() {
+    panel?.setAttribute('hidden', '');
+    toggleBtn?.setAttribute('aria-expanded', 'false');
+    toggleBtn?.focus();
+  }
+
+  toggleBtn?.addEventListener('click', () => {
+    if (panel?.hasAttribute('hidden')) openPanel();
+    else closePanel();
+  });
+  closeBtn?.addEventListener('click', closePanel);
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !panel?.hasAttribute('hidden')) closePanel();
+  });
+  document.addEventListener('click', (e) => {
+    const widget = document.getElementById('a11y-widget');
+    if (widget && !widget.contains(e.target as Node) && !panel?.hasAttribute('hidden')) closePanel();
+  });
+
+  document.getElementById('a11y-font-inc')?.addEventListener('click', () => {
+    prefs = { ...prefs, fontStep: Math.min(MAX_STEP, prefs.fontStep + 1) };
+    savePrefs(prefs);
+    apply(prefs);
+  });
+  document.getElementById('a11y-font-dec')?.addEventListener('click', () => {
+    prefs = { ...prefs, fontStep: Math.max(MIN_STEP, prefs.fontStep - 1) };
+    savePrefs(prefs);
+    apply(prefs);
+  });
+  document.getElementById('a11y-contrast')?.addEventListener('change', (e) => {
+    prefs = { ...prefs, contrast: (e.target as HTMLInputElement).checked };
+    savePrefs(prefs);
+    apply(prefs);
+  });
+  document.getElementById('a11y-underline')?.addEventListener('change', (e) => {
+    prefs = { ...prefs, underline: (e.target as HTMLInputElement).checked };
+    savePrefs(prefs);
+    apply(prefs);
+  });
+  document.getElementById('a11y-motion')?.addEventListener('change', (e) => {
+    prefs = { ...prefs, reducedMotion: (e.target as HTMLInputElement).checked };
+    savePrefs(prefs);
+    apply(prefs);
+  });
+  document.getElementById('a11y-reset')?.addEventListener('click', () => {
+    prefs = { fontStep: 0, contrast: false, underline: false, reducedMotion: false };
+    savePrefs(prefs);
+    apply(prefs);
+  });
+</script>

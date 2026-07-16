@@ -102,8 +102,9 @@ const currentPath = Astro.url.pathname;
           <div class="relative group">
             <a
               href={item.href}
+              aria-haspopup={item.sub ? 'true' : undefined}
               class:list={[
-                'px-3 py-2 text-sm font-medium transition-colors hover:text-[#c4a94a] flex items-center gap-1',
+                'px-3 py-2 text-sm font-medium transition-colors hover:text-[#c4a94a] focus-visible:text-[#c4a94a] flex items-center gap-1',
                 currentPath.startsWith(item.href) ? 'text-[#c4a94a]' : 'text-[#132e21]'
               ]}
             >
@@ -115,7 +116,7 @@ const currentPath = Astro.url.pathname;
               )}
             </a>
             {item.sub && (
-              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+              <div class="absolute top-full left-1/2 -translate-x-1/2 pt-3 opacity-0 invisible group-hover:opacity-100 group-hover:visible group-focus-within:opacity-100 group-focus-within:visible transition-all duration-200 z-50">
                 <!-- Pfeil -->
                 <div class="absolute top-[6px] left-1/2 -translate-x-1/2 w-3 h-3 bg-[#0d2118] border-l border-t border-white/10 rotate-45 z-10"></div>
                 <div class="relative bg-[#0d2118] border border-white/10 shadow-2xl min-w-[260px] overflow-hidden">

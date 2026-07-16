@@ -39,3 +39,39 @@ img:not(.no-radius) {
   outline: 2px solid #c4a94a;
   outline-offset: 2px;
 }
+
+/* ── Barrierefreiheits-Widget ────────────────────────────────────── */
+
+/* Text kontrastreicher: helle Grautöne, die auf Weiß oft unter der
+   WCAG-AA-Grenze von 4.5:1 liegen, durch dunklere ersetzen */
+.a11y-contrast .text-gray-300,
+.a11y-contrast .text-gray-400,
+.a11y-contrast .text-gray-500 {
+  color: #374151 !important;
+}
+
+.a11y-underline a:not(.no-underline) {
+  text-decoration: underline !important;
+  text-underline-offset: 2px;
+}
+
+.a11y-reduced-motion,
+.a11y-reduced-motion *,
+.a11y-reduced-motion *::before,
+.a11y-reduced-motion *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
