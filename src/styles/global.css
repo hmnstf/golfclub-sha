@@ -17,12 +17,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
   font-family: var(--font-sans);
   color: #1a1a1a;
   background: #ffffff;
+  overflow-x: hidden;
 }
 
 h1, h2, h3 {

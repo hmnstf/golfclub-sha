@@ -15,7 +15,7 @@ const email              = data?.email               ?? 'info@gc-sha.de';
 const routen             = data?.anfahrt_routen      ?? [];
 
 const heroUrl       = bildUrlMitFormat(data?.hero_bild,    { width: 1920, height: 600, quality: 85 }) || '/images/hero-fallback.jpg';
-const formularBild  = bildUrlMitFormat(data?.formular_bild, { width: 900, height: 700, quality: 85 }) || '/images/clubhaus.jpg';
+const formularBild  = bildUrlMitFormat(data?.formular_bild, { width: 900, height: 700, quality: 85 }) || '/images/hero/clubhouse.jpg';
 
 // Google Maps – hardcoded mit echter Adresse
 const MAPS_EMBED = `https://maps.google.com/maps?q=${encodeURIComponent('Golfclub Schwäbisch Hall e.V., Am Golfplatz 1, 74523 Schwäbisch Hall')}&output=embed&z=15&hl=de`;
