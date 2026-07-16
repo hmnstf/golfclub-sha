@@ -356,6 +356,8 @@ export interface SiteSettings {
   bild_golf_lernen:  string | DirectusFile | null;
   bild_golf_lernen_training: string | DirectusFile | null;
   bild_historie:     string | DirectusFile | null;
+  bild_rundung:      number | null;
+  schriftgroesse:    number | null;
 }
 
 export async function getSettings(): Promise<SiteSettings | null> {

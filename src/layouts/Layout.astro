@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
+import { getSettings } from '../lib/directus';
 
 interface Props {
   title?: string;
@@ -12,10 +13,14 @@ const {
   title = 'Golfclub Schwäbisch Hall e.V.',
   description = 'Golfen in Schwäbisch Hall – Sport, Natur und Gemeinschaft erleben.',
 } = Astro.props;
+
+const settings = await getSettings();
+const bildRundung = settings?.bild_rundung ?? 0;
+const schriftgroesse = settings?.schriftgroesse ?? 16;
 ---
 
 <!doctype html>
-<html lang="de">
+<html lang="de" style={`font-size: ${schriftgroesse}px; --img-radius: ${bildRundung}px;`}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
