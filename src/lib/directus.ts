@@ -400,3 +400,22 @@ export async function getPartner(): Promise<Partner[]> {
   );
   return data ?? [];
 }
+
+export interface Partnerhotel {
+  id: number;
+  name: string;
+  aktiv: boolean;
+  adresse: string | null;
+  ort: string | null;
+  telefon: string | null;
+  fax: string | null;
+  email: string | null;
+  website: string | null;
+}
+
+export async function getPartnerhotels(): Promise<Partnerhotel[]> {
+  const data = await fetchDirectus<Partnerhotel[]>(
+    '/items/partnerhotels?filter[aktiv][_eq]=true&sort=sort'
+  );
+  return data ?? [];
+}
