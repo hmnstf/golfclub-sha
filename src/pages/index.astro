@@ -228,12 +228,12 @@ const events = allEvents.slice(0, 4);
             { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>`, label1: 'Driving', label2: 'Range' },
             { icon: `<path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>`, label1: 'Golf', label2: 'Academy' },
           ].map(({ icon, label1, label2 }) => (
-            <div class="text-center">
+            <div class="text-center min-w-0">
               <div class="w-10 h-10 mx-auto mb-2 flex items-center justify-center">
                 <svg class="w-7 h-7 text-[#c4a94a]" fill="none" stroke="currentColor" viewBox="0 0 24 24" set:html={icon}></svg>
               </div>
-              <div class="text-[10px] font-bold uppercase tracking-wider text-[#132e21] leading-tight">{label1}</div>
-              <div class="text-[10px] uppercase tracking-wider text-gray-400 leading-tight">{label2}</div>
+              <div class="text-[10px] font-bold uppercase tracking-wider text-[#132e21] leading-tight break-words">{label1}</div>
+              <div class="text-[10px] uppercase tracking-wider text-gray-400 leading-tight break-words">{label2}</div>
             </div>
           ))}
         </div>
@@ -365,14 +365,14 @@ const events = allEvents.slice(0, 4);
             img: firmenBildHome || '/images/gallery/golf5.jpg',
           },
         ].map(({ badge, title, desc, cta, href, img }) => (
-          <a href={href} class="group relative overflow-hidden min-h-[360px] flex items-end">
+          <a href={href} class="group relative overflow-hidden min-h-[280px] sm:min-h-[360px] flex items-end">
             <img src={img} alt={title} class="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
             <div class="absolute inset-0 bg-gradient-to-t from-black/85 via-black/40 to-transparent"></div>
-            <div class="relative p-8">
-              <span class="inline-block bg-white text-[#132e21] text-xs font-bold px-3 py-1 uppercase tracking-wider mb-3 rounded">{badge}</span>
-              <h3 class="font-serif text-3xl text-white mb-2">{title}</h3>
-              <p class="text-white/70 text-sm leading-relaxed mb-6 max-w-sm">{desc}</p>
-              <span class="inline-block bg-[#c4a94a] text-[#132e21] font-bold px-7 py-3 rounded-lg uppercase tracking-wider text-sm group-hover:bg-[#d4bc6a] transition-colors shadow-lg">
+            <div class="relative p-5 sm:p-8">
+              <span class="inline-block bg-white text-[#132e21] text-[10px] sm:text-xs font-bold px-2.5 py-1 uppercase tracking-wider mb-2 sm:mb-3 rounded">{badge}</span>
+              <h3 class="font-serif text-xl sm:text-3xl text-white mb-1.5 sm:mb-2">{title}</h3>
+              <p class="text-white/70 text-xs sm:text-sm leading-relaxed mb-3 sm:mb-6 max-w-sm">{desc}</p>
+              <span class="inline-block bg-[#c4a94a] text-[#132e21] font-bold px-4 py-2 sm:px-7 sm:py-3 rounded-lg uppercase tracking-wider text-xs sm:text-sm group-hover:bg-[#d4bc6a] transition-colors shadow-lg">
                 {cta}
               </span>
             </div>

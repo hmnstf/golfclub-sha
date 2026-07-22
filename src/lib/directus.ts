@@ -396,11 +396,12 @@ export interface Partnerhotel {
   fax: string | null;
   email: string | null;
   website: string | null;
+  bild: string | DirectusFile | null;
 }
 
 export async function getPartnerhotels(): Promise<Partnerhotel[]> {
   const data = await fetchDirectus<Partnerhotel[]>(
-    '/items/partnerhotels?filter[aktiv][_eq]=true&sort=sort'
+    '/items/partnerhotels?fields=*,bild.id&filter[aktiv][_eq]=true&sort=sort'
   );
   return data ?? [];
 }
