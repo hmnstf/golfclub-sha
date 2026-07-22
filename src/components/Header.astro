@@ -78,7 +78,7 @@ const currentPath = Astro.url.pathname;
         href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
         target="_blank"
         rel="noopener noreferrer"
-        class="bg-[#c4a94a] text-[#132e21] font-bold px-6 py-2 text-xs uppercase tracking-wider rounded-full hover:bg-[#d4bc6a] hover:scale-105 transition-all"
+        class="bg-[#c4a94a] text-[#132e21] font-bold px-5 py-2 text-xs uppercase tracking-wider rounded-lg hover:bg-[#d4bc6a] transition-colors"
       >
         Startzeit buchen
       </a>
@@ -166,8 +166,11 @@ const currentPath = Astro.url.pathname;
         aria-expanded="false"
         aria-controls="mobile-menu"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg id="mobile-menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+        <svg id="mobile-menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
         </svg>
       </button>
     </div>
@@ -201,7 +204,7 @@ const currentPath = Astro.url.pathname;
         href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
         target="_blank"
         rel="noopener noreferrer"
-        class="mt-4 bg-[#c4a94a] text-[#132e21] font-bold px-6 py-3.5 text-sm uppercase tracking-wider text-center rounded-full hover:bg-[#d4bc6a] transition-colors"
+        class="mt-4 bg-[#c4a94a] text-[#132e21] font-bold px-6 py-3 text-sm uppercase tracking-wider text-center rounded-lg hover:bg-[#d4bc6a] transition-colors"
       >
         Startzeit buchen
       </a>
@@ -212,10 +215,14 @@ const currentPath = Astro.url.pathname;
 <script>
   const btn = document.getElementById('mobile-menu-btn');
   const menu = document.getElementById('mobile-menu');
+  const iconOpen = document.getElementById('mobile-menu-icon-open');
+  const iconClose = document.getElementById('mobile-menu-icon-close');
   btn?.addEventListener('click', () => {
     const isHidden = menu?.classList.toggle('hidden');
     btn.setAttribute('aria-expanded', isHidden ? 'false' : 'true');
     btn.setAttribute('aria-label', isHidden ? 'Menü öffnen' : 'Menü schließen');
+    iconOpen?.classList.toggle('hidden', !isHidden);
+    iconClose?.classList.toggle('hidden', isHidden);
   });
 
   // Wetter via Open-Meteo (kostenlos, kein API-Key)
