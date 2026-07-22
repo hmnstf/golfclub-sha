@@ -385,21 +385,6 @@ export async function getMitgliedschaftModelle(): Promise<MitgliedschaftModell[]
   return data ?? [];
 }
 
-export interface Partner {
-  id: number;
-  name: string;
-  kategorie: 'hotel' | 'shop' | 'sonstige';
-  logo: string | DirectusFile | null;
-  url: string | null;
-  aktiv: boolean;
-}
-
-export async function getPartner(): Promise<Partner[]> {
-  const data = await fetchDirectus<Partner[]>(
-    '/items/partner?fields=*,logo.id&filter[aktiv][_eq]=true&sort=sort'
-  );
-  return data ?? [];
-}
 
 export interface Partnerhotel {
   id: number;

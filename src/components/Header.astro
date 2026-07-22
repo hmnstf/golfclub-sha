@@ -180,8 +180,32 @@ const currentPath = Astro.url.pathname;
   <!-- Mobile Nav -->
   <div id="mobile-menu" class="hidden lg:hidden border-t border-white/10 bg-[#0d2118]">
     <nav class="max-w-7xl mx-auto px-4 py-3 flex flex-col" aria-label="Mobile Navigation">
-      {navItems.map((item: any) => (
-        <>
+      {navItems.map((item: any, i: number) => (
+        item.sub ? (
+          <div class="border-b border-white/5">
+            <button
+              type="button"
+              class="mobile-submenu-btn w-full flex items-center justify-between py-3 text-sm font-medium text-white/90 hover:text-[#c4a94a] transition-colors"
+              aria-expanded="false"
+              aria-controls={`mobile-sub-${i}`}
+            >
+              <span>{item.label}</span>
+              <svg class="mobile-submenu-icon w-4 h-4 text-white/50 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </button>
+            <div id={`mobile-sub-${i}`} class="mobile-submenu-content hidden pb-2">
+              {item.sub.map((sub: any) => (
+                <a
+                  href={sub.href}
+                  class="block py-2 pl-4 text-xs text-white/50 hover:text-[#c4a94a] transition-colors"
+                >
+                  → {sub.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : (
           <a
             href={item.href}
             target={item.external ? '_blank' : undefined}
@@ -190,15 +214,7 @@ const currentPath = Astro.url.pathname;
           >
             {item.label}
           </a>
-          {item.sub && item.sub.map((sub: any) => (
-            <a
-              href={sub.href}
-              class="py-2 pl-4 text-xs text-white/50 hover:text-[#c4a94a] border-b border-white/5 transition-colors"
-            >
-              → {sub.label}
-            </a>
-          ))}
-        </>
+        )
       ))}
       <a
         href="https://www.pccaddie.net/clubs/0497729/app.php?cat=tt_timetable_course"
@@ -223,6 +239,18 @@ const currentPath = Astro.url.pathname;
     btn.setAttribute('aria-label', isHidden ? 'Menü öffnen' : 'Menü schließen');
     iconOpen?.classList.toggle('hidden', !isHidden);
     iconClose?.classList.toggle('hidden', isHidden);
+  });
+
+  document.querySelectorAll('.mobile-submenu-btn').forEach((subBtn) => {
+    subBtn.addEventListener('click', () => {
+      const targetId = subBtn.getAttribute('aria-controls');
+      const content = targetId ? document.getElementById(targetId) : null;
+      const icon = subBtn.querySelector('.mobile-submenu-icon');
+      const isOpen = subBtn.getAttribute('aria-expanded') === 'true';
+      subBtn.setAttribute('aria-expanded', String(!isOpen));
+      content?.classList.toggle('hidden');
+      icon?.classList.toggle('rotate-180');
+    });
   });
 
   // Wetter via Open-Meteo (kostenlos, kein API-Key)
