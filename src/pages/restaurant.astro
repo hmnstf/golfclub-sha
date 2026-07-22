@@ -4,14 +4,14 @@ import { getRestaurant, bildUrlMitFormat } from '../lib/directus';
 
 const restaurantData = await getRestaurant();
 const oeffnungszeiten = restaurantData?.oeffnungszeiten ?? [];
-const hinweis         = restaurantData?.hinweis         ?? '';
 const telefon         = restaurantData?.reservierungTelefon ?? '+49 7907 94 02 42';
-const email           = restaurantData?.reservierungEmail   ?? '';
 const heroUrl         = bildUrlMitFormat(restaurantData?.hero_bild,  { width: 1600, quality: 80 });
 const innenUrl        = bildUrlMitFormat(restaurantData?.bild_innen, { width: 800,  quality: 80 });
+
+const BRASSIE_URL = 'https://brassie.de';
 ---
 
-<Layout title="Restaurant Brassie" description="Restaurant Brassie im Golfclub Schwäbisch Hall – Hausgemachte deutsche Spezialitäten mit Blick auf das 18. Grün">
+<Layout title="Restaurant Brassie" description="Restaurant Brassie im Golfclub Schwäbisch Hall – hausgemachte deutsche Spezialitäten mit Blick auf das 18. Grün">
 
   <div class="relative h-[300px] md:h-[360px] overflow-hidden">
     <img src={heroUrl || "/images/gallery/golf5.jpg"} alt="Restaurant Brassie" class="absolute inset-0 w-full h-full object-cover"/>
@@ -22,22 +22,29 @@ const innenUrl        = bildUrlMitFormat(restaurantData?.bild_innen, { width: 80
     </div>
   </div>
 
-  <!-- Über das Restaurant -->
+  <!-- Teaser -->
   <section class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
       <div>
         <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Willkommen</p>
         <h2 class="font-serif text-4xl text-[#132e21] mb-6">Genuss nach der Runde</h2>
-        <p class="text-gray-600 leading-relaxed mb-4">
-          Das Restaurant <strong>Brassie</strong> begrüßt Sie mit hausgemachten deutschen Spezialitäten
-          in gemütlicher Atmosphäre. Ob nach der Runde, zur Mittagspause oder als geselliger
-          Abend mit Freunden – unser Team sorgt für Ihr Wohlbefinden.
-        </p>
         <p class="text-gray-600 leading-relaxed mb-8">
-          Unsere große Terrasse mit Blick auf das 18. Grün und die Driving Range lädt zum
-          Entspannen ein. Die Küche richtet sich auf private Events und Gruppenveranstaltungen
-          mit individuell angepassten Menüs ein.
+          Das Restaurant <strong>Brassie</strong> begrüßt Sie mit hausgemachten deutschen Spezialitäten
+          in gemütlicher Atmosphäre und großer Terrasse mit Blick auf das 18. Grün – ob nach der Runde,
+          zur Mittagspause oder als geselliger Abend mit Freunden.
         </p>
+
+        <a
+          href={BRASSIE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center gap-2 bg-[#c4a94a] text-[#132e21] font-bold px-7 py-3 rounded-lg uppercase tracking-wider text-sm hover:bg-[#d4bc6a] transition-colors shadow-lg mb-8"
+        >
+          Zur Restaurant-Website
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+          </svg>
+        </a>
 
         <!-- Öffnungszeiten -->
         <div class="bg-[#f5f5f0] p-6">
@@ -87,50 +94,29 @@ const innenUrl        = bildUrlMitFormat(restaurantData?.bild_innen, { width: 80
     </div>
   </section>
 
-  <!-- Angebote -->
-  <section class="py-16 bg-[#f5f5f0]">
-    <div class="max-w-7xl mx-auto px-4">
-      <div class="mb-10">
-        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Was wir bieten</p>
-        <h2 class="font-serif text-3xl text-[#132e21]">Angebote & Events</h2>
-      </div>
-      <div class="grid md:grid-cols-3 gap-6">
-        {[
-          {
-            title: 'Mittagstisch',
-            desc: 'Frische Tagesgerichte und hausgemachte Spezialitäten zur Mittagszeit – für Golfer und externe Gäste.',
-          },
-          {
-            title: 'Turnieressen',
-            desc: 'Nach dem Turnier gemeinsam speisen: Wir organisieren Buffets und Menüs für Ihre Turnierteilnehmer.',
-          },
-          {
-            title: 'Private Feiern',
-            desc: 'Geburtstage, Firmenfeiern, Jubiläen – unser Team plant Ihr Event mit individuellen Menüs und besonderem Ambiente.',
-          },
-        ].map(({ title, desc }) => (
-          <div class="bg-white p-6 border-t-2 border-[#c4a94a]">
-            <h3 class="font-serif text-xl text-[#132e21] mb-3">{title}</h3>
-            <p class="text-gray-500 text-sm leading-relaxed">{desc}</p>
-          </div>
-        ))}
-      </div>
-    </div>
-  </section>
-
-  <!-- Reservierung CTA -->
+  <!-- CTA -->
   <section class="bg-[#132e21] py-14">
     <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-6">
       <div>
-        <div class="font-serif text-2xl text-white mb-1">Tisch reservieren</div>
-        <div class="text-white/60 text-sm">Restaurant Brassie · {telefon}</div>
+        <div class="font-serif text-2xl text-white mb-1">Speisekarte, Events &amp; mehr</div>
+        <div class="text-white/60 text-sm">Alle Details auf der Restaurant-Website · {telefon}</div>
       </div>
-      <a
-        href={`tel:${telefon.replace(/\s/g, '')}`}
-        class="shrink-0 bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm rounded-lg hover:bg-[#d4bc6a] transition-colors"
-      >
-        Jetzt anrufen
-      </a>
+      <div class="flex flex-wrap gap-3 shrink-0">
+        <a
+          href={`tel:${telefon.replace(/\s/g, '')}`}
+          class="bg-white/10 text-white px-8 py-3 font-semibold uppercase tracking-wider text-sm rounded-lg hover:bg-white/20 transition-colors"
+        >
+          Anrufen
+        </a>
+        <a
+          href={BRASSIE_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          class="bg-[#c4a94a] text-[#132e21] px-8 py-3 font-semibold uppercase tracking-wider text-sm rounded-lg hover:bg-[#d4bc6a] transition-colors"
+        >
+          Zur Website
+        </a>
+      </div>
     </div>
   </section>
 
