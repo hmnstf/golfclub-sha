@@ -3,12 +3,15 @@ import { defineConfig } from 'astro/config';
 import tailwindcss from '@tailwindcss/vite';
 import node from '@astrojs/node';
 import cookieconsent from '@jop-software/astro-cookieconsent';
+import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
+  site: 'https://gc-sha.de',
   output: 'server',
   adapter: node({ mode: 'standalone' }),
   integrations: [
+    sitemap(),
     cookieconsent({
       guiOptions: {
         consentModal: {
