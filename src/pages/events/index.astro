@@ -67,7 +67,7 @@ const allGroups = [
                   <!-- Bild -->
                   {bildUrl && (
                     <div class="shrink-0 w-16 h-11 overflow-hidden bg-gray-100">
-                      <img src={bildUrl} alt={e.titel} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
+                      <img loading="lazy" src={bildUrl} alt={e.titel} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"/>
                     </div>
                   )}
                   <!-- Info -->

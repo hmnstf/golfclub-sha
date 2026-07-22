@@ -33,9 +33,39 @@ const datumText = (() => {
     return `${d.getDate()}. – ${dBis.toLocaleDateString('de-DE', opts)}`;
   return `${d.toLocaleDateString('de-DE', opts)} – ${dBis.toLocaleDateString('de-DE', opts)}`;
 })();
+
+const eventSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Event',
+  name: event.titel,
+  startDate: event.uhrzeit_von ? `${event.datum_von}T${event.uhrzeit_von}` : event.datum_von,
+  ...(event.datum_bis && {
+    endDate: event.uhrzeit_bis ? `${event.datum_bis}T${event.uhrzeit_bis}` : event.datum_bis,
+  }),
+  eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  eventStatus: 'https://schema.org/EventScheduled',
+  description: event.beschreibung?.replace(/<[^>]+>/g, '').slice(0, 300),
+  image: bildUrl ? [bildUrl] : undefined,
+  location: {
+    '@type': 'Place',
+    name: event.ort || 'Golfclub Schwäbisch Hall e.V.',
+    address: {
+      '@type': 'PostalAddress',
+      streetAddress: 'Am Golfplatz 1',
+      postalCode: '74523',
+      addressLocality: 'Schwäbisch Hall',
+      addressCountry: 'DE',
+    },
+  },
+  organizer: {
+    '@type': 'Organization',
+    name: 'Golfclub Schwäbisch Hall e.V.',
+    url: 'https://gc-sha.de',
+  },
+};
 ---
 
-<Layout title={event.titel} description={event.beschreibung?.slice(0, 160) ?? event.titel}>
+<Layout title={event.titel} description={event.beschreibung?.slice(0, 160) ?? event.titel} structuredData={eventSchema}>
 
   <!-- Zurück-Link -->
   <div class="bg-[#f5f5f0] border-b border-gray-200">
@@ -96,7 +126,7 @@ const datumText = (() => {
       <!-- Bild -->
       {bildUrl && (
         <div class="mb-8 overflow-hidden">
-          <img src={bildUrl} alt={event.titel} class="w-full h-72 md:h-96 object-cover"/>
+          <img loading="lazy" src={bildUrl} alt={event.titel} class="w-full h-72 md:h-96 object-cover"/>
         </div>
       )}
 

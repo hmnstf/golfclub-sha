@@ -98,7 +98,7 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,    { width: 1200, quali
           <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-2">Übersicht</p>
           <h2 class="font-serif text-3xl text-[#132e21] mb-6">Platzgrafik</h2>
           <div class="overflow-x-auto border border-gray-100">
-            <img src={platzgrafikUrl || "/images/platz/platzgrafik.png"} alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full"/>
+            <img loading="lazy" src={platzgrafikUrl || "/images/platz/platzgrafik.png"} alt="Platzgrafik Golfclub Schwäbisch Hall" class="w-full max-w-full"/>
           </div>
         </div>
         <!-- Legende -->
@@ -199,17 +199,17 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,    { width: 1200, quali
       </div>
       <div class="grid grid-cols-2 gap-3 h-[420px]">
         <div class="row-span-2 relative overflow-hidden">
-          <img src={galerie1 || "/images/platz/golfanlage1.jpg"} alt="Meisterschaftsplatz" class="w-full h-full object-cover"/>
+          <img loading="lazy" src={galerie1 || "/images/platz/golfanlage1.jpg"} alt="Meisterschaftsplatz" class="w-full h-full object-cover"/>
           <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-4">
             <div class="text-[#c4a94a] text-xs uppercase tracking-wider">18 Loch</div>
             <div class="font-serif text-white text-sm">Meisterschaftsplatz</div>
           </div>
         </div>
         <div class="relative overflow-hidden">
-          <img src={galerie2 || "/images/platz/bruecke-herbst.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
+          <img loading="lazy" src={galerie2 || "/images/platz/bruecke-herbst.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
         </div>
         <div class="relative overflow-hidden">
-          <img src={galerie3 || "/images/platz/golfanlage2.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
+          <img loading="lazy" src={galerie3 || "/images/platz/golfanlage2.jpg"} alt="Golfanlage" class="w-full h-full object-cover"/>
         </div>
       </div>
     </div>
@@ -219,7 +219,7 @@ const platzgrafikUrl = bildUrlMitFormat(ge?.platzgrafik,    { width: 1200, quali
   <section id="kurzplatz" class="py-20 bg-white">
     <div class="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-16 items-center">
       <div class="relative overflow-hidden h-72 lg:h-[400px] order-2 lg:order-1">
-        <img src={kurzplatzUrl || "/images/platz/kurzplatz-luft.jpg"} alt="Kurzplatz" class="w-full h-full object-cover"/>
+        <img loading="lazy" src={kurzplatzUrl || "/images/platz/kurzplatz-luft.jpg"} alt="Kurzplatz" class="w-full h-full object-cover"/>
         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-[#132e21]/80 p-5">
           <div class="text-[#c4a94a] text-xs uppercase tracking-wider">6 Loch</div>
           <div class="font-serif text-white">Kurzplatz – offen für Gäste</div>

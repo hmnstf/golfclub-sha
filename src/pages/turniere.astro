@@ -145,7 +145,7 @@ const nextTurniereCards = nextTurniere.map(e => {
                 <!-- Bild -->
                 {e.bildUrl && (
                   <div class="shrink-0 w-16 h-12 overflow-hidden bg-gray-100">
-                    <img src={e.bildUrl} alt={e.titel} class="w-full h-full object-cover"/>
+                    <img loading="lazy" src={e.bildUrl} alt={e.titel} class="w-full h-full object-cover"/>
                   </div>
                 )}
                 <!-- Info -->
@@ -186,7 +186,7 @@ const nextTurniereCards = nextTurniere.map(e => {
               <!-- Bild mit Datum-Badge -->
               <div class="relative h-44 overflow-hidden bg-gray-200">
                 {e.bildUrl
-                  ? <img src={e.bildUrl} alt={e.titel} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+                  ? <img loading="lazy" src={e.bildUrl} alt={e.titel} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
                   : <div class="w-full h-full bg-gradient-to-br from-[#132e21] to-[#1e4a32]"></div>
                 }
                 <!-- Datum-Badge -->
@@ -241,7 +241,7 @@ const nextTurniereCards = nextTurniere.map(e => {
       </a>
     </div>
     <div class="relative min-h-[280px] md:min-h-0">
-      <img src={firmenEventsUrl} alt="Firmenevents" class="absolute inset-0 w-full h-full object-cover"/>
+      <img loading="lazy" src={firmenEventsUrl} alt="Firmenevents" class="absolute inset-0 w-full h-full object-cover"/>
       <div class="absolute inset-0 bg-black/20"></div>
     </div>
   </section>

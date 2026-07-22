@@ -39,7 +39,7 @@ const kategorien = [
               <!-- Foto -->
               <div class="aspect-square bg-[#f5f5f0] mb-4 overflow-hidden">
                 {current[k.bildKey] ? (
-                  <img
+                  <img loading="lazy"
                     src={bildUrl(current[k.bildKey])}
                     alt={current[k.key]}
                     class="w-full h-full object-cover object-top grayscale group-hover:grayscale-0 transition-all duration-500"

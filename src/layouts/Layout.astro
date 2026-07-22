@@ -9,12 +9,14 @@ interface Props {
   title?: string;
   description?: string;
   image?: string;
+  structuredData?: Record<string, unknown> | Record<string, unknown>[];
 }
 
 const {
   title = 'Golfclub Schwäbisch Hall e.V.',
   description = 'Golfen in Schwäbisch Hall – Sport, Natur und Gemeinschaft erleben.',
   image = '/images/hero/course.jpg',
+  structuredData,
 } = Astro.props;
 
 const settings = await getSettings();
@@ -24,6 +26,30 @@ const schriftgroesse = settings?.schriftgroesse ?? 16;
 const fullTitle = `${title} | Golfclub Schwäbisch Hall`;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const socialImageURL = new URL(image, Astro.site);
+
+// Seitenweite Schema.org-Identität (LocalBusiness/GolfCourse) – Adresse/Telefon
+// entsprechen den echten Werten von /kontakt
+const golfCourseSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'GolfCourse',
+  name: 'Golfclub Schwäbisch Hall e.V.',
+  url: 'https://gc-sha.de',
+  telephone: '+49 7907 8190',
+  email: 'info@gc-sha.de',
+  image: new URL('/images/hero/course.jpg', Astro.site).toString(),
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: 'Am Golfplatz 1',
+    postalCode: '74523',
+    addressLocality: 'Schwäbisch Hall',
+    addressCountry: 'DE',
+  },
+  sameAs: ['https://www.instagram.com/gc.schwaebischhall/'],
+};
+
+const structuredDataList = structuredData
+  ? Array.isArray(structuredData) ? structuredData : [structuredData]
+  : [];
 ---
 
 <!doctype html>
@@ -36,11 +62,6 @@ const socialImageURL = new URL(image, Astro.site);
     <link rel="canonical" href={canonicalURL} />
     <link rel="icon" type="image/x-icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-
-    <!-- Google Fonts: preconnect statt render-blockendem @import -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
 
     <!-- Open Graph / Facebook, WhatsApp, etc. -->
     <meta property="og:type" content="website" />
@@ -56,6 +77,12 @@ const socialImageURL = new URL(image, Astro.site);
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={socialImageURL} />
+
+    <!-- Schema.org strukturierte Daten -->
+    <script type="application/ld+json" set:html={JSON.stringify(golfCourseSchema)} />
+    {structuredDataList.map((data) => (
+      <script type="application/ld+json" set:html={JSON.stringify(data)} />
+    ))}
   </head>
   <body>
     <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:bg-white focus:text-[#132e21] focus:px-4 focus:py-2 focus:z-50 focus:font-semibold">Zum Hauptinhalt springen</a>

@@ -30,7 +30,7 @@ const titelbildSm = bildUrlMitFormat(artikel.bild, { width: 800, quality: 75 });
   <!-- Hero mit Titelbild -->
   {titelbild ? (
     <div class="relative h-64 md:h-96 overflow-hidden">
-      <img src={titelbild} alt={artikel.titel} class="w-full h-full object-cover"/>
+      <img loading="lazy" src={titelbild} alt={artikel.titel} class="w-full h-full object-cover"/>
       <div class="absolute inset-0 bg-gradient-to-t from-[#132e21]/80 to-transparent"/>
       <div class="absolute bottom-0 left-0 right-0 max-w-4xl mx-auto px-4 pb-8">
         <p class="text-[#c4a94a] text-xs font-bold uppercase tracking-widest mb-2">{formatDatum(artikel.datum)}</p>

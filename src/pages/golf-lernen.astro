@@ -200,7 +200,7 @@ const trainingUrl = bildUrlMitFormat(settings?.bild_golf_lernen_training, { widt
   <section id="einzeltraining" class="grid md:grid-cols-2 min-h-[380px]">
     <!-- Bild links -->
     <div class="relative min-h-[240px] md:min-h-0 overflow-hidden">
-      <img src={trainingUrl || "/images/gallery/golf2.jpg"} alt="Individuelles Training" class="absolute inset-0 w-full h-full object-cover"/>
+      <img loading="lazy" src={trainingUrl || "/images/gallery/golf2.jpg"} alt="Individuelles Training" class="absolute inset-0 w-full h-full object-cover"/>
       <div class="absolute inset-0 bg-black/30"></div>
     </div>
     <!-- Text rechts -->

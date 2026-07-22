@@ -48,7 +48,7 @@ function formatDatum(iso: string) {
               <a href={`/news/${artikel.slug}`} class="group flex flex-col border border-gray-100 hover:border-[#c4a94a]/40 transition-colors">
                 {bild && (
                   <div class="overflow-hidden h-48">
-                    <img
+                    <img loading="lazy"
                       src={bild}
                       alt={artikel.titel}
                       class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
