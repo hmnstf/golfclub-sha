@@ -1,9 +1,18 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import { getTeam, getClubmeister, getSettings, bildUrl, bildUrlMitFormat } from '../lib/directus';
+import { getTeam, getClubmeister, getSettings, getPartner, bildUrl, bildUrlMitFormat } from '../lib/directus';
 
-const [teamMembers, clubmeister, settings] = await Promise.all([getTeam(), getClubmeister(), getSettings()]);
+const [teamMembers, clubmeister, settings, partner] = await Promise.all([getTeam(), getClubmeister(), getSettings(), getPartner()]);
 const heroUrl = bildUrlMitFormat(settings?.bild_club, { width: 1600, quality: 80 });
+
+const partnerKategorieLabels: Record<string, string> = {
+  hotel: 'Partnerhotels',
+  shop: 'Partnershop',
+  sonstige: 'Weitere Partner',
+};
+const partnerKategorien = ['hotel', 'shop', 'sonstige']
+  .map(kat => ({ kat, items: partner.filter((p: any) => p.kategorie === kat) }))
+  .filter(({ items }) => items.length > 0);
 
 const gruppenLabels: Record<string, string> = {
   vorstand_gf: 'Geschäftsführender Vorstand',
@@ -229,6 +238,39 @@ const gruppen = ['vorstand_gf', 'vorstand', 'geschaeftsstelle', 'trainer', 'ehre
       </div>
     </div>
   </section>
+
+  <!-- Partner -->
+  {partnerKategorien.length > 0 && (
+    <section class="py-20 bg-[#f5f5f0]">
+      <div class="max-w-7xl mx-auto px-4">
+        <p class="text-[#c4a94a] text-xs font-semibold uppercase tracking-widest mb-3">Kooperationen</p>
+        <h2 class="font-serif text-4xl text-[#132e21] mb-10">Unsere Partner</h2>
+        <div class="space-y-10">
+          {partnerKategorien.map(({ kat, items }) => (
+            <div>
+              <h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">{partnerKategorieLabels[kat] ?? kat}</h3>
+              <div class="flex flex-wrap gap-4">
+                {items.map((p: any) => (
+                  <a
+                    href={p.url || undefined}
+                    target={p.url ? '_blank' : undefined}
+                    rel={p.url ? 'noopener noreferrer' : undefined}
+                    class="group bg-white border border-gray-200 hover:border-[#c4a94a] px-6 py-5 flex items-center gap-3 transition-colors"
+                  >
+                    {p.logo ? (
+                      <img src={bildUrl(p.logo)} alt={p.name} class="h-10 w-auto object-contain no-radius"/>
+                    ) : (
+                      <span class="font-serif text-lg text-[#132e21] group-hover:text-[#c4a94a] transition-colors">{p.name}</span>
+                    )}
+                  </a>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- Kontakt CTA -->
   <section class="bg-[#132e21] py-16">
